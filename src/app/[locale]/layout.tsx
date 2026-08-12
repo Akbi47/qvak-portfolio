@@ -2,6 +2,8 @@ import type { ReactNode } from "react";
 
 import { locales } from "@/features/i18n/config";
 import { getLocaleFromParams } from "@/features/i18n/server";
+import { ThemeProvider } from "@/features/theme/theme-provider";
+import { ThemeScript } from "@/features/theme/theme-script";
 
 import "@/styles/globals.css";
 
@@ -21,8 +23,13 @@ export default async function LocaleLayout({
   const locale = await getLocaleFromParams(params);
 
   return (
-    <html lang={locale}>
-      <body>{children}</body>
+    <html data-theme="light" lang={locale} suppressHydrationWarning>
+      <head>
+        <ThemeScript />
+      </head>
+      <body>
+        <ThemeProvider>{children}</ThemeProvider>
+      </body>
     </html>
   );
 }

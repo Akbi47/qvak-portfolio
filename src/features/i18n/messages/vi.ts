@@ -10,6 +10,11 @@ const messages = {
     english: "English",
     vietnamese: "Tiếng Việt",
   },
+  themeToggle: {
+    toggle: "Chuyển giao diện màu",
+    switchToLight: "Chuyển sang giao diện sáng",
+    switchToDark: "Chuyển sang giao diện tối",
+  },
   foundation: {
     eyebrow: "Nền tảng portfolio",
     title: "Một khung nền rõ ràng cho hành trình phía trước.",

@@ -6,6 +6,7 @@ import { SectionHeading } from "@/components/ui/section-heading";
 import { LocaleSwitcher } from "@/features/i18n/locale-switcher";
 import { getMessages } from "@/features/i18n/messages";
 import { getLocaleFromParams } from "@/features/i18n/server";
+import { ThemeToggle } from "@/features/theme/theme-toggle";
 
 interface LocalePageProps {
   params: Promise<{ locale: string }>;
@@ -32,7 +33,10 @@ export default async function LocalePage({
   return (
     <PageShell>
       <Section aria-labelledby="foundation-title" surface="elevated">
-        <LocaleSwitcher locale={locale} messages={messages.localeSwitcher} />
+        <div className="foundation-controls">
+          <LocaleSwitcher locale={locale} messages={messages.localeSwitcher} />
+          <ThemeToggle messages={messages.themeToggle} />
+        </div>
 
         <SectionHeading
           description={messages.foundation.description}

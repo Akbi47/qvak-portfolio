@@ -10,6 +10,11 @@ const messages = {
     english: "English",
     vietnamese: "Tiếng Việt",
   },
+  themeToggle: {
+    toggle: "Toggle color theme",
+    switchToLight: "Switch to light theme",
+    switchToDark: "Switch to dark theme",
+  },
   foundation: {
     eyebrow: "Portfolio foundation",
     title: "A clear frame for the work ahead.",
