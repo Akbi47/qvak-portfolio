@@ -6,6 +6,14 @@ Planning and implementation source of truth for migrating `quachvoanhkhoa.feaon.
 
 Build a modern, multilingual, responsive portfolio with a consistent design system, typed content models, and a clean path to a lightweight CMS later.
 
+## Start here
+
+- **First implementation task:** [Issue #1 — bootstrap Next.js portfolio repository](../../issues/1)
+- Full execution order: [`docs/06-issue-breakdown.md`](docs/06-issue-breakdown.md)
+- Codex rules: [`AGENTS.md`](AGENTS.md) and [`docs/07-codex-execution-contract.md`](docs/07-codex-execution-contract.md)
+
+Do not start implementation from an arbitrary feature issue. Bootstrap and migration inventory establish the foundation first.
+
 ## Canonical documents
 
 1. [`docs/00-product-brief.md`](docs/00-product-brief.md)
@@ -34,6 +42,8 @@ Further changes should be recorded as amendments instead of silently changing ac
 - Phase 4: Contact + Footer + SEO/accessibility/performance
 - Phase 5: content migration, production cutover, redirects
 - Phase 6: optional Supabase-backed CMS/admin
+
+The GitHub tracker currently contains Issues **#1–#17 for MVP/launch** and **#18–#21 for the post-MVP CMS phase**.
 
 ## Non-goals for MVP
 
