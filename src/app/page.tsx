@@ -1,14 +1,43 @@
+import { PageShell } from "@/components/layout/page-shell";
+import { Section } from "@/components/layout/section";
+import { SectionHeading } from "@/components/ui/section-heading";
+
+const foundationItems = [
+  {
+    title: "Responsive by default",
+    description: "A shared container adapts from mobile through wide screens.",
+  },
+  {
+    title: "One visual language",
+    description: "Semantic tokens keep future sections coherent and maintainable.",
+  },
+  {
+    title: "Motion with care",
+    description: "The foundation honors reduced-motion preferences from the start.",
+  },
+];
+
 export default function HomePage() {
   return (
-    <main className="mx-auto flex min-h-screen max-w-3xl items-center px-6 py-16">
-      <div>
-        <h1 className="text-4xl font-semibold tracking-tight">
-          Quach Vo Anh Khoa
-        </h1>
-        <p className="mt-4 text-lg text-neutral-600">
-          The new portfolio is under construction.
-        </p>
-      </div>
-    </main>
+    <PageShell>
+      <Section aria-labelledby="foundation-title" surface="elevated">
+        <SectionHeading
+          description="The shared design system and page shell are ready for portfolio sections to build on."
+          eyebrow="Portfolio foundation"
+          level="h1"
+          title="A clear frame for the work ahead."
+          titleId="foundation-title"
+        />
+
+        <div className="foundation-grid">
+          {foundationItems.map((item) => (
+            <article className="foundation-card" key={item.title}>
+              <h2>{item.title}</h2>
+              <p>{item.description}</p>
+            </article>
+          ))}
+        </div>
+      </Section>
+    </PageShell>
   );
 }
