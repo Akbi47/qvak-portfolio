@@ -17,4 +17,8 @@ export async function getMessages(
   return (await messageLoaders[locale]()).default;
 }
 
-export type { LocaleSwitcherMessages, PortfolioMessages } from "@/features/i18n/messages/types";
+export type {
+  HeaderMessages,
+  LocaleSwitcherMessages,
+  PortfolioMessages,
+} from "@/features/i18n/messages/types";

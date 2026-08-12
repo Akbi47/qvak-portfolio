@@ -1,6 +1,9 @@
 import type { ReactNode } from "react";
 
+import { SiteHeader } from "@/components/navigation/site-header";
+import { portfolioProfile } from "@/content/profile";
 import { locales } from "@/features/i18n/config";
+import { getMessages } from "@/features/i18n/messages";
 import { getLocaleFromParams } from "@/features/i18n/server";
 import { ThemeProvider } from "@/features/theme/theme-provider";
 import { ThemeScript } from "@/features/theme/theme-script";
@@ -21,6 +24,7 @@ export default async function LocaleLayout({
   params,
 }: Readonly<LocaleLayoutProps>) {
   const locale = await getLocaleFromParams(params);
+  const messages = await getMessages(locale);
 
   return (
     <html data-theme="light" lang={locale} suppressHydrationWarning>
@@ -28,7 +32,16 @@ export default async function LocaleLayout({
         <ThemeScript />
       </head>
       <body>
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <SiteHeader
+            githubUrl={portfolioProfile.githubUrl}
+            locale={locale}
+            localeSwitcherMessages={messages.localeSwitcher}
+            messages={messages.header}
+            themeToggleMessages={messages.themeToggle}
+          />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

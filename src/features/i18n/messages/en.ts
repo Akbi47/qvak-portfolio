@@ -10,6 +10,21 @@ const messages = {
     english: "English",
     vietnamese: "Tiếng Việt",
   },
+  header: {
+    primaryNavigation: "Portfolio sections",
+    homeAction: "Go to Home",
+    openMenu: "Open navigation menu",
+    closeMenu: "Close navigation menu",
+    github: "Open GitHub profile",
+    sections: {
+      home: "Home",
+      about: "About",
+      skills: "Skills",
+      projects: "Projects",
+      resume: "Resume",
+      contact: "Contact",
+    },
+  },
   themeToggle: {
     toggle: "Toggle color theme",
     switchToLight: "Switch to light theme",

@@ -10,6 +10,21 @@ const messages = {
     english: "English",
     vietnamese: "Tiếng Việt",
   },
+  header: {
+    primaryNavigation: "Các phần portfolio",
+    homeAction: "Đi đến Trang chủ",
+    openMenu: "Mở trình đơn điều hướng",
+    closeMenu: "Đóng trình đơn điều hướng",
+    github: "Mở hồ sơ GitHub",
+    sections: {
+      home: "Trang chủ",
+      about: "Giới thiệu",
+      skills: "Kỹ năng",
+      projects: "Dự án",
+      resume: "Hồ sơ",
+      contact: "Liên hệ",
+    },
+  },
   themeToggle: {
     toggle: "Chuyển giao diện màu",
     switchToLight: "Chuyển sang giao diện sáng",

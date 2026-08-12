@@ -1,7 +1,18 @@
+import type { NavigationSectionId } from "@/features/navigation/config";
+
 export interface LocaleSwitcherMessages {
   label: string;
   english: string;
   vietnamese: string;
+}
+
+export interface HeaderMessages {
+  primaryNavigation: string;
+  homeAction: string;
+  openMenu: string;
+  closeMenu: string;
+  github: string;
+  sections: Record<NavigationSectionId, string>;
 }
 
 export interface ThemeToggleMessages {
@@ -16,6 +27,7 @@ export interface PortfolioMessages {
     description: string;
   };
   localeSwitcher: LocaleSwitcherMessages;
+  header: HeaderMessages;
   themeToggle: ThemeToggleMessages;
   foundation: {
     eyebrow: string;
