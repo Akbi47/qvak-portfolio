@@ -1,0 +1,17 @@
+import "server-only";
+
+import { notFound } from "next/navigation";
+
+import { isLocale, type Locale } from "@/features/i18n/config";
+
+export async function getLocaleFromParams(
+  params: Promise<{ locale: string }>,
+): Promise<Locale> {
+  const { locale } = await params;
+
+  if (!isLocale(locale)) {
+    notFound();
+  }
+
+  return locale;
+}
