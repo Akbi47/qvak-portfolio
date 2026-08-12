@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 
+import { Container } from "@/components/layout/container";
 import { PageShell } from "@/components/layout/page-shell";
 import { Section } from "@/components/layout/section";
 import { SectionHeading } from "@/components/ui/section-heading";
-import { LocaleSwitcher } from "@/features/i18n/locale-switcher";
 import { getMessages } from "@/features/i18n/messages";
 import { getLocaleFromParams } from "@/features/i18n/server";
-import { ThemeToggle } from "@/features/theme/theme-toggle";
+import { navigationSectionIds } from "@/features/navigation/config";
 
 interface LocalePageProps {
   params: Promise<{ locale: string }>;
@@ -32,12 +32,12 @@ export default async function LocalePage({
 
   return (
     <PageShell>
-      <Section aria-labelledby="foundation-title" surface="elevated">
-        <div className="foundation-controls">
-          <LocaleSwitcher locale={locale} messages={messages.localeSwitcher} />
-          <ThemeToggle messages={messages.themeToggle} />
-        </div>
-
+      <Section
+        aria-labelledby="foundation-title"
+        className="navigation-anchor navigation-anchor--home"
+        id="home"
+        surface="elevated"
+      >
         <SectionHeading
           description={messages.foundation.description}
           eyebrow={messages.foundation.eyebrow}
@@ -55,6 +55,24 @@ export default async function LocalePage({
           ))}
         </div>
       </Section>
+
+      {navigationSectionIds.slice(1).map((sectionId) => (
+        <section
+          aria-labelledby={`${sectionId}-anchor-title`}
+          className="navigation-anchor navigation-anchor--placeholder"
+          id={sectionId}
+          key={sectionId}
+        >
+          <Container>
+            <h2
+              className="navigation-anchor__title"
+              id={`${sectionId}-anchor-title`}
+            >
+              {messages.header.sections[sectionId]}
+            </h2>
+          </Container>
+        </section>
+      ))}
     </PageShell>
   );
 }
