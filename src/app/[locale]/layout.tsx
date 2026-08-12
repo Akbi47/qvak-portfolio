@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
 import { SiteHeader } from "@/components/navigation/site-header";
+import { portfolioProfile } from "@/content/profile";
 import { locales } from "@/features/i18n/config";
 import { getMessages } from "@/features/i18n/messages";
 import { getLocaleFromParams } from "@/features/i18n/server";
@@ -33,6 +34,7 @@ export default async function LocaleLayout({
       <body>
         <ThemeProvider>
           <SiteHeader
+            githubUrl={portfolioProfile.githubUrl}
             locale={locale}
             localeSwitcherMessages={messages.localeSwitcher}
             messages={messages.header}
