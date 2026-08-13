@@ -30,6 +30,14 @@ const messages = {
     switchToLight: "Chuyển sang giao diện sáng",
     switchToDark: "Chuyển sang giao diện tối",
   },
+  aboutSlider: {
+    label: "Ảnh giới thiệu",
+    previous: "Xem ảnh chân dung trước",
+    next: "Xem ảnh chân dung tiếp theo",
+    goToSlide: "Xem ảnh chân dung",
+    portrait: "Ảnh",
+    of: "trên",
+  },
   foundation: {
     eyebrow: "Nền tảng portfolio",
     title: "Một khung nền rõ ràng cho hành trình phía trước.",

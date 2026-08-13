@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 
 import { Container } from "@/components/layout/container";
 import { PageShell } from "@/components/layout/page-shell";
-import { Section } from "@/components/layout/section";
-import { SectionHeading } from "@/components/ui/section-heading";
+import { AboutSection } from "@/components/sections/about/about-section";
+import { HeroSection } from "@/components/sections/home/hero-section";
+import { getPortfolioProfile } from "@/content/profile";
 import { getMessages } from "@/features/i18n/messages";
 import { getLocaleFromParams } from "@/features/i18n/server";
 import { navigationSectionIds } from "@/features/navigation/config";
@@ -29,34 +30,14 @@ export default async function LocalePage({
 }: Readonly<LocalePageProps>) {
   const locale = await getLocaleFromParams(params);
   const messages = await getMessages(locale);
+  const profile = getPortfolioProfile(locale);
 
   return (
     <PageShell>
-      <Section
-        aria-labelledby="foundation-title"
-        className="navigation-anchor navigation-anchor--home"
-        id="home"
-        surface="elevated"
-      >
-        <SectionHeading
-          description={messages.foundation.description}
-          eyebrow={messages.foundation.eyebrow}
-          level="h1"
-          title={messages.foundation.title}
-          titleId="foundation-title"
-        />
+      <HeroSection profile={profile} />
+      <AboutSection messages={messages.aboutSlider} profile={profile} />
 
-        <div className="foundation-grid">
-          {messages.foundation.items.map((item) => (
-            <article className="foundation-card" key={item.id}>
-              <h2>{item.title}</h2>
-              <p>{item.description}</p>
-            </article>
-          ))}
-        </div>
-      </Section>
-
-      {navigationSectionIds.slice(1).map((sectionId) => (
+      {navigationSectionIds.slice(2).map((sectionId) => (
         <section
           aria-labelledby={`${sectionId}-anchor-title`}
           className="navigation-anchor navigation-anchor--placeholder"

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { type MouseEvent, useEffect, useRef, useState } from "react";
 
 import type { Locale } from "@/features/i18n/config";
 import { LocaleSwitcher } from "@/features/i18n/locale-switcher";
@@ -72,12 +72,12 @@ export function SiteHeader({
     const firstLink = navigationRef.current?.querySelector<HTMLAnchorElement>(
       ".site-navigation__link",
     );
-    firstLink?.focus();
+    firstLink?.focus({ preventScroll: true });
 
     function closeOnEscape(event: KeyboardEvent) {
       if (event.key === "Escape") {
         setMenuOpen(false);
-        menuButtonRef.current?.focus();
+        menuButtonRef.current?.focus({ preventScroll: true });
       }
     }
 
@@ -103,8 +103,28 @@ export function SiteHeader({
   function closeAfterNavigation() {
     if (menuOpen) {
       setMenuOpen(false);
-      window.requestAnimationFrame(() => menuButtonRef.current?.focus());
+      window.requestAnimationFrame(() =>
+        menuButtonRef.current?.focus({ preventScroll: true }),
+      );
     }
+  }
+
+  function navigateToSection(
+    event: MouseEvent<HTMLAnchorElement>,
+    sectionId: NavigationSectionId,
+  ) {
+    event.preventDefault();
+    const hash = `#${sectionId}`;
+
+    if (window.location.hash !== hash) {
+      window.history.pushState(null, "", hash);
+    }
+
+    setActiveSection(sectionId);
+    closeAfterNavigation();
+    window.requestAnimationFrame(() =>
+      document.getElementById(sectionId)?.scrollIntoView(),
+    );
   }
 
   return (
@@ -115,7 +135,7 @@ export function SiteHeader({
             aria-label={messages.homeAction}
             className="site-header__logo"
             href="#home"
-            onClick={closeAfterNavigation}
+            onClick={(event) => navigateToSection(event, "home")}
           >
             QVAK
           </a>
@@ -178,7 +198,7 @@ export function SiteHeader({
                       }
                       className="site-navigation__link"
                       href={`#${sectionId}`}
-                      onClick={closeAfterNavigation}
+                      onClick={(event) => navigateToSection(event, sectionId)}
                     >
                       {messages.sections[sectionId]}
                     </a>
