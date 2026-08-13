@@ -6,7 +6,8 @@ const messages = {
     description: "Portfolio foundation for Quach Vo Anh Khoa.",
   },
   localeSwitcher: {
-    label: "Language",
+    label: "Change language",
+    currentLanguage: "Current language",
     english: "English",
     vietnamese: "Tiếng Việt",
   },

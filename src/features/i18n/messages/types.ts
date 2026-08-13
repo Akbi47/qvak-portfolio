@@ -2,6 +2,7 @@ import type { NavigationSectionId } from "@/features/navigation/config";
 
 export interface LocaleSwitcherMessages {
   label: string;
+  currentLanguage: string;
   english: string;
   vietnamese: string;
 }

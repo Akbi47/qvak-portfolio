@@ -6,7 +6,8 @@ const messages = {
     description: "Nền tảng portfolio của Quách Võ Anh Khoa.",
   },
   localeSwitcher: {
-    label: "Ngôn ngữ",
+    label: "Đổi ngôn ngữ",
+    currentLanguage: "Ngôn ngữ hiện tại",
     english: "English",
     vietnamese: "Tiếng Việt",
   },

@@ -24,6 +24,8 @@ interface SiteHeaderProps {
   themeToggleMessages: ThemeToggleMessages;
 }
 
+let restoreMenuFocusAfterLocale = false;
+
 export function SiteHeader({
   githubUrl,
   locale,
@@ -118,12 +120,32 @@ export function SiteHeader({
     return () => window.cancelAnimationFrame(frame);
   }, [locale]);
 
+  useEffect(() => {
+    if (!restoreMenuFocusAfterLocale) {
+      return;
+    }
+
+    restoreMenuFocusAfterLocale = false;
+    const frame = window.requestAnimationFrame(() =>
+      menuButtonRef.current?.focus({ preventScroll: true }),
+    );
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [locale]);
+
   function closeAfterNavigation() {
     if (menuOpen) {
       setMenuOpen(false);
       window.requestAnimationFrame(() =>
         menuButtonRef.current?.focus({ preventScroll: true }),
       );
+    }
+  }
+
+  function closeAfterLocaleNavigation() {
+    if (menuOpen) {
+      restoreMenuFocusAfterLocale = true;
+      setMenuOpen(false);
     }
   }
 
@@ -276,7 +298,7 @@ export function SiteHeader({
               <LocaleSwitcher
                 locale={locale}
                 messages={localeSwitcherMessages}
-                onNavigate={closeAfterNavigation}
+                onNavigate={closeAfterLocaleNavigation}
               />
               <ThemeToggle messages={themeToggleMessages} />
             </div>
