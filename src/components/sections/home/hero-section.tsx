@@ -51,7 +51,6 @@ export function HeroSection({ profile }: Readonly<HeroSectionProps>) {
       aria-labelledby="home-title"
       className="home-hero navigation-anchor"
       containerSize="wide"
-      id="home"
     >
       <div className="home-hero__layout">
         <div className="home-hero__content">

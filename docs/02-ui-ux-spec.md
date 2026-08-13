@@ -39,6 +39,8 @@ Both themes must be designed deliberately; dark mode is not an inverted aftertho
 
 - visible current-section treatment
 - anchor scrolling accounts for sticky header offset
+- Home and logo target the locale root and clear any current hash
+- top-of-page state is Home; About becomes active at its in-hero region
 - icon buttons have accessible labels/tooltips
 - locale/theme menus work by keyboard
 
@@ -53,8 +55,8 @@ Recommended treatment:
 - preserve subject focal point across responsive crops
 - use `object-position` intentionally per breakpoint
 
-The hero also carries a compact About intro and keeps distinct `#home` and
-`#about` anchor targets for primary navigation.
+The hero also carries a compact About intro. Home is the locale-root,
+top-of-page state; `#about` is the first in-page anchor target.
 
 ## About
 

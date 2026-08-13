@@ -13,6 +13,7 @@ import {
   navigationSectionIds,
   type NavigationSectionId,
 } from "@/features/navigation/config";
+import { getLocalizedPathname } from "@/features/i18n/routing";
 import { ThemeToggle } from "@/features/theme/theme-toggle";
 
 interface SiteHeaderProps {
@@ -36,6 +37,7 @@ export function SiteHeader({
   const headerRef = useRef<HTMLElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const navigationRef = useRef<HTMLDivElement>(null);
+  const homePath = getLocalizedPathname("/", locale);
 
   useEffect(() => {
     function updateActiveSection() {
@@ -43,7 +45,7 @@ export function SiteHeader({
       const marker = Math.max(headerBottom + 48, window.innerHeight * 0.45);
       let currentSection: NavigationSectionId = "home";
 
-      for (const sectionId of navigationSectionIds) {
+      for (const sectionId of navigationSectionIds.slice(1)) {
         const section = document.getElementById(sectionId);
 
         if (section && section.getBoundingClientRect().top <= marker) {
@@ -100,6 +102,22 @@ export function SiteHeader({
     return () => desktopQuery.removeEventListener("change", closeAtDesktop);
   }, []);
 
+  useEffect(() => {
+    const hashSection = navigationSectionIds
+      .slice(1)
+      .find((sectionId) => window.location.hash === `#${sectionId}`);
+
+    if (!hashSection) {
+      return;
+    }
+
+    const frame = window.requestAnimationFrame(() =>
+      document.getElementById(hashSection)?.scrollIntoView(),
+    );
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [locale]);
+
   function closeAfterNavigation() {
     if (menuOpen) {
       setMenuOpen(false);
@@ -127,6 +145,31 @@ export function SiteHeader({
     );
   }
 
+  function navigateHome(event: MouseEvent<HTMLAnchorElement>) {
+    event.preventDefault();
+    const homeUrl = `${homePath}${window.location.search}`;
+
+    if (
+      `${window.location.pathname}${window.location.search}${window.location.hash}` !==
+      homeUrl
+    ) {
+      window.history.pushState(null, "", homeUrl);
+    }
+
+    setActiveSection("home");
+    closeAfterNavigation();
+    window.requestAnimationFrame(() => {
+      const reduceMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+
+      window.scrollTo({
+        behavior: reduceMotion ? "auto" : "smooth",
+        top: 0,
+      });
+    });
+  }
+
   return (
     <header className="site-header" ref={headerRef}>
       <div className="container-shell" data-size="wide">
@@ -134,8 +177,8 @@ export function SiteHeader({
           <a
             aria-label={messages.homeAction}
             className="site-header__logo"
-            href="#home"
-            onClick={(event) => navigateToSection(event, "home")}
+            href={homePath}
+            onClick={navigateHome}
           >
             QVAK
           </a>
@@ -197,8 +240,12 @@ export function SiteHeader({
                         activeSection === sectionId ? "location" : undefined
                       }
                       className="site-navigation__link"
-                      href={`#${sectionId}`}
-                      onClick={(event) => navigateToSection(event, sectionId)}
+                      href={sectionId === "home" ? homePath : `#${sectionId}`}
+                      onClick={(event) =>
+                        sectionId === "home"
+                          ? navigateHome(event)
+                          : navigateToSection(event, sectionId)
+                      }
                     >
                       {messages.sections[sectionId]}
                     </a>

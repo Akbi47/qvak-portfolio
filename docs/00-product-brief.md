@@ -30,6 +30,9 @@ Behavior:
 
 - Sticky header.
 - Smooth section navigation.
+- Home and the logo return to the locale root (`/` or `/vi`), clear the hash,
+  preserve the query string, and scroll to the top.
+- About remains the first in-page anchor inside the unified hero.
 - Active section state where practical.
 - GitHub opens the configured GitHub profile/repository destination.
 - Language and theme controls remain keyboard accessible.
