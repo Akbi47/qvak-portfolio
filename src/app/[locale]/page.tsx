@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 
 import { Container } from "@/components/layout/container";
 import { PageShell } from "@/components/layout/page-shell";
-import { AboutSection } from "@/components/sections/about/about-section";
 import { HeroSection } from "@/components/sections/home/hero-section";
 import { SkillsSection } from "@/components/sections/skills/skills-section";
 import { getPortfolioProfile } from "@/content/profile";
@@ -38,7 +37,6 @@ export default async function LocalePage({
   return (
     <PageShell>
       <HeroSection profile={profile} />
-      <AboutSection messages={messages.aboutSlider} profile={profile} />
       <SkillsSection content={skills} />
 
       {navigationSectionIds.slice(3).map((sectionId) => (

@@ -39,6 +39,8 @@ Both themes must be designed deliberately; dark mode is not an inverted aftertho
 
 - visible current-section treatment
 - anchor scrolling accounts for sticky header offset
+- Home and logo target the locale root and clear any current hash
+- top-of-page state is Home; About becomes active at its in-hero region
 - icon buttons have accessible labels/tooltips
 - locale/theme menus work by keyboard
 
@@ -53,29 +55,27 @@ Recommended treatment:
 - preserve subject focal point across responsive crops
 - use `object-position` intentionally per breakpoint
 
-The hero can remain minimal so the About intro carries the longer copy.
+The hero also carries a compact About intro. Home is the locale-root,
+top-of-page state; `#about` is the first in-page anchor target.
 
 ## About
 
-Structure inspired by the supplied “I'm Rakib / MERN-Stack Developer” reference, not its exact style.
+About is integrated into the top hero rather than rendered as an oversized
+standalone section. Its compact intro begins **I am Khoa, ...**.
 
-### Left
+The two supplied About portraits appear as circular avatar bubbles overlapping
+the hero image frame. They retain meaningful alt text, explicit dimensions,
+stable crops, and sufficient separation from the main portrait to keep the
+composition intentional.
 
-- large heading: **Hi There**
-- intro paragraph begins: **I am Khoa, ...**
-- optional CTAs
-
-### Right
-
-- framed visual panel
-- slider contains exactly the two supplied slider portraits in initial content
-- arrows/dots optional; swipe on touch devices
-- no aggressive autoplay; if autoplay is used, respect reduced-motion and pause on interaction
+The hero action group links to existing Projects, Contact, and Resume anchor
+targets. It uses clear hierarchy without copying the supplied reference style.
 
 ### Responsive
 
-- desktop: text + visual panel side-by-side
-- mobile: text first, slider second
+- desktop: content and framed hero visual sit side-by-side
+- mobile: content and actions remain first, followed by the framed visual
+- portrait bubbles scale and reposition without causing horizontal overflow
 
 ## Skills
 

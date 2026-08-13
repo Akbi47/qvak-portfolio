@@ -16,40 +16,40 @@ interface LocalizedProfileContent {
     eyebrow: LocalizedText;
     title: LocalizedText;
     description: LocalizedText;
-    aboutAction: LocalizedText;
+    actions: Readonly<Record<HeroActionId, LocalizedText>>;
   };
   about: {
-    eyebrow: LocalizedText;
-    heading: LocalizedText;
     intro: LocalizedText;
-    description: LocalizedText;
   };
+}
+
+export type HeroActionId = "case-studies" | "discussion" | "resume";
+
+interface HeroActionView {
+  id: HeroActionId;
+  label: string;
+  href: "#projects" | "#contact" | "#resume";
 }
 
 export interface PortfolioProfileView {
   name: string;
-  shortName: string;
   role: string;
   githubUrl: string;
   hero: {
     eyebrow: string;
     title: string;
     description: string;
-    aboutAction: string;
+    actions: ReadonlyArray<HeroActionView>;
     image: Omit<ProfileImage, "alt"> & { alt: string };
   };
   about: {
-    eyebrow: string;
-    heading: string;
     intro: string;
-    description: string;
     portraits: ReadonlyArray<Omit<ProfileImage, "alt"> & { alt: string }>;
   };
 }
 
 export const portfolioProfile = {
   name: "Quach Vo Anh Khoa",
-  shortName: "Khoa",
   githubUrl: "https://github.com/Akbi47",
   media: {
     hero: {
@@ -94,38 +94,36 @@ const localizedProfile = {
   },
   hero: {
     eyebrow: {
-      en: "Hello, I’m Khoa",
-      vi: "Xin chào, mình là Khoa",
+      en: "A little about me",
+      vi: "Đôi nét về mình",
     },
     title: {
-      en: "Building thoughtful digital experiences with clarity.",
-      vi: "Kiến tạo trải nghiệm số chỉn chu và rõ ràng.",
+      en: "Turning complex ideas into calm, useful experiences",
+      vi: "Biến những ý tưởng phức tạp thành trải nghiệm gần gũi, hữu ích",
     },
     description: {
       en: "I shape dependable web products where useful engineering and considered design work together.",
       vi: "Mình xây dựng các sản phẩm web đáng tin cậy, nơi kỹ thuật hữu ích song hành cùng thiết kế có chủ đích.",
     },
-    aboutAction: {
-      en: "Discover my story",
-      vi: "Tìm hiểu về mình",
+    actions: {
+      "case-studies": {
+        en: "View Case Studies",
+        vi: "Xem dự án tiêu biểu",
+      },
+      discussion: {
+        en: "Technical Discussion",
+        vi: "Trao đổi kỹ thuật",
+      },
+      resume: {
+        en: "View Resume",
+        vi: "Xem hồ sơ",
+      },
     },
   },
   about: {
-    eyebrow: {
-      en: "A little about me",
-      vi: "Đôi nét về mình",
-    },
-    heading: {
-      en: "Hi There",
-      vi: "Xin chào",
-    },
     intro: {
-      en: "I am Khoa, a software engineer and full-stack developer who enjoys turning complex ideas into calm, useful experiences.",
-      vi: "Mình là Khoa, một kỹ sư phần mềm và lập trình viên full-stack yêu thích việc biến những ý tưởng phức tạp thành trải nghiệm gần gũi, hữu ích.",
-    },
-    description: {
-      en: "I care about the details behind a polished interface: resilient systems, accessible interactions, and decisions that keep products maintainable as they grow.",
-      vi: "Mình chú trọng cả những chi tiết phía sau một giao diện hoàn thiện: hệ thống bền vững, tương tác dễ tiếp cận và những quyết định giúp sản phẩm dễ phát triển lâu dài.",
+      en: "I am Khoa, a software engineer and full-stack developer focused on resilient systems, accessible interactions, and products that remain maintainable as they grow.",
+      vi: "Mình là Khoa, một kỹ sư phần mềm và lập trình viên full-stack tập trung vào hệ thống bền vững, tương tác dễ tiếp cận và sản phẩm dễ phát triển lâu dài.",
     },
   },
 } satisfies LocalizedProfileContent;
@@ -135,24 +133,36 @@ export function getPortfolioProfile(locale: Locale): PortfolioProfileView {
 
   return {
     name: portfolioProfile.name,
-    shortName: portfolioProfile.shortName,
     role: content.role[locale],
     githubUrl: portfolioProfile.githubUrl,
     hero: {
       eyebrow: content.hero.eyebrow[locale],
       title: content.hero.title[locale],
       description: content.hero.description[locale],
-      aboutAction: content.hero.aboutAction[locale],
+      actions: [
+        {
+          id: "case-studies",
+          label: content.hero.actions["case-studies"][locale],
+          href: "#projects",
+        },
+        {
+          id: "discussion",
+          label: content.hero.actions.discussion[locale],
+          href: "#contact",
+        },
+        {
+          id: "resume",
+          label: content.hero.actions.resume[locale],
+          href: "#resume",
+        },
+      ],
       image: {
         ...portfolioProfile.media.hero,
         alt: portfolioProfile.media.hero.alt[locale],
       },
     },
     about: {
-      eyebrow: content.about.eyebrow[locale],
-      heading: content.about.heading[locale],
       intro: content.about.intro[locale],
-      description: content.about.description[locale],
       portraits: portfolioProfile.media.aboutPortraits.map((portrait) => ({
         ...portrait,
         alt: portrait.alt[locale],
