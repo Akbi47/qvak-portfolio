@@ -30,6 +30,14 @@ const messages = {
     switchToLight: "Switch to light theme",
     switchToDark: "Switch to dark theme",
   },
+  aboutSlider: {
+    label: "About portraits",
+    previous: "Show previous portrait",
+    next: "Show next portrait",
+    goToSlide: "Show portrait",
+    portrait: "Portrait",
+    of: "of",
+  },
   foundation: {
     eyebrow: "Portfolio foundation",
     title: "A clear frame for the work ahead.",

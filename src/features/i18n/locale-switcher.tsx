@@ -31,6 +31,7 @@ export function LocaleSwitcher({
     const localizedPathname = getLocalizedPathname(pathname, targetLocale);
     router.replace(
       `${localizedPathname}${window.location.search}${window.location.hash}`,
+      { scroll: false },
     );
   }
 
