@@ -21,15 +21,6 @@ export interface ThemeToggleMessages {
   switchToDark: string;
 }
 
-export interface AboutSliderMessages {
-  label: string;
-  previous: string;
-  next: string;
-  goToSlide: string;
-  portrait: string;
-  of: string;
-}
-
 export interface PortfolioMessages {
   metadata: {
     title: string;
@@ -38,7 +29,6 @@ export interface PortfolioMessages {
   localeSwitcher: LocaleSwitcherMessages;
   header: HeaderMessages;
   themeToggle: ThemeToggleMessages;
-  aboutSlider: AboutSliderMessages;
   foundation: {
     eyebrow: string;
     title: string;

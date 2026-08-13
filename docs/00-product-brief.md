@@ -36,13 +36,12 @@ Behavior:
 
 ## Main page order
 
-1. Home / visual hero
-2. About / intro
-3. Skills
-4. Projects
-5. Resume
-6. Contact
-7. Footer
+1. Unified Home / About hero
+2. Skills
+3. Projects
+4. Resume
+5. Contact
+6. Footer
 
 The product is a long-scroll portfolio. A dedicated `/projects` route is not required for MVP.
 
@@ -142,7 +141,7 @@ Three personal portraits are supplied:
 Intent:
 
 - third/side-profile portrait → hero/banner visual
-- first two portraits → two-image right-side slider in the About/intro experience
+- first two portraits → circular avatar bubbles integrated with the hero visual
 
 ## Design principle
 
