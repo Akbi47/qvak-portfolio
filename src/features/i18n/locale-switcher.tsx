@@ -15,7 +15,7 @@ import { getLocalizedPathname } from "@/features/i18n/routing";
 interface LocaleSwitcherProps {
   locale: Locale;
   messages: LocaleSwitcherMessages;
-  onNavigate?: () => void;
+  onNavigate?: (targetLocale: Locale) => void;
 }
 
 export function LocaleSwitcher({
@@ -67,7 +67,7 @@ export function LocaleSwitcher({
   ) {
     event.preventDefault();
     setOpen(false);
-    onNavigate?.();
+    onNavigate?.(targetLocale);
 
     const localizedPathname = getLocalizedPathname(pathname, targetLocale);
     router.replace(
