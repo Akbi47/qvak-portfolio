@@ -41,6 +41,7 @@ Both themes must be designed deliberately; dark mode is not an inverted aftertho
 - anchor scrolling accounts for sticky header offset
 - Home and logo target the locale root and clear any current hash
 - top-of-page state is Home; About becomes active at its in-hero region
+- language selection uses a compact globe disclosure with EN/VI links
 - icon buttons have accessible labels/tooltips
 - locale/theme menus work by keyboard
 

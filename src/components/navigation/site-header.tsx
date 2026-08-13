@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { type MouseEvent, useEffect, useRef, useState } from "react";
 
 import type { Locale } from "@/features/i18n/config";
@@ -24,6 +25,8 @@ interface SiteHeaderProps {
   themeToggleMessages: ThemeToggleMessages;
 }
 
+const menuFocusLocaleStorageKey = "qvak.menu-focus-locale";
+
 export function SiteHeader({
   githubUrl,
   locale,
@@ -37,6 +40,7 @@ export function SiteHeader({
   const headerRef = useRef<HTMLElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const navigationRef = useRef<HTMLDivElement>(null);
+  const restoreMenuFocusAfterLocaleRef = useRef(false);
   const homePath = getLocalizedPathname("/", locale);
 
   useEffect(() => {
@@ -118,12 +122,75 @@ export function SiteHeader({
     return () => window.cancelAnimationFrame(frame);
   }, [locale]);
 
+  useEffect(() => {
+    if (menuOpen) {
+      return;
+    }
+
+    let pendingLocale: string | null = null;
+
+    try {
+      pendingLocale = window.sessionStorage.getItem(menuFocusLocaleStorageKey);
+    } catch {
+      // The instance-local ref still restores focus when storage is unavailable.
+    }
+
+    if (
+      !restoreMenuFocusAfterLocaleRef.current &&
+      pendingLocale !== locale
+    ) {
+      return;
+    }
+
+    if (pendingLocale !== null && pendingLocale !== locale) {
+      return;
+    }
+
+    const frame = window.requestAnimationFrame(() => {
+      restoreMenuFocusAfterLocaleRef.current = false;
+
+      try {
+        if (
+          window.sessionStorage.getItem(menuFocusLocaleStorageKey) === locale
+        ) {
+          window.sessionStorage.removeItem(menuFocusLocaleStorageKey);
+        }
+      } catch {
+        // Focus restoration does not depend on storage cleanup succeeding.
+      }
+
+      menuButtonRef.current?.focus({ preventScroll: true });
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [locale, menuOpen]);
+
   function closeAfterNavigation() {
     if (menuOpen) {
       setMenuOpen(false);
       window.requestAnimationFrame(() =>
         menuButtonRef.current?.focus({ preventScroll: true }),
       );
+    }
+  }
+
+  function closeAfterLocaleNavigation(targetLocale: Locale) {
+    if (menuOpen) {
+      restoreMenuFocusAfterLocaleRef.current = true;
+
+      if (targetLocale !== locale) {
+        try {
+          window.sessionStorage.setItem(
+            menuFocusLocaleStorageKey,
+            targetLocale,
+          );
+        } catch {
+          // Synchronous focus remains available when storage is blocked.
+        }
+      }
+
+      setMenuOpen(false);
+      menuButtonRef.current?.focus({ preventScroll: true });
     }
   }
 
@@ -180,7 +247,14 @@ export function SiteHeader({
             href={homePath}
             onClick={navigateHome}
           >
-            QVAK
+            <Image
+              alt=""
+              className="site-header__logo-image"
+              height={219}
+              priority
+              src="/images/brand/qvak-logo.png"
+              width={500}
+            />
           </a>
 
           <button
@@ -276,7 +350,7 @@ export function SiteHeader({
               <LocaleSwitcher
                 locale={locale}
                 messages={localeSwitcherMessages}
-                onNavigate={closeAfterNavigation}
+                onNavigate={closeAfterLocaleNavigation}
               />
               <ThemeToggle messages={themeToggleMessages} />
             </div>
