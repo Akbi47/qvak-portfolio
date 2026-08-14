@@ -63,8 +63,8 @@ export const resumeEntries = [
     id: "dynamic-global-solutions",
     category: "career-journey",
     title: {
-      en: "Full-stack developer",
-      vi: "Lập trình viên full-stack",
+      en: "Full-stack development and maintenance",
+      vi: "Phát triển và bảo trì full-stack",
     },
     organization: {
       en: "Dynamic Global Solutions",
@@ -99,8 +99,8 @@ export const resumeEntries = [
     id: "englishwing",
     category: "career-journey",
     title: {
-      en: "Backend developer",
-      vi: "Lập trình viên backend",
+      en: "Backend work on a learning management system",
+      vi: "Làm backend cho hệ thống quản lý học tập",
     },
     organization: {
       en: "EnglishWing",
@@ -135,8 +135,8 @@ export const resumeEntries = [
     id: "smartit",
     category: "career-journey",
     title: {
-      en: "Full-stack developer",
-      vi: "Lập trình viên full-stack",
+      en: "Full-stack work on vehicle booking and management",
+      vi: "Làm full-stack cho hệ thống đặt và quản lý xe",
     },
     organization: {
       en: "SmartIT",
@@ -171,8 +171,8 @@ export const resumeEntries = [
     id: "zenitech",
     category: "career-journey",
     title: {
-      en: "WordPress developer",
-      vi: "Lập trình viên WordPress",
+      en: "WordPress and SEO development",
+      vi: "Phát triển WordPress và SEO",
     },
     organization: {
       en: "Zenitech",
@@ -207,8 +207,8 @@ export const resumeEntries = [
     id: "bachelor-electronics-telecommunications",
     category: "education-certifications",
     title: {
-      en: "Bachelor of Engineering",
-      vi: "Cử nhân Kỹ thuật",
+      en: "Bachelor's degree",
+      vi: "Bằng cử nhân",
     },
     organization: {
       en: "University of Science, VNU-HCM",
