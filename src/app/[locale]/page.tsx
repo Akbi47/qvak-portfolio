@@ -3,8 +3,10 @@ import type { Metadata } from "next";
 import { Container } from "@/components/layout/container";
 import { PageShell } from "@/components/layout/page-shell";
 import { HeroSection } from "@/components/sections/home/hero-section";
+import { ProjectsSection } from "@/components/sections/projects/projects-section";
 import { SkillsSection } from "@/components/sections/skills/skills-section";
 import { getPortfolioProfile } from "@/content/profile";
+import { getFeaturedProjects } from "@/content/projects";
 import { getSkillsContent } from "@/content/skills";
 import { getMessages } from "@/features/i18n/messages";
 import { getLocaleFromParams } from "@/features/i18n/server";
@@ -33,13 +35,15 @@ export default async function LocalePage({
   const messages = await getMessages(locale);
   const profile = getPortfolioProfile(locale);
   const skills = getSkillsContent(locale);
+  const projects = getFeaturedProjects(locale);
 
   return (
     <PageShell>
       <HeroSection profile={profile} />
       <SkillsSection content={skills} />
+      <ProjectsSection content={projects} />
 
-      {navigationSectionIds.slice(3).map((sectionId) => (
+      {navigationSectionIds.slice(4).map((sectionId) => (
         <section
           aria-labelledby={`${sectionId}-anchor-title`}
           className="navigation-anchor navigation-anchor--placeholder"
