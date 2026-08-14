@@ -53,6 +53,48 @@ There is **no automated test runner** configured — no test files, no Jest/Play
 - Empty directories are preserved with `.gitkeep` files — keep them when adding files.
 - `docs/references/` and `docs/migration/legacy-assets/` hold design-reference/migration evidence only; keep them out of the runtime bundle and do not move them into `public/`. Ignore `:Zone.Identifier` junk files.
 
+## ChatGPT–OpenCode Collaboration
+
+GitHub is the communication protocol for implementation and review.
+
+The linked GitHub Issue is the task and scope authority.
+
+OpenCode is the implementation agent.
+
+OpenCode must:
+
+- inspect the current repository and working-tree state before changing files;
+- preserve existing uncommitted work;
+- follow the linked Issue and canonical project documentation;
+- remain inside approved scope;
+- delegate visual analysis to `@vision` when visual understanding is required;
+- run real verification;
+- self-review the complete diff;
+- hand meaningful work off through a Pull Request;
+- respond to actionable ChatGPT review feedback;
+- never merge by default.
+
+OpenCode self-review does not replace independent review.
+
+GitHub Actions provides independent automated verification.
+
+ChatGPT Web independently reviews the Issue, Pull Request diff, CI results,
+scope compliance, security boundaries, production impact, tests, and relevant
+architecture/documentation.
+
+Human maintainers retain final authority over merge, production changes,
+material scope changes, dependencies, architecture, security decisions, and
+hosted-resource mutations.
+
+### Visual tasks
+
+When a task involves screenshots, images, UI references, mockups, visual
+comparison, visual regression, responsive screenshots, diagrams, or visual
+bugs, delegate visual analysis to `@vision` before making material visual
+implementation decisions.
+
+`@vision` analyzes only. The Primary Build Agent implements.
+
 ## Quality gates
 
 Expected before merge:

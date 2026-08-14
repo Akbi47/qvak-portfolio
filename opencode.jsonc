@@ -1,0 +1,75 @@
+{
+  // OpenCode project configuration for the QVAK portfolio repository.
+  // Loaded when opencode starts in this directory; restart opencode after changes.
+  "$schema": "https://opencode.ai/config.json",
+
+  // Enable Superpowers project-specifically (official OpenCode plugin install).
+  // See https://github.com/obra/superpowers (docs/README.opencode.md).
+  "plugin": [
+    "superpowers@git+https://github.com/obra/superpowers.git"
+  ],
+
+  // Approved safe Git/GitHub permission policy.
+  //
+  // - Safe repository inspection, staging, and commits run without confirmation.
+  // - Mutating Git/GitHub operations (push, branch switching, gh pr create, gh
+  //   api, and any command not listed) require confirmation.
+  // - Destructive/dangerous operations are explicitly denied.
+  //
+  // opencode evaluates bash rules by pattern match with the LAST matching rule
+  // winning, so the catch-all "*" comes first and the deny rules come last.
+  // The human remains the final merge authority; gh pr merge is denied.
+  "permission": {
+    "bash": {
+      "*": "ask",
+      // Safe repository inspection
+      "git status*": "allow",
+      "git diff*": "allow",
+      "git log*": "allow",
+      "git show*": "allow",
+      "git branch*": "allow",
+      "git remote*": "allow",
+      "git rev-parse*": "allow",
+      "git ls-files*": "allow",
+      "git fetch*": "allow",
+      "git grep*": "allow",
+      // Normal intentional development: staging and commits
+      "git add*": "allow",
+      "git commit*": "allow",
+      // GitHub Issue/PR inspection
+      "gh issue view*": "allow",
+      "gh issue list*": "allow",
+      "gh pr view*": "allow",
+      "gh pr list*": "allow",
+      "gh pr checks*": "allow",
+      "gh repo view*": "allow",
+      "gh auth status*": "allow",
+      // Mutating Git/GitHub operations require confirmation
+      "git commit --amend*": "ask",
+      "git pull*": "ask",
+      "git push*": "ask",
+      "git merge*": "ask",
+      "git rebase*": "ask",
+      "git switch*": "ask",
+      "git checkout*": "ask",
+      "git stash*": "ask",
+      "gh issue create*": "ask",
+      "gh issue edit*": "ask",
+      "gh pr create*": "ask",
+      "gh pr edit*": "ask",
+      "gh pr comment*": "ask",
+      "gh pr review*": "ask",
+      // Deny destructive/dangerous Git/GitHub operations.
+      // Deny rules come last so they win over broader allow/ask patterns.
+      "git reset*": "deny",
+      "git clean*": "deny",
+      "git restore*": "deny",
+      "git checkout --*": "deny",
+      "git checkout .*": "deny",
+      "git push --force*": "deny",
+      "git push -f*": "deny",
+      "git push --force-with-lease*": "deny",
+      "gh pr merge*": "deny"
+    }
+  }
+}
