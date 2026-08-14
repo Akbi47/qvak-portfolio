@@ -29,5 +29,6 @@ jobs:
         uses: anomalyco/opencode/github@latest
         env:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
         with:
-          model: opencode/big-pickle
+          model: opencode-go/deepseek-v4-flash
