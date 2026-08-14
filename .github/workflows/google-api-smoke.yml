@@ -1,0 +1,46 @@
+name: Google API smoke test
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  gemini:
+    name: Verify Gemini API key
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Call Gemini 3.6 Flash
+        env:
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${GOOGLE_API_KEY:-}" || { echo "GOOGLE_API_KEY is not configured"; exit 1; }
+
+          http_code=$(curl --silent --show-error \
+            --output /tmp/gemini-response.json \
+            --write-out '%{http_code}' \
+            --request POST \
+            'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent' \
+            --header 'Content-Type: application/json' \
+            --header "x-goog-api-key: ${GOOGLE_API_KEY}" \
+            --data '{"contents":[{"parts":[{"text":"Reply exactly GOOGLE_API_OK"}]}],"generationConfig":{"maxOutputTokens":20,"temperature":0}}')
+
+          if [ "$http_code" != "200" ]; then
+            echo "Gemini API returned HTTP ${http_code}"
+            jq -c '{error: .error}' /tmp/gemini-response.json || true
+            exit 1
+          fi
+
+          text=$(jq -r '.candidates[0].content.parts[0].text // ""' /tmp/gemini-response.json | tr -d '\r\n')
+          if [ "$text" != "GOOGLE_API_OK" ]; then
+            echo "Gemini API authenticated but returned an unexpected response"
+            exit 1
+          fi
+
+          echo "GOOGLE_API_KEY verified successfully against gemini-3.6-flash"
