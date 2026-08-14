@@ -21,12 +21,14 @@ jobs:
       issues: read
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        # actions/checkout v6.0.2 (immutable)
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
 
       - name: Run opencode
-        uses: anomalyco/opencode/github@latest
+        # anomalyco/opencode GitHub Action, v1.18.18 tag (immutable)
+        uses: anomalyco/opencode/github@31406ccc51b4bd2a4e1e086b2bcaa5f7f804f26d
         env:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
