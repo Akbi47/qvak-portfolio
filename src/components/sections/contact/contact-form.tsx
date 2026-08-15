@@ -5,6 +5,7 @@ import { useFormStatus } from "react-dom";
 
 import type { ContactContentView } from "@/content/contact";
 import { submitContactForm } from "@/features/contact/actions";
+import type { SubmitContactResult } from "@/features/contact/submit";
 import {
   validateContactSubmission,
   type ContactFieldErrors,
@@ -44,25 +45,25 @@ export function ContactForm({ content }: Readonly<ContactFormProps>) {
     subject: "",
     message: "",
   });
-  const [clientErrors, setClientErrors] = useState<ContactFieldErrors>({});
-  const [previousStatus, setPreviousStatus] = useState("idle");
+  const [fieldErrors, setFieldErrors] = useState<ContactFieldErrors>({});
+  const [lastState, setLastState] = useState<SubmitContactResult>(initialState);
 
-  if (state.status !== previousStatus) {
-    setPreviousStatus(state.status);
+  if (state !== lastState) {
+    setLastState(state);
     if (state.status === "success") {
       setValues({ name: "", email: "", subject: "", message: "" });
+      setFieldErrors({});
+    } else if (state.status === "field-error") {
+      setFieldErrors(state.fieldErrors);
+    } else {
+      setFieldErrors({});
     }
   }
 
-  const hasClientErrors = Object.keys(clientErrors).length > 0;
-  const serverErrors =
-    state.status === "field-error" ? state.fieldErrors : {};
-  const fieldErrors = (
-    hasClientErrors ? clientErrors : serverErrors
-  ) as ContactFieldErrors;
+  const hasFieldErrors = Object.keys(fieldErrors).length > 0;
 
   const statusMessage = (() => {
-    if (hasClientErrors) {
+    if (hasFieldErrors) {
       return "";
     }
     switch (state.status) {
@@ -81,7 +82,7 @@ export function ContactForm({ content }: Readonly<ContactFormProps>) {
 
   function handleChange(field: ContactFieldName, value: string) {
     setValues((current) => ({ ...current, [field]: value }));
-    setClientErrors((current) => {
+    setFieldErrors((current) => {
       if (current[field] === undefined) {
         return current;
       }
@@ -95,9 +96,9 @@ export function ContactForm({ content }: Readonly<ContactFormProps>) {
     const errors = validateContactSubmission(values);
     if (Object.keys(errors).length > 0) {
       event.preventDefault();
-      setClientErrors(errors);
+      setFieldErrors(errors);
     } else {
-      setClientErrors({});
+      setFieldErrors({});
     }
   }
 
