@@ -28,6 +28,16 @@ export interface ResumeEntry {
   order: number;
 }
 
+export interface ResumeMediaView {
+  id: string;
+  thumbnailSrc: string;
+  fullSrc: string;
+  alt: string;
+  caption?: string;
+  width?: number;
+  height?: number;
+}
+
 export interface ResumeEntryView {
   id: string;
   index: string;
@@ -38,7 +48,7 @@ export interface ResumeEntryView {
   summary?: string;
   highlights?: ReadonlyArray<string>;
   tags?: ReadonlyArray<string>;
-  media?: ReadonlyArray<ResumeMedia>;
+  media?: ReadonlyArray<ResumeMediaView>;
 }
 
 export interface ResumeCategoryView {
@@ -55,6 +65,9 @@ export interface ResumeContentView {
   previousEntry: string;
   nextEntry: string;
   entryCounter: string;
+  viewImage: string;
+  closeLightbox: string;
+  lightboxLabel: string;
   categories: ReadonlyArray<ResumeCategoryView>;
 }
 
@@ -344,6 +357,18 @@ const resumeCopy = {
     en: "Entry",
     vi: "Mục",
   },
+  viewImage: {
+    en: "View image",
+    vi: "Xem hình",
+  },
+  closeLightbox: {
+    en: "Close",
+    vi: "Đóng",
+  },
+  lightboxLabel: {
+    en: "Full-size image viewer",
+    vi: "Trình xem hình kích thước đầy đủ",
+  },
   categoryNames: {
     "career-journey": {
       en: "Career Journey",
@@ -371,6 +396,9 @@ export function getResumeContent(locale: Locale): ResumeContentView {
     previousEntry: resumeCopy.previousEntry[locale],
     nextEntry: resumeCopy.nextEntry[locale],
     entryCounter: resumeCopy.entryCounter[locale],
+    viewImage: resumeCopy.viewImage[locale],
+    closeLightbox: resumeCopy.closeLightbox[locale],
+    lightboxLabel: resumeCopy.lightboxLabel[locale],
     categories: categories.map((categoryId) => {
       const entries = (resumeEntries as ReadonlyArray<ResumeEntry>)
         .filter((entry) => entry.category === categoryId)
@@ -389,7 +417,15 @@ export function getResumeContent(locale: Locale): ResumeContentView {
           summary: entry.summary ? localized(entry.summary) : undefined,
           highlights: entry.highlights?.map(localized),
           tags: entry.tags?.map(localized),
-          media: entry.media,
+          media: entry.media?.map((media) => ({
+            id: media.id,
+            thumbnailSrc: media.thumbnailSrc,
+            fullSrc: media.fullSrc,
+            alt: localized(media.alt),
+            caption: media.caption ? localized(media.caption) : undefined,
+            width: media.width,
+            height: media.height,
+          })),
         })),
       };
     }),
