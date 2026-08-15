@@ -1,11 +1,30 @@
 ---
 name: chatgpt-review
-description: Use when the user wants a response, diff, plan, or code reviewed by ChatGPT Plus (web) without copy-pasting. Also triggered by "review with chatgpt", "gửi cho chatgpt review", "review ngoài", or when a task finishes and auto-review is enabled. Sends content to ChatGPT Plus via a browser bridge and returns the review.
+description: Use when a completed task's final result text should be reviewed by ChatGPT Plus (web) without copy-pasting. Also triggered by "review with chatgpt", "gửi cho chatgpt review", "review ngoài", or when a task finishes and auto-review is enabled. Sends the task's result summary to ChatGPT Plus via a browser bridge and returns the review.
 ---
 
 # chatgpt-review
 
-Send a prompt to ChatGPT Plus (web) through a Playwright bridge and read the reply back into the session. The user does **not** need to copy-paste.
+Send a completed task's **final result text** (the "Done / What changed /
+Verification" summary) to ChatGPT Plus (web) through a Playwright bridge and read
+the review back into the session. The user does **not** need to copy-paste.
+
+## What gets reviewed
+
+Send the agent's own result text — e.g. a summary like:
+
+```
+Done. Pushed to PR #38 (still Draft, not merged), CI green.
+
+What changed
+- ...
+
+Verification
+- ...
+```
+
+Do **not** fetch or attach a raw `git diff` — review the completed work's
+summary that the agent just produced.
 
 ## Requirements
 
@@ -22,12 +41,12 @@ Send a prompt to ChatGPT Plus (web) through a Playwright bridge and read the rep
 
 2. Build the review prompt. Write it to a temp file, e.g. `/tmp/opencode/chatgpt-review-prompt.md`. A good review prompt includes:
    - What the task was (1-2 sentences).
-   - The actual code/diff/output to review (git diff, relevant files, the plan, or the response text).
-   - What to focus on (bugs, security, correctness, style, suggested improvements).
+   - The **result text verbatim** (the summary the agent produced).
+   - What to focus on (bugs, security, correctness, completeness, missing steps).
    - Ask for a concise verdict in a fixed format, e.g.:
      ```
      VERDICT: approve / approve-with-changes / reject
-     ISSUES: bullet list (with file:line when relevant)
+     ISSUES: bullet list
      SUGGESTIONS: prioritized short list
      ```
 3. Send it:
@@ -73,6 +92,6 @@ repo) so they are organized, share project instructions, and keep project memory
 
 ## Notes
 
-- Use `git diff` for uncommitted changes; `git diff <base>..HEAD` for committed work. Ask the user which scope they want if it is ambiguous.
+- Only send the result **summary text**, not raw diffs.
 - ChatGPT's web UI changes occasionally; if selectors break, the script throws a descriptive error. Do not silently claim a review succeeded when the bridge errored.
-- If the user wants a quick check, keep the prompt tight: send the diff plus 3 focus questions, not a wall of context.
+- If the user wants a quick check, keep the prompt tight: send the result plus 3 focus questions, not a wall of context.

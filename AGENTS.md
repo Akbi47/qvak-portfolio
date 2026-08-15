@@ -80,14 +80,15 @@ OpenCode self-review does not replace independent review.
 
 Before opening a Pull Request, run an external review through the ChatGPT bridge
 to catch issues an independent reviewer may flag. Use the `@chatgpt-review`
-subagent (or the `chatgpt-review` skill) with the full diff. One command, no
-copy-paste:
+subagent (or the `chatgpt-review` skill). One command, no copy-paste:
 
-1. Invoke `@chatgpt-review` in the session and ask for a review of the current
-   working-tree diff against the linked Issue.
-2. The subagent packages the diff, sends it to ChatGPT Plus (web) via the
-   browser bridge, and returns the verdict.
-3. Address actionable feedback, rerun relevant checks, and mention the review
+1. Finish the task and write the normal result summary (Done / What changed /
+   Verification).
+2. Invoke `@chatgpt-review` in the session and pass that result summary text as
+   the review material. Do not attach a git diff.
+3. The subagent sends the summary to ChatGPT Plus (web) via the browser bridge
+   and returns the verdict.
+4. Address actionable feedback, rerun relevant checks, and mention the review
    in the PR.
 
 The bridge needs a one-time login: run
