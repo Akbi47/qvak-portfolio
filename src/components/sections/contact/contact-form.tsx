@@ -5,9 +5,10 @@ import { useFormStatus } from "react-dom";
 
 import type { ContactContentView } from "@/content/contact";
 import { submitContactForm } from "@/features/contact/actions";
-import type {
-  ContactFieldErrors,
-  ContactFieldName,
+import {
+  validateContactSubmission,
+  type ContactFieldErrors,
+  type ContactFieldName,
 } from "@/features/contact/validation";
 
 const FIELD_ORDER: ContactFieldName[] = ["name", "email", "subject", "message"];
@@ -43,6 +44,7 @@ export function ContactForm({ content }: Readonly<ContactFormProps>) {
     subject: "",
     message: "",
   });
+  const [clientErrors, setClientErrors] = useState<ContactFieldErrors>({});
   const [previousStatus, setPreviousStatus] = useState("idle");
 
   if (state.status !== previousStatus) {
@@ -52,11 +54,17 @@ export function ContactForm({ content }: Readonly<ContactFormProps>) {
     }
   }
 
+  const hasClientErrors = Object.keys(clientErrors).length > 0;
+  const serverErrors =
+    state.status === "field-error" ? state.fieldErrors : {};
   const fieldErrors = (
-    state.status === "field-error" ? state.fieldErrors : {}
+    hasClientErrors ? clientErrors : serverErrors
   ) as ContactFieldErrors;
 
   const statusMessage = (() => {
+    if (hasClientErrors) {
+      return "";
+    }
     switch (state.status) {
       case "success":
         return content.status.success;
@@ -73,6 +81,24 @@ export function ContactForm({ content }: Readonly<ContactFormProps>) {
 
   function handleChange(field: ContactFieldName, value: string) {
     setValues((current) => ({ ...current, [field]: value }));
+    setClientErrors((current) => {
+      if (current[field] === undefined) {
+        return current;
+      }
+      const next = { ...current };
+      delete next[field];
+      return next;
+    });
+  }
+
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    const errors = validateContactSubmission(values);
+    if (Object.keys(errors).length > 0) {
+      event.preventDefault();
+      setClientErrors(errors);
+    } else {
+      setClientErrors({});
+    }
   }
 
   return (
@@ -81,6 +107,7 @@ export function ContactForm({ content }: Readonly<ContactFormProps>) {
       aria-label={content.aria.formLabel}
       className="contact-form"
       noValidate
+      onSubmit={handleSubmit}
     >
       <p className="contact-form__required-note">{content.aria.requiredNote}</p>
 
