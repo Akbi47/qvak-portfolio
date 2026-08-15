@@ -11,6 +11,8 @@ import { Container } from "@/components/layout/container";
 import { SectionHeading } from "@/components/ui/section-heading";
 import type { ResumeContentView } from "@/content/resume";
 
+import { ResumeMediaView } from "./resume-media-view";
+
 interface ResumeSectionProps {
   content: ResumeContentView;
 }
@@ -233,6 +235,15 @@ export function ResumeSection({ content }: Readonly<ResumeSectionProps>) {
                       <li key={tag}>{tag}</li>
                     ))}
                   </ul>
+                ) : null}
+
+                {entry.media && entry.media.length > 0 ? (
+                  <ResumeMediaView
+                    closeLabel={content.closeLightbox}
+                    lightboxLabel={content.lightboxLabel}
+                    media={entry.media}
+                    viewImageLabel={content.viewImage}
+                  />
                 ) : null}
               </article>
 
