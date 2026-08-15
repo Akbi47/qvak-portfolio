@@ -76,6 +76,36 @@ OpenCode must:
 
 OpenCode self-review does not replace independent review.
 
+### ChatGPT review bridge (pre-PR, optional but encouraged)
+
+Before opening a Pull Request, run an external review through the ChatGPT bridge
+to catch issues an independent reviewer may flag. Use the `@chatgpt-review`
+subagent (or the `chatgpt-review` skill) with the full diff. One command, no
+copy-paste:
+
+1. Invoke `@chatgpt-review` in the session and ask for a review of the current
+   working-tree diff against the linked Issue.
+2. The subagent packages the diff, sends it to ChatGPT Plus (web) via the
+   browser bridge, and returns the verdict.
+3. Address actionable feedback, rerun relevant checks, and mention the review
+   in the PR.
+
+The bridge needs a one-time login: run
+`~/.config/opencode/chatgpt-bridge/bin/chatgpt-review login` in a terminal, then
+verify with `~/.config/opencode/chatgpt-bridge/bin/chatgpt-review status`.
+
+The bridge keeps one ChatGPT thread per repo+branch so reviews on the same
+branch share context instead of spawning new chats. It reuses the saved thread
+and only starts a fresh one when it gets stale (`max_chars` / `max_turns` /
+`max_age_hours` in `~/.config/opencode/chatgpt-bridge/bridge-config.json`) or
+when a saved id fails to open. Inspect state with
+`~/.config/opencode/chatgpt-bridge/bin/chatgpt-review chats`; force a fresh
+thread with `/chatgpt-new`.
+
+This repo uses a ChatGPT Project named after the repo for its reviews: on
+`@chatgpt-review`, the bridge opens (or creates) the project and keeps the
+review thread inside it. Manage the mapping with `/chatgpt-project`.
+
 GitHub Actions provides independent automated verification.
 
 ChatGPT Web independently reviews the Issue, Pull Request diff, CI results,
