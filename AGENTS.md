@@ -119,12 +119,14 @@ hosted-resource mutations.
 
 Merge is permitted through the safety-checked wrapper
 `.opencode/scripts/merge-approved-pr.sh` (recommended). Raw `gh pr merge` and
-historically destructive operations (`git reset`/`clean`/`restore`, force-push)
-prompt for confirmation (`ask`). See `opencode.jsonc`.
+history-rewriting operations (`git reset`/`clean`/`restore`, force-push) are
+hard-denied in `opencode.jsonc` so an automated agent cannot bypass the wrapper.
+See `opencode.jsonc`.
 
 Do not run OpenCode with `--auto`/auto-approve when relying on `ask`-tier
 confirmation as a human gate — auto mode approves all `ask`-tier operations
-without an explicit human prompt. The human may revoke these permissions at any time.
+without an explicit human prompt. Only `deny`-tier operations remain gated under
+`--auto`. The human may revoke these permissions at any time.
 
 ### Visual tasks
 
