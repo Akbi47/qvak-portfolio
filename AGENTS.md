@@ -127,9 +127,9 @@ Feature-branch pushes run only through
 `.opencode/scripts/push-feature-branch.sh` (which refuses `main`). See
 `opencode.jsonc`.
 
-`main` branch protection (a GitHub ruleset requiring PRs) is recommended but not
-enabled yet; the in-repo deny rules are the current guard against direct
-updates to `main`.
+`main` is protected by a GitHub ruleset (active, no bypass actors) requiring pull
+requests and blocking direct/deletion/non-fast-forward pushes. The in-repo deny
+rules are defense-in-depth on top of that server-side guard.
 
 Do not run OpenCode with `--auto`/auto-approve when relying on `ask`-tier
 confirmation as a human gate — auto mode approves all `ask`-tier operations
