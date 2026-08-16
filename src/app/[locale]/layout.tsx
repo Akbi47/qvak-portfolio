@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 
 import { SiteHeader } from "@/components/navigation/site-header";
+import { FooterSection } from "@/components/sections/footer/footer-section";
+import { getFooterContent } from "@/content/footer";
 import { portfolioProfile } from "@/content/profile";
 import { locales } from "@/features/i18n/config";
 import { getMessages } from "@/features/i18n/messages";
@@ -25,6 +27,7 @@ export default async function LocaleLayout({
 }: Readonly<LocaleLayoutProps>) {
   const locale = await getLocaleFromParams(params);
   const messages = await getMessages(locale);
+  const footerContent = getFooterContent(locale);
 
   return (
     <html data-theme="light" lang={locale} suppressHydrationWarning>
@@ -41,6 +44,11 @@ export default async function LocaleLayout({
             themeToggleMessages={messages.themeToggle}
           />
           {children}
+          <FooterSection
+            content={footerContent}
+            locale={locale}
+            messages={messages.header}
+          />
         </ThemeProvider>
       </body>
     </html>

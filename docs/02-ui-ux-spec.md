@@ -228,6 +228,8 @@ Bottom row:
 
 Mobile stacks logically; newsletter remains usable without excessive width.
 
+Privacy / Terms / Cookies render only when real routes exist; do not emit fake `#` destinations while the routes are absent.
+
 ## Motion
 
 Allowed:

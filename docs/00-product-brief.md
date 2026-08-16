@@ -133,6 +133,8 @@ Inspired by the supplied reference:
 
 Newsletter can be visually present in MVP even if subscription persistence is deferred; if deferred, the action must not pretend success.
 
+Privacy / Terms / Cookies links are deferred until their routes exist. Until then the footer must not render fake `#` destinations; the links are added when the routes land.
+
 ## Image usage
 
 Three personal portraits are supplied:
