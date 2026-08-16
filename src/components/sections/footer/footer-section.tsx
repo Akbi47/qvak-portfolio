@@ -1,0 +1,110 @@
+import { Container } from "@/components/layout/container";
+import type { FooterContentView } from "@/content/footer";
+import type { Locale } from "@/features/i18n/config";
+import type { HeaderMessages } from "@/features/i18n/messages/types";
+import { navigationSectionIds } from "@/features/navigation/config";
+import { getLocalizedPathname } from "@/features/i18n/routing";
+
+import { BackToTop } from "./back-to-top";
+import { NewsletterForm } from "./newsletter-form";
+
+interface FooterSectionProps {
+  content: FooterContentView;
+  locale: Locale;
+  messages: HeaderMessages;
+}
+
+export function FooterSection({
+  content,
+  locale,
+  messages,
+}: Readonly<FooterSectionProps>) {
+  const rootPath = getLocalizedPathname("/", locale);
+  const year = new Date().getFullYear();
+
+  return (
+    <footer aria-label={content.aria.footerLabel} className="site-footer">
+      <Container>
+        <div className="site-footer__grid">
+          <div className="site-footer__brand">
+            <h2 className="site-footer__brand-name">{content.brand.name}</h2>
+            <p className="site-footer__brand-description">
+              {content.brand.description}
+            </p>
+            <ul className="site-footer__socials">
+              {content.details.map((detail) => (
+                <li key={detail.id}>
+                  <a
+                    className="site-footer__social"
+                    href={detail.href}
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    <span className="site-footer__social-label">
+                      {detail.label}
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <nav aria-label={content.navigationLabel} className="site-footer__column">
+            <h3 className="site-footer__heading">
+              {content.navigationLabel}
+            </h3>
+            <ul className="site-footer__links">
+              {navigationSectionIds.map((sectionId) => (
+                <li key={sectionId}>
+                  <a
+                    className="site-footer__link"
+                    href={
+                      sectionId === "home"
+                        ? rootPath
+                        : `${rootPath}#${sectionId}`
+                    }
+                  >
+                    {messages.sections[sectionId]}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          <div className="site-footer__column">
+            <h3 className="site-footer__heading">{content.contactLabel}</h3>
+            <ul className="site-footer__links">
+              {content.details.map((detail) => (
+                <li key={detail.id}>
+                  <a
+                    className="site-footer__link"
+                    href={detail.href}
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    <span className="site-footer__link-label">
+                      {detail.label}:
+                    </span>{" "}
+                    {detail.value}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="site-footer__column">
+            <h3 className="site-footer__heading">{content.newsletter.label}</h3>
+            <NewsletterForm content={content} />
+          </div>
+        </div>
+
+        <div className="site-footer__bottom">
+          <p className="site-footer__copyright">
+            © {year} {content.brand.name}. {content.bottom.rights}
+          </p>
+          <BackToTop label={content.bottom.backToTop} />
+        </div>
+      </Container>
+    </footer>
+  );
+}

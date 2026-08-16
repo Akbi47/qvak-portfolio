@@ -120,7 +120,7 @@
 - navigation
 - contact
 - newsletter UI
-- legal links
+- legal links (deferred until routes exist; do not emit fake `#` destinations)
 - back-to-top
 
 ### Quality
