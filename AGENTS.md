@@ -117,6 +117,15 @@ Human maintainers retain final authority over merge, production changes,
 material scope changes, dependencies, architecture, security decisions, and
 hosted-resource mutations.
 
+Merge is permitted through the safety-checked wrapper
+`.opencode/scripts/merge-approved-pr.sh` (recommended). Raw `gh pr merge` and
+historically destructive operations (`git reset`/`clean`/`restore`, force-push)
+prompt for confirmation (`ask`). See `opencode.jsonc`.
+
+Do not run OpenCode with `--auto`/auto-approve when relying on `ask`-tier
+confirmation as a human gate — auto mode approves all `ask`-tier operations
+without an explicit human prompt. The human may revoke these permissions at any time.
+
 ### Visual tasks
 
 When a task involves screenshots, images, UI references, mockups, visual
