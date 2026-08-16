@@ -117,6 +117,25 @@ Human maintainers retain final authority over merge, production changes,
 material scope changes, dependencies, architecture, security decisions, and
 hosted-resource mutations.
 
+Merge is permitted through the safety-checked wrapper
+`.opencode/scripts/merge-approved-pr.sh` (recommended). Raw `gh pr merge`,
+direct `git push*`, and history-rewriting operations (`git reset`/`clean`/
+`restore`, force-push) are hard-denied in `opencode.jsonc`, and raw `gh api*`
+mutations are denied too, so an automated agent cannot bypass the wrapper,
+update `main` directly, or mutate GitHub outside the intended wrapper paths.
+Feature-branch pushes run only through
+`.opencode/scripts/push-feature-branch.sh` (which refuses `main`). See
+`opencode.jsonc`.
+
+`main` is protected by a GitHub ruleset (active, no bypass actors) requiring pull
+requests and blocking direct/deletion/non-fast-forward pushes. The in-repo deny
+rules are defense-in-depth on top of that server-side guard.
+
+Do not run OpenCode with `--auto`/auto-approve when relying on `ask`-tier
+confirmation as a human gate — auto mode approves all `ask`-tier operations
+without an explicit human prompt. Only `deny`-tier operations remain gated under
+`--auto`. The human may revoke these permissions at any time.
+
 ### Visual tasks
 
 When a task involves screenshots, images, UI references, mockups, visual
