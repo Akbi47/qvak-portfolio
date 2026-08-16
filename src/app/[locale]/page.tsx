@@ -2,10 +2,12 @@ import type { Metadata } from "next";
 
 import { Container } from "@/components/layout/container";
 import { PageShell } from "@/components/layout/page-shell";
+import { ContactSection } from "@/components/sections/contact/contact-section";
 import { HeroSection } from "@/components/sections/home/hero-section";
 import { ProjectsSection } from "@/components/sections/projects/projects-section";
 import { ResumeSection } from "@/components/sections/resume/resume-section";
 import { SkillsSection } from "@/components/sections/skills/skills-section";
+import { getContactContent } from "@/content/contact";
 import { getPortfolioProfile } from "@/content/profile";
 import { getFeaturedProjects } from "@/content/projects";
 import { getResumeContent } from "@/content/resume";
@@ -39,6 +41,7 @@ export default async function LocalePage({
   const skills = getSkillsContent(locale);
   const projects = getFeaturedProjects(locale);
   const resume = getResumeContent(locale);
+  const contact = getContactContent(locale);
 
   return (
     <PageShell>
@@ -46,8 +49,9 @@ export default async function LocalePage({
       <SkillsSection content={skills} />
       <ProjectsSection content={projects} />
       <ResumeSection content={resume} />
+      <ContactSection content={contact} />
 
-      {navigationSectionIds.slice(5).map((sectionId) => (
+      {navigationSectionIds.slice(6).map((sectionId) => (
         <section
           aria-labelledby={`${sectionId}-anchor-title`}
           className="navigation-anchor navigation-anchor--placeholder"

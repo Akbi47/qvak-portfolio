@@ -35,7 +35,7 @@ If an issue conflicts with an accepted canonical document, stop and report the c
 - `npm run dev` — dev server
 - `gh` is available for issue/PR workflows; PRs use `Closes #<issue>` with one PR per issue.
 
-There is **no automated test runner** configured — no test files, no Jest/Playwright config committed. Verification is manual/visual smoke checks plus lint/typecheck/build. Do not invent a `npm test`.
+There is a minimal `npm test` runner using Node's built-in `node:test` via `tsx`, covering the contact-delivery feature (`src/features/contact/*.test.ts`). For other areas, verification remains manual/visual smoke checks plus lint/typecheck/build.
 
 ### Build quirk
 
