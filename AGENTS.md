@@ -118,10 +118,18 @@ material scope changes, dependencies, architecture, security decisions, and
 hosted-resource mutations.
 
 Merge is permitted through the safety-checked wrapper
-`.opencode/scripts/merge-approved-pr.sh` (recommended). Raw `gh pr merge` and
-history-rewriting operations (`git reset`/`clean`/`restore`, force-push) are
-hard-denied in `opencode.jsonc` so an automated agent cannot bypass the wrapper.
-See `opencode.jsonc`.
+`.opencode/scripts/merge-approved-pr.sh` (recommended). Raw `gh pr merge`,
+direct `git push*`, and history-rewriting operations (`git reset`/`clean`/
+`restore`, force-push) are hard-denied in `opencode.jsonc`, and raw `gh api*`
+mutations are denied too, so an automated agent cannot bypass the wrapper,
+update `main` directly, or mutate GitHub outside the intended wrapper paths.
+Feature-branch pushes run only through
+`.opencode/scripts/push-feature-branch.sh` (which refuses `main`). See
+`opencode.jsonc`.
+
+`main` branch protection (a GitHub ruleset requiring PRs) is recommended but not
+enabled yet; the in-repo deny rules are the current guard against direct
+updates to `main`.
 
 Do not run OpenCode with `--auto`/auto-approve when relying on `ask`-tier
 confirmation as a human gate — auto mode approves all `ask`-tier operations

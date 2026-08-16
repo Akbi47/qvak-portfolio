@@ -10,10 +10,12 @@
   // Approved safe Git/GitHub permission policy.
   //
   // - Safe repository inspection, staging, and commits run without confirmation.
-  // - Mutating Git/GitHub operations require confirmation (ask).
-  // - Merge and force-push are hard-denied so an automated agent (including
-  //   --auto mode, which auto-approves ask-tier operations) cannot bypass the
-  //   safety-checked merge wrapper or rewrite history without a human.
+  // - Feature-branch pushes run through the allowlisted
+  //   push-feature-branch.sh wrapper (which refuses `main`).
+  // - Merge, force-push, history rewriting, direct push, and raw gh api are
+  //   hard-denied so an automated agent (including --auto mode, which
+  //   auto-approves ask-tier operations) cannot update `main` or mutate GitHub
+  //   outside the intended wrapper paths without a human.
   //
   // opencode evaluates bash rules by pattern match with the LAST matching rule
   // winning, so the catch-all "*" comes first and the narrow rules come last.
@@ -49,7 +51,6 @@
       // Mutating Git/GitHub operations require confirmation
       "git commit --amend*": "ask",
       "git pull*": "ask",
-      "git push*": "ask",
       "git merge*": "ask",
       "git rebase*": "ask",
       "git switch*": "ask",
@@ -60,22 +61,27 @@
       "gh pr edit*": "ask",
       "gh pr comment*": "ask",
       "gh pr review*": "ask",
-      // The dedicated safety-checked wrapper script is allowlisted; it takes no
-      // arguments, so no trailing wildcard is needed.
+      // The dedicated safety-checked wrapper scripts are allowlisted; they take
+      // no arguments, so no trailing wildcard is needed.
       ".opencode/scripts/merge-approved-pr.sh": "allow",
-      // Merge and history-rewriting operations are hard-denied so an automated
-      // agent (including --auto mode, which auto-approves ask-tier operations)
-      // cannot bypass the wrapper or force-push without a human. Deny rules come
-      // last so they win over the broader allow/ask patterns.
+      ".opencode/scripts/push-feature-branch.sh": "allow",
+      // Merge, history-rewriting, and direct git push operations are hard-denied
+      // so an automated agent (including --auto mode, which auto-approves
+      // ask-tier operations) cannot bypass the merge wrapper, force-push, or
+      // update main directly. gh api* is also denied so GitHub mutations cannot
+      // be issued outside the intended wrapper paths. Deny rules come last so
+      // they win over the broader allow/ask patterns.
       "git reset*": "deny",
       "git clean*": "deny",
       "git restore*": "deny",
       "git checkout --*": "deny",
       "git checkout .*": "deny",
+      "git push*": "deny",
       "git push --force*": "deny",
       "git push -f*": "deny",
       "git push --force-with-lease*": "deny",
       "gh pr merge*": "deny",
+      "gh api*": "deny",
     },
   },
 }
