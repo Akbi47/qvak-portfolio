@@ -123,7 +123,7 @@ The criteria below are **additive/refined** — they do not replace the above; t
 5. Contact/social destinations match the owner-approved set (D8) — satisfies #16 criterion 2.
 6. Final EN/VI copy is owner-approved across all content files (D1) — satisfies #16 criterion 4.
 7. No bytes from `docs/migration/legacy-assets/` are moved into `public/` or the runtime bundle — supports #16 criterion 6.
-8. Redirect activation follows decisions (D7): `/resume/` and `/case-studies/` only after content approval; no blanket homepage redirects.
+8. Redirect activation follows decisions (D7): `/resume/` and `/case-studies/` only after content approval; no blanket homepage redirects. *(Additional cutover guard — does not map to an existing #16 criterion; it governs when already-implemented redirects in `src/proxy.ts` may be relied upon at production cutover, tracked under #17.)*
 
 ---
 
