@@ -25,6 +25,7 @@ Each item records the current state in the repository and what is required to ac
 - **Question:** Which projects are featured, in what order, and what are the **real** Live Demo and Code destinations for each (or explicitly none)?
 - **Acceptance:** Featured set matches the owner-approved list; every Live Demo/Code URL is verified live by the owner; missing destinations are intentionally omitted (no placeholder links).
 - **Decision (2026-08-18):** Keep the current project dataset temporarily. The owner will replace it with real projects later. **This intentionally conflicts with Issue #16's "No placeholder/sample personal data remains" criterion** — recorded as an explicit owner-approved temporary-content exception; the old criterion is not silently marked satisfied.
+- **Link verification (2026-08-18):** All six retained external destinations were verified live (HTTP 200): `youtube.com/watch?v=f3NrpMbqwV4`, `youtu.be/4O9kGRFmXVY`, `youtube.com/watch?v=BU1RvITWoi8`, `youtu.be/WD_NulE5_l4`, `github.com/Akbi47/Feaon-ldp-v2`, `github.com/Akbi47`. This satisfies the "All external links are real and verified" criterion for the retained dataset; `atm-seeking` and `readingtime` intentionally omit Live Demo/Code URLs.
 
 ### D3 — Public permission for employer/client names and supporting employment evidence
 
@@ -43,6 +44,7 @@ Each item records the current state in the repository and what is required to ac
 - **Question:** Which certificates publish structured text only vs. an approved redacted derivative? What is the redaction policy?
 - **Acceptance:** Certificate media policy is explicit; any published derivative is owner-approved and redacted; raw originals stay out of `public/`.
 - **Decision (2026-08-18):** Certificate content may be visible **similarly to the legacy WordPress portfolio**. Inspect the required source assets under `docs/migration/legacy-assets/`; use only the needed assets, with intentional production paths, dimensions, localized alt text, and the existing resume/lightbox behavior. Do not invent certificate data.
+- **Redaction exception (2026-08-18):** Explicit owner-approved exception to the "redacted derivative" acceptance above. The published derivatives (Bachelor's degree, TOEIC, Basic IT Application) are production-sized/compressed versions of the legacy source scans and **are not redacted** — they expose the same identifiers present in the legacy scans, which the legacy WordPress portfolio also published publicly. Raw originals remain outside `public/`. This exception applies only to the three D4/D10-required certificate assets.
 
 ### D5 — Current downloadable CV file + stable URL
 

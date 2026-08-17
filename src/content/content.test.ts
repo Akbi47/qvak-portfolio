@@ -189,3 +189,78 @@ test("all featured projects carry a real destination or none is faked", () => {
     }
   }
 });
+
+const verifiedExternalUrls = new Set([
+  "https://www.youtube.com/watch?v=f3NrpMbqwV4",
+  "https://youtu.be/4O9kGRFmXVY",
+  "https://www.youtube.com/watch?v=BU1RvITWoi8",
+  "https://youtu.be/WD_NulE5_l4",
+  "https://github.com/Akbi47/Feaon-ldp-v2",
+]);
+
+test("every featured project external URL is owner-verified (D2, 2026-08-18)", () => {
+  const used = new Set<string>();
+  for (const project of allProjects) {
+    for (const url of [project.liveDemoUrl, project.codeUrl]) {
+      if (url) {
+        used.add(url);
+        assert.ok(
+          verifiedExternalUrls.has(url),
+          `project ${project.id} uses an unverified external URL: ${url}`,
+        );
+      }
+    }
+  }
+  assert.ok(used.size > 0, "expected at least one verified external URL");
+});
+
+const approvedCertificateDerivatives = new Set([
+  "/images/resume/bachelor-degree.jpg",
+  "/images/resume/bachelor-degree-thumb.jpg",
+  "/images/resume/toeic.jpg",
+  "/images/resume/toeic-thumb.jpg",
+  "/images/resume/basic-it-application.jpg",
+  "/images/resume/basic-it-application-thumb.jpg",
+]);
+
+test("resume certificate media uses only the approved derivatives (D4)", () => {
+  const referenced = allEntries.flatMap((entry) =>
+    (entry.media ?? []).flatMap((media) => [media.thumbnailSrc, media.fullSrc]),
+  );
+  for (const source of referenced) {
+    assert.ok(
+      approvedCertificateDerivatives.has(source),
+      `unapproved certificate derivative referenced: ${source}`,
+    );
+  }
+  assert.equal(referenced.length, approvedCertificateDerivatives.size);
+});
+
+test("no raw legacy-assets files are referenced in published media (D4)", () => {
+  const publishedSources = [
+    portfolioProfile.media.hero.src,
+    ...portfolioProfile.media.aboutPortraits.map((portrait) => portrait.src),
+    ...allProjects.flatMap((project) => project.media.map((media) => media.src)),
+    ...allEntries.flatMap((entry) =>
+      (entry.media ?? []).flatMap((media) => [
+        media.thumbnailSrc,
+        media.fullSrc,
+      ]),
+    ),
+  ];
+  const rawLegacyFiles = [
+    "quachvoanhkhoa-certificate-1.jpg",
+    "quachvoanhkhoa-certificate-2.jpg",
+    "quachvoanhkhoa-certificate-3.jpg",
+    "quachvoanhkhoa-certificate-4.jpg",
+    "toeic-cer.jpg",
+    "codeforces-cer.jpg",
+    "QVAK-e1738690597153.png",
+  ];
+  for (const source of publishedSources) {
+    assert.ok(
+      !rawLegacyFiles.some((raw) => source.endsWith(raw)),
+      `raw legacy asset leaked into public media: ${source}`,
+    );
+  }
+});
