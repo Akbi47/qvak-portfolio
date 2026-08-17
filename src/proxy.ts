@@ -2,6 +2,11 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 import { defaultLocale, locales } from "@/features/i18n/config";
+import {
+  buildRedirectUrl,
+  getLegacyRedirectTarget,
+  normalizeTrailingSlash,
+} from "@/features/seo/redirects";
 
 const localeRewriteHeader = "x-qvak-locale-rewrite";
 
@@ -20,6 +25,33 @@ export function proxy(request: NextRequest) {
 
     url.pathname = pathname.slice(defaultLocale.length + 1) || "/";
     return NextResponse.redirect(url);
+  }
+
+  const requestedLocale = pathnameLocale ?? defaultLocale;
+  const legacyPathname = pathnameLocale
+    ? pathname.slice(pathnameLocale.length + 1)
+    : pathname;
+  const legacyTarget = getLegacyRedirectTarget(requestedLocale, legacyPathname);
+
+  if (legacyTarget) {
+    return NextResponse.redirect(
+      buildRedirectUrl(
+        url.origin,
+        legacyTarget.pathname,
+        url.search,
+        legacyTarget.hash,
+      ),
+      301,
+    );
+  }
+
+  const normalizedPathname = normalizeTrailingSlash(pathname);
+
+  if (normalizedPathname) {
+    return NextResponse.redirect(
+      buildRedirectUrl(url.origin, normalizedPathname, url.search, url.hash),
+      308,
+    );
   }
 
   if (pathnameLocale) {
