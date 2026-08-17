@@ -24,12 +24,14 @@ Each item records the current state in the repository and what is required to ac
 - **Question:** Which projects are featured, in what order, and what are the **real** Live Demo and Code destinations for each (or explicitly none)?
 - **Acceptance:** Featured set matches the owner-approved list; every Live Demo/Code URL is verified live by the owner; missing destinations are intentionally omitted (no placeholder links).
 
-### D3 — Public permission for employer/client names
+### D3 — Public permission for employer/client names and supporting employment evidence
 
-- **Current state:** `src/content/resume.ts` publishes employer names: Dynamic Global Solutions, EnglishWing, SmartIT, Zenitech. The Dynamic Global Solution landing page project references the same company.
-- **Inventory context:** "Verify employer naming, dates, confidentiality, and approved public wording."
-- **Question:** Is each employer/client name + project reference approved for public display? Any rewordings required?
-- **Acceptance:** Every employer/client name and project association is explicitly approved or corrected.
+- **Current state:** `src/content/resume.ts` publishes employer names: Dynamic Global Solutions, EnglishWing, SmartIT, Zenitech. The Dynamic Global Solution landing page project references the same company. The inventory also lists supporting employment evidence such as the **EnglishWing employment confirmation** (`quachvoanhkhoa-certificate-2.jpg` in `docs/migration/legacy-assets/`) as `Archive / Replace` — "Contains signatures, seal, and employment document text. Keep privately unless an explicitly approved redacted derivative is needed."
+- **Inventory context:** "Verify employer naming, dates, confidentiality, and approved public wording" and whether employment-confirmation evidence may be publicly referenced.
+- **Questions:**
+  1. Is each employer/client name + project reference approved for public display? Any rewordings required?
+  2. May any supporting employment evidence (e.g. the EnglishWing confirmation) be publicly referenced or published? If so, under what derivative/redaction policy?
+- **Acceptance:** Every employer/client name and project association is explicitly approved or corrected; the publication/redaction status of supporting employment evidence is explicitly decided (private / public-with-redaction / text-only reference), with no silent assumption either way.
 
 ### D4 — Certificate publication / redaction policy
 
@@ -90,6 +92,7 @@ This flags every place current content relies on an unresolved inventory decisio
 | `src/content/projects.ts` | `atm-seeking`, `readingtime` no Live Demo/Code | Intentionally omitted? unconfirmed | D2 |
 | `src/content/projects.ts` | Dynamic Global Solution references company name | Publication permission unverified | D3 |
 | `src/content/resume.ts` | Employer names (DGS, EnglishWing, SmartIT, Zenitech) | Publication permission unverified | D3 |
+| `docs/migration/legacy-assets/` | EnglishWing employment confirmation (`quachvoanhkhoa-certificate-2.jpg`) | Publication/redaction status undecided | D3 |
 | `src/content/resume.ts` | Education/cert entries (degree, TOEIC, IT cert, Codeforces) | Text-only; media policy unresolved | D4 |
 | `src/content/resume.ts` | `media` arrays empty (no certificate images wired) | Consistent with "no raw publication"; needs policy | D4 |
 | `src/content/profile.ts` | No `resumeUrl` | CV unknown | D5 |
@@ -101,15 +104,25 @@ This flags every place current content relies on an unresolved inventory decisio
 
 ## 3. Proposed acceptance criteria for issue #16
 
-The roadmap (`docs/06`) gives #16 no acceptance criteria. These are proposed, testable criteria for the real content-migration issue (to be finalized when #16 is implemented):
+GitHub issue #16 already defines seven acceptance criteria:
 
-1. Featured project set and order match the owner-approved list (D2).
-2. Every rendered Live Demo/Code URL is owner-verified live; missing destinations are intentionally omitted.
-3. No unapproved employer/client name or certificate media is published (D3, D4).
-4. CV file and URL (if any) are decided and wired (D5).
-5. Contact/social destinations match the owner-approved set (D8).
-6. Final EN/VI copy is owner-approved across all content files (D1).
-7. No bytes from `docs/migration/legacy-assets/` are moved into `public/` or the runtime bundle.
+1. No placeholder/sample personal data remains in production sections.
+2. All external links are real and verified.
+3. Missing optional links are omitted rather than faked.
+4. EN/VI content is complete for launch-critical UI.
+5. Image alt text and media dimensions are supplied.
+6. No private/unapproved personal data is published.
+7. `lint`, `typecheck`, content validation/tests, and build pass.
+
+The criteria below are **additive/refined** — they do not replace the above; they operationalize how the owner decisions (D1–D10) satisfy #16's existing criteria:
+
+1. Featured project set and order match the owner-approved list (D2) — satisfies #16 criterion 1/2.
+2. Every rendered Live Demo/Code URL is owner-verified live; missing destinations are intentionally omitted (D2) — satisfies #16 criterion 2/3.
+3. No unapproved employer/client name or certificate media is published (D3, D4) — satisfies #16 criterion 6.
+4. CV file and URL (if any) are decided and wired (D5) — satisfies #16 criterion 1/2.
+5. Contact/social destinations match the owner-approved set (D8) — satisfies #16 criterion 2.
+6. Final EN/VI copy is owner-approved across all content files (D1) — satisfies #16 criterion 4.
+7. No bytes from `docs/migration/legacy-assets/` are moved into `public/` or the runtime bundle — supports #16 criterion 6.
 8. Redirect activation follows decisions (D7): `/resume/` and `/case-studies/` only after content approval; no blanket homepage redirects.
 
 ---
