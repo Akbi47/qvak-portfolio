@@ -18,9 +18,11 @@ export function proxy(request: NextRequest) {
       pathname === `/${locale}` || pathname.startsWith(`/${locale}/`),
   );
 
+  const requestHeaders = new Headers(request.headers);
+
   if (pathnameLocale === defaultLocale) {
-    if (request.headers.get(localeRewriteHeader) === defaultLocale) {
-      return NextResponse.next();
+    if (requestHeaders.get(localeRewriteHeader) === defaultLocale) {
+      return NextResponse.next({ request: { headers: requestHeaders } });
     }
 
     url.pathname = pathname.slice(defaultLocale.length + 1) || "/";
@@ -54,12 +56,13 @@ export function proxy(request: NextRequest) {
     );
   }
 
+  requestHeaders.set(localeRewriteHeader, requestedLocale);
+
   if (pathnameLocale) {
-    return NextResponse.next();
+    return NextResponse.next({ request: { headers: requestHeaders } });
   }
 
   url.pathname = `/${defaultLocale}${pathname === "/" ? "" : pathname}`;
-  const requestHeaders = new Headers(request.headers);
   requestHeaders.set(localeRewriteHeader, defaultLocale);
 
   return NextResponse.rewrite(url, {
