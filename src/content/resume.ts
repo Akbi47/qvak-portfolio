@@ -18,7 +18,7 @@ export interface ResumeEntry {
   id: string;
   category: ResumeCategory;
   title: LocalizedText;
-  organization: LocalizedText;
+  organization?: LocalizedText;
   location?: LocalizedText;
   dateLabel?: LocalizedText;
   summary?: LocalizedText;
@@ -42,7 +42,7 @@ export interface ResumeEntryView {
   id: string;
   index: string;
   title: string;
-  organization: string;
+  organization?: string;
   location?: string;
   dateLabel?: string;
   summary?: string;
@@ -73,15 +73,11 @@ export interface ResumeContentView {
 
 export const resumeEntries = [
   {
-    id: "dynamic-global-solutions",
+    id: "fullstack-maintenance",
     category: "career-journey",
     title: {
       en: "Full-stack development and maintenance",
       vi: "Phát triển và bảo trì full-stack",
-    },
-    organization: {
-      en: "Dynamic Global Solutions",
-      vi: "Dynamic Global Solutions",
     },
     dateLabel: {
       en: "2024 – Present",
@@ -109,15 +105,11 @@ export const resumeEntries = [
     order: 1,
   },
   {
-    id: "englishwing",
+    id: "backend-lms",
     category: "career-journey",
     title: {
       en: "Backend work on a learning management system",
       vi: "Làm backend cho hệ thống quản lý học tập",
-    },
-    organization: {
-      en: "EnglishWing",
-      vi: "EnglishWing",
     },
     dateLabel: {
       en: "2024",
@@ -145,15 +137,11 @@ export const resumeEntries = [
     order: 2,
   },
   {
-    id: "smartit",
+    id: "vehicle-booking-fullstack",
     category: "career-journey",
     title: {
       en: "Full-stack work on vehicle booking and management",
       vi: "Làm full-stack cho hệ thống đặt và quản lý xe",
-    },
-    organization: {
-      en: "SmartIT",
-      vi: "SmartIT",
     },
     dateLabel: {
       en: "2023",
@@ -181,15 +169,11 @@ export const resumeEntries = [
     order: 3,
   },
   {
-    id: "zenitech",
+    id: "wordpress-seo-development",
     category: "career-journey",
     title: {
       en: "WordPress and SEO development",
       vi: "Phát triển WordPress và SEO",
-    },
-    organization: {
-      en: "Zenitech",
-      vi: "Zenitech",
     },
     dateLabel: {
       en: "2020 – 2023",
@@ -245,6 +229,23 @@ export const resumeEntries = [
       { en: "Electronics", vi: "Điện tử" },
       { en: "Telecommunications", vi: "Viễn thông" },
     ],
+    media: [
+      {
+        id: "bachelor-degree-certificate",
+        thumbnailSrc: "/images/resume/bachelor-degree-thumb.jpg",
+        fullSrc: "/images/resume/bachelor-degree.jpg",
+        alt: {
+          en: "Bachelor's degree certificate in Electronics–Telecommunications Engineering issued by the University of Science, VNU-HCM",
+          vi: "Bằng cử nhân Kỹ thuật Điện tử–Viễn thông do Trường Đại học Khoa học Tự nhiên, ĐHQG-HCM cấp",
+        },
+        caption: {
+          en: "Bachelor's degree certificate",
+          vi: "Bằng cử nhân",
+        },
+        width: 1600,
+        height: 1200,
+      },
+    ],
     order: 1,
   },
   {
@@ -265,6 +266,23 @@ export const resumeEntries = [
     tags: [
       { en: "English", vi: "Tiếng Anh" },
       { en: "TOEIC", vi: "TOEIC" },
+    ],
+    media: [
+      {
+        id: "toeic-certificate",
+        thumbnailSrc: "/images/resume/toeic-thumb.jpg",
+        fullSrc: "/images/resume/toeic.jpg",
+        alt: {
+          en: "TOEIC certificates recording Listening & Reading 775 and Speaking & Writing 330",
+          vi: "Chứng chỉ TOEIC ghi nhận điểm Nghe & Đọc 775 và Nói & Viết 330",
+        },
+        caption: {
+          en: "TOEIC certificates",
+          vi: "Chứng chỉ TOEIC",
+        },
+        width: 1600,
+        height: 1263,
+      },
     ],
     order: 2,
   },
@@ -296,6 +314,23 @@ export const resumeEntries = [
     tags: [
       { en: "IT", vi: "CNTT" },
       { en: "Certificate", vi: "Chứng chỉ" },
+    ],
+    media: [
+      {
+        id: "basic-it-application-certificate",
+        thumbnailSrc: "/images/resume/basic-it-application-thumb.jpg",
+        fullSrc: "/images/resume/basic-it-application.jpg",
+        alt: {
+          en: "Basic IT Application Certificate issued by the University of Science IT Center in 2019",
+          vi: "Chứng chỉ Ứng dụng CNTT cơ bản do Trung tâm Tin học, Trường Đại học Khoa học Tự nhiên cấp năm 2019",
+        },
+        caption: {
+          en: "Basic IT Application Certificate",
+          vi: "Chứng chỉ Ứng dụng CNTT cơ bản",
+        },
+        width: 1600,
+        height: 1090,
+      },
     ],
     order: 3,
   },
@@ -411,7 +446,9 @@ export function getResumeContent(locale: Locale): ResumeContentView {
           id: entry.id,
           index: String(index + 1).padStart(2, "0"),
           title: localized(entry.title),
-          organization: localized(entry.organization),
+          organization: entry.organization
+            ? localized(entry.organization)
+            : undefined,
           location: entry.location ? localized(entry.location) : undefined,
           dateLabel: entry.dateLabel ? localized(entry.dateLabel) : undefined,
           summary: entry.summary ? localized(entry.summary) : undefined,

@@ -207,15 +207,17 @@ export function ResumeSection({ content }: Readonly<ResumeSectionProps>) {
                   <p className="resume-entry__date">{entry.dateLabel}</p>
                 ) : null}
                 <h3 className="resume-entry__title">{entry.title}</h3>
-                <p className="resume-entry__organization">
-                  {entry.organization}
-                  {entry.location ? (
-                    <>
-                      <span aria-hidden="true"> · </span>
-                      {entry.location}
-                    </>
-                  ) : null}
-                </p>
+                {entry.organization ? (
+                  <p className="resume-entry__organization">
+                    {entry.organization}
+                    {entry.location ? (
+                      <>
+                        <span aria-hidden="true"> · </span>
+                        {entry.location}
+                      </>
+                    ) : null}
+                  </p>
+                ) : null}
 
                 {entry.summary ? (
                   <p className="resume-entry__summary">{entry.summary}</p>

@@ -1,9 +1,9 @@
 # Owner Decisions & Pre-Cutover Evidence — Production Content Migration (#16)
 
 Source of truth for decisions: `docs/migration/wordpress-content-inventory.md`.
-Owner: Khoa (repo owner). This document captures what must be decided before issue #16 (content migration) and #17 (cutover) can proceed. Nothing here is a decision; every item is an open question with acceptance criteria so the owner can answer once and implementation can proceed without guessing.
+Owner: Khoa (repo owner). This document captures what must be decided before issue #16 (content migration) and #17 (cutover) can proceed. The inventory rule is explicit: **unknowns must not be filled with guessed content.** This document makes the unknowns answerable.
 
-The inventory rule is explicit: **unknowns must not be filled with guessed content.** This document makes the unknowns answerable.
+> **Answers recorded 2026-08-18** (Issue #46 thread): D1–D10 are answered below in Section 1. Issue #16 is now unblocked.
 
 ---
 
@@ -16,6 +16,7 @@ Each item records the current state in the repository and what is required to ac
 - **Current state:** `src/content/profile.ts`, `src/content/skills.ts`, `src/content/projects.ts`, `src/content/resume.ts`, `src/content/contact.ts`, `src/content/footer.ts` contain draft bilingual copy treated as *source material*.
 - **Question:** Approve the current EN/VI copy as final, or provide corrections per string?
 - **Acceptance:** Every user-facing string across all content files is owner-approved for both locales.
+- **Decision (2026-08-18):** Approve the current EN/VI content as the **production-for-now** copy. It may be revised later.
 
 ### D2 — Featured project set + real Live Demo / Code URLs
 
@@ -23,6 +24,7 @@ Each item records the current state in the repository and what is required to ac
 - **Inventory context:** `/case-studies/` → `/#projects` redirect is *decided conditionally* — gated on "Approved Projects section represents the collection." Per-post destinations are `Keep candidate` / `Mapping required`.
 - **Question:** Which projects are featured, in what order, and what are the **real** Live Demo and Code destinations for each (or explicitly none)?
 - **Acceptance:** Featured set matches the owner-approved list; every Live Demo/Code URL is verified live by the owner; missing destinations are intentionally omitted (no placeholder links).
+- **Decision (2026-08-18):** Keep the current project dataset temporarily. The owner will replace it with real projects later. **This intentionally conflicts with Issue #16's "No placeholder/sample personal data remains" criterion** — recorded as an explicit owner-approved temporary-content exception; the old criterion is not silently marked satisfied.
 
 ### D3 — Public permission for employer/client names and supporting employment evidence
 
@@ -32,6 +34,7 @@ Each item records the current state in the repository and what is required to ac
   1. Is each employer/client name + project reference approved for public display? Any rewordings required?
   2. May any supporting employment evidence (e.g. the EnglishWing confirmation) be publicly referenced or published? If so, under what derivative/redaction policy?
 - **Acceptance:** Every employer/client name and project association is explicitly approved or corrected; the publication/redaction status of supporting employment evidence is explicitly decided (private / public-with-redaction / text-only reference), with no silent assumption either way.
+- **Decision (2026-08-18):** Do **not** publish employer/client names or supporting employment evidence. Remove or rewrite public content as necessary **without inventing replacement companies or facts**.
 
 ### D4 — Certificate publication / redaction policy
 
@@ -39,6 +42,7 @@ Each item records the current state in the repository and what is required to ac
 - **Inventory context:** Raw certificate images contain birth/credential identifiers; "raw public use is not approved."
 - **Question:** Which certificates publish structured text only vs. an approved redacted derivative? What is the redaction policy?
 - **Acceptance:** Certificate media policy is explicit; any published derivative is owner-approved and redacted; raw originals stay out of `public/`.
+- **Decision (2026-08-18):** Certificate content may be visible **similarly to the legacy WordPress portfolio**. Inspect the required source assets under `docs/migration/legacy-assets/`; use only the needed assets, with intentional production paths, dimensions, localized alt text, and the existing resume/lightbox behavior. Do not invent certificate data.
 
 ### D5 — Current downloadable CV file + stable URL
 
@@ -46,12 +50,14 @@ Each item records the current state in the repository and what is required to ac
 - **Inventory context:** Old WordPress-upload CV PDFs are `Unknown / Replace` — "Obtain one current, owner-approved CV and decide its stable production URL."
 - **Question:** Is there a current CV to publish? If so, what file (outside `legacy-assets/`) and what stable URL?
 - **Acceptance:** CV (if any) is a current owner-approved file with a decided stable URL; old upload URLs are handled per a decided redirect/retention policy.
+- **Decision (2026-08-18):** No current CV is available. Do **not** create a fake CV URL or fake downloadable file. Omit the CV link/action until the owner supplies a real file and stable URL.
 
 ### D6 — Blog-retention mechanism
 
 - **Current state:** No blog UI or hosting in the MVP. `/blog/` and the four tech-blog posts are `Migrate later` — "retain the URL/content until a separate blog migration or retirement plan is approved." Hosting mechanism unresolved.
 - **Question:** Which mechanism — staged content migration, retained legacy hosting, or archive/410 — and when?
 - **Acceptance:** A mechanism is chosen (see Section 4 for options); the chosen mechanism is recorded here with an owner-approved timeline.
+- **Decision (2026-08-18):** Do **not** implement a blog in the Next.js MVP.
 
 ### D7 — Per-route 410 / redirect handling for non-migrated case studies and low-value archives
 
@@ -59,6 +65,10 @@ Each item records the current state in the repository and what is required to ac
 - **Inventory context:** "Later, redirect archives to an equivalent collection only if it exists; otherwise evaluate `410 Gone` after checking Search Console/backlinks. Do not redirect all secondary URLs to the homepage."
 - **Question:** For each remaining route group, what is the decision (equivalent collection redirect, retain, or 410) after Search Console/backlink review?
 - **Acceptance:** Per-route-group handling is decided; no blanket homepage redirects.
+- **Decision (2026-08-18):** Owner redirect policy:
+  - legacy URL with a **meaningful equivalent** in the new portfolio → redirect to that new equivalent;
+  - legacy URL with **no equivalent** → redirect to the homepage.
+  This is an explicit owner override of the previous inventory guidance against blanket homepage redirects. Cutover redirect execution belongs to Issue #17; Issue #16 does not activate unrelated cutover redirects.
 
 ### D8 — Contact / social destinations
 
@@ -66,18 +76,21 @@ Each item records the current state in the repository and what is required to ac
 - **Inventory context:** "The live destinations were not accepted as final content by Issue #2; verify each before publication."
 - **Question:** Which contact/social destinations are final (GitHub, email, LinkedIn, etc.)? Are email/phone/location intentionally public?
 - **Acceptance:** Contact/social values are owner-approved and verified; absent values are intentionally omitted.
+- **Decision (2026-08-18):** Keep current contact/social destinations **as-is** — currently GitHub only. Do **not** invent email, phone, location, LinkedIn, or other destinations.
 
 ### D9 — About FEAON role
 
 - **Current state:** The legacy homepage's "About FEAON / mission copy" was `Archive`d (excluded from the personal portfolio MVP). No About FEAON block exists in the current site.
 - **Question:** Does About FEAON have any approved future role in the personal portfolio? If yes, what?
 - **Acceptance:** A decision is recorded (include/never/include differently).
+- **Decision (2026-08-18):** About FEAON has no role in this personal portfolio. Keep it excluded.
 
 ### D10 — Complete uploads inventory
 
 - **Current state:** `docs/migration/wordpress-content-inventory.md` notes the uploads export is "Incomplete / unknown" for homepage portraits/logo and some inline post media. The local `legacy-assets/` is a partial subset.
 - **Question:** Where is the verified, complete `wp-content/uploads` export, and which originals map to which production assets?
 - **Acceptance:** A verified uploads inventory exists (kept outside this repo) covering all production media references.
+- **Decision (2026-08-18):** The owner confirms the migration assets needed for this portfolio are available locally under `docs/migration/legacy-assets/`. Inspect that directory and map only the assets required by Issue #16.
 
 ---
 
@@ -116,14 +129,15 @@ GitHub issue #16 already defines seven acceptance criteria:
 
 The criteria below are **additive/refined** — they do not replace the above; they operationalize how the owner decisions (D1–D10) satisfy #16's existing criteria:
 
-1. Featured project set and order match the owner-approved list (D2) — satisfies #16 criterion 1/2.
+1. Featured project set and order match the owner-approved list (D2) — satisfies #16 criterion 1/2. *(Owner-approved temporary-content exception per D2: the current project dataset is retained temporarily and is explicitly NOT treated as satisfying criterion 1.)*
 2. Every rendered Live Demo/Code URL is owner-verified live; missing destinations are intentionally omitted (D2) — satisfies #16 criterion 2/3.
-3. No unapproved employer/client name or certificate media is published (D3, D4) — satisfies #16 criterion 6.
-4. CV file and URL (if any) are decided and wired (D5) — satisfies #16 criterion 1/2.
-5. Contact/social destinations match the owner-approved set (D8) — satisfies #16 criterion 2.
-6. Final EN/VI copy is owner-approved across all content files (D1) — satisfies #16 criterion 4.
-7. No bytes from `docs/migration/legacy-assets/` are moved into `public/` or the runtime bundle — supports #16 criterion 6.
-8. Redirect activation follows decisions (D7): `/resume/` and `/case-studies/` only after content approval; no blanket homepage redirects. *(Additional cutover guard — does not map to an existing #16 criterion; it governs when already-implemented redirects in `src/proxy.ts` may be relied upon at production cutover, tracked under #17.)*
+3. No employer/client name or supporting employment evidence is published (D3) — satisfies #16 criterion 6.
+4. Certificate derivatives are intentional production assets (paths, dimensions, localized alt text, resume/lightbox behavior) derived only from required legacy-assets (D4/D10); raw originals stay out of `public/` — satisfies #16 criterion 5/6.
+5. CV link/action is omitted until a real file and stable URL exist (D5) — satisfies #16 criterion 1/2/3.
+6. Contact/social destinations match the owner-approved set (GitHub only) (D8) — satisfies #16 criterion 2.
+7. Final EN/VI copy is owner-approved across all content files (D1) — satisfies #16 criterion 4.
+8. No bytes from `docs/migration/legacy-assets/` are moved into `public/` or the runtime bundle — supports #16 criterion 6.
+9. Redirect activation follows decisions (D7): equivalent legacy URLs redirect to their equivalent; non-equivalent legacy URLs redirect to the homepage; execution belongs to Issue #17. *(Cutover guard — does not map to an existing #16 criterion; tracked under #17.)*
 
 ---
 

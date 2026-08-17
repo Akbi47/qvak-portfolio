@@ -137,17 +137,19 @@ Taxonomy/author URLs should remain with the retained blog/case-study content unt
 
 No redirect below is implemented by Issue #2.
 
+> **Owner override (2026-08-18, Issue #46 / D7):** Legacy URL with a meaningful equivalent in the new portfolio → redirect to that new equivalent; legacy URL with no equivalent → redirect to the homepage. This explicitly overrides the previous guidance below against blanket homepage redirects. Execution of cutover redirects belongs to Issue #17.
+
 | Legacy URL or group | Planned destination/behavior | Status | Gate before activation |
 |---|---|---|---|
 | `/` | `/` | Keep | New homepage content approved and deployed. |
 | `/resume/` | Permanent redirect to `/#resume` | Decided, not implemented | Equivalent Resume section live; content/media/privacy review complete. |
 | `/case-studies/` | Permanent redirect to `/#projects` | Decided conditionally | Approved Projects section represents the collection. |
-| Six Case Study post URLs | Equivalent project detail or selected state; otherwise retain | Mapping required | Featured set and per-project destination approved. |
+| Six Case Study post URLs | Redirect to equivalent project content (the six featured projects) if a meaningful equivalent exists | Mapping required | Featured set and per-project destination approved. |
 | `/blog/` and four Tech Blog post URLs | Retain now; migrate later | Decided, hosting mechanism unresolved | Content/export verified and post-MVP blog or retirement plan approved. |
-| `/category/case-studies/` | Equivalent projects collection if one exists | Candidate | Backlink/index check and equivalent destination. |
-| `/category/tech-blog/`, blog tags, author archive | Retain with blog; later map to equivalent blog collection or evaluate `410` | Candidate | Blog decision plus Search Console/backlink evidence. |
-| Case-study tags | Equivalent project collection only where semantically valid; otherwise evaluate `410` | Candidate | Per-tag relevance and backlink/index check. |
-| `/blocks/*` | Remove from sitemap; candidate `410 Gone` | Candidate | Confirm no meaningful backlinks or intended standalone content. |
+| `/category/case-studies/` | Equivalent projects collection if one exists, else homepage | Candidate | Backlink/index check and equivalent destination. |
+| `/category/tech-blog/`, blog tags, author archive | Retain with blog; later map to equivalent blog collection or homepage | Candidate | Blog decision plus Search Console/backlink evidence. |
+| Case-study tags | Redirect to equivalent project collection where semantically valid; else homepage | Candidate | Per-tag relevance and backlink/index check. |
+| `/blocks/*` | Remove from sitemap; redirect to homepage | Candidate | Confirm no meaningful backlinks or intended standalone content. |
 | Old WordPress-upload CV PDFs | One owner-approved stable CV URL, or retain/archive without public redirect | Unknown | Current CV supplied; privacy and cache behavior approved. |
 
 Redirect implementation must preserve query strings where safe, avoid chains, use permanent status only after validation, and be tested against an exact pre-cutover URL export.
@@ -178,17 +180,19 @@ These are external operational prerequisites. Do not commit the resulting databa
 
 **Current backup status:** not verified. The local PDF/JPEG subset does not satisfy these gates.
 
-## Unresolved owner decisions
+## Owner decisions (answered 2026-08-18)
 
-- final English/Vietnamese profile and career copy
-- which Case Studies become featured projects and their real Live Demo/Code destinations
-- public permission for employer/client names and supporting employment evidence
-- whether certificate images are published at all, and the exact redaction/derivative policy
-- current downloadable CV file and stable production URL
-- blog retention/migration hosting mechanism during the Next.js cutover
-- per-route handling for non-migrated Case Studies and low-value taxonomy/archive URLs after Search Console/backlink review
-- final contact/social destinations and public contact fields
-- whether About FEAON has any approved future role in the personal portfolio
-- complete uploads inventory, including homepage portraits/logo and any inline post media omitted from sitemaps
+The unresolved items below were answered by the owner in Issue #46 (D1–D10). See `docs/migration/owner-decision-capture.md` for the recorded answers and acceptance criteria. Summary of the changes they imply for Issue #16:
+
+- final English/Vietnamese profile and career copy — **D1:** current copy approved as production-for-now.
+- which Case Studies become featured projects and their real Live Demo/Code destinations — **D2:** keep current dataset temporarily (owner-approved exception to the "no placeholder" criterion).
+- public permission for employer/client names and supporting employment evidence — **D3:** do not publish; remove/rewrite without inventing.
+- whether certificate images are published at all, and the exact redaction/derivative policy — **D4:** visible similarly to the legacy portfolio; use only required legacy assets with intentional derivatives.
+- current downloadable CV file and stable production URL — **D5:** no current CV; omit the CV link/action.
+- blog retention/migration hosting mechanism during the Next.js cutover — **D6:** no blog in the Next.js MVP.
+- per-route handling for non-migrated Case Studies and low-value taxonomy/archive URLs — **D7:** equivalent → equivalent; no equivalent → homepage (owner override of the blanket-homepage guidance).
+- final contact/social destinations and public contact fields — **D8:** keep GitHub only; no invented destinations.
+- whether About FEAON has any approved future role in the personal portfolio — **D9:** no role; keep excluded.
+- complete uploads inventory, including homepage portraits/logo and any inline post media omitted from sitemaps — **D10:** required migration assets confirmed locally under `docs/migration/legacy-assets/`; map only Issue #16's required assets.
 
 Unknowns above are explicit cutover gates; they must not be filled with guessed content or broad redirects.
