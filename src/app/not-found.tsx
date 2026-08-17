@@ -10,6 +10,8 @@ import { getMessages } from "@/features/i18n/messages";
 import { getLocalizedPathname } from "@/features/i18n/routing";
 import { ThemeScript } from "@/features/theme/theme-script";
 
+import "@/styles/globals.css";
+
 const localeRewriteHeader = "x-qvak-locale-rewrite";
 
 export default async function NotFound() {
