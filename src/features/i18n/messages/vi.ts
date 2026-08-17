@@ -31,6 +31,12 @@ const messages = {
     switchToLight: "Chuyển sang giao diện sáng",
     switchToDark: "Chuyển sang giao diện tối",
   },
+  notFound: {
+    eyebrow: "404",
+    title: "Không tìm thấy trang này",
+    description: "Trang bạn đang tìm có thể đã di chuyển hoặc không còn tồn tại.",
+    homeAction: "Về Trang chủ",
+  },
   foundation: {
     eyebrow: "Nền tảng portfolio",
     title: "Một khung nền rõ ràng cho hành trình phía trước.",

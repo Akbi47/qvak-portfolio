@@ -30,6 +30,12 @@ export interface PortfolioMessages {
   localeSwitcher: LocaleSwitcherMessages;
   header: HeaderMessages;
   themeToggle: ThemeToggleMessages;
+  notFound: {
+    eyebrow: string;
+    title: string;
+    description: string;
+    homeAction: string;
+  };
   foundation: {
     eyebrow: string;
     title: string;

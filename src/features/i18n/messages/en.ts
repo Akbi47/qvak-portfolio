@@ -31,6 +31,13 @@ const messages = {
     switchToLight: "Switch to light theme",
     switchToDark: "Switch to dark theme",
   },
+  notFound: {
+    eyebrow: "404",
+    title: "This page could not be found",
+    description:
+      "The page you are looking for may have moved or no longer exists.",
+    homeAction: "Back to Home",
+  },
   foundation: {
     eyebrow: "Portfolio foundation",
     title: "A clear frame for the work ahead.",

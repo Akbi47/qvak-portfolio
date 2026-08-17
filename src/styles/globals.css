@@ -44,7 +44,7 @@
   --color-surface-subtle: var(--palette-neutral-100);
   --color-surface-elevated: var(--palette-neutral-0);
   --color-text: var(--palette-neutral-950);
-  --color-text-muted: var(--palette-neutral-500);
+  --color-text-muted: oklch(52% 0.025 270);
   --color-text-inverse: var(--palette-neutral-0);
   --color-border: var(--palette-neutral-200);
   --color-border-strong: oklch(78% 0.02 270);
@@ -2166,12 +2166,78 @@ video {
   }
 }
 
+.not-found {
+  display: grid;
+  min-height: max(32rem, 70vh);
+  align-items: center;
+  padding-block: var(--section-space);
+  background:
+    radial-gradient(
+      circle at 12% 12%,
+      var(--color-accent-soft),
+      transparent 24rem
+    ),
+    var(--color-page);
+}
+
+.not-found__card {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.not-found__eyebrow {
+  color: var(--color-accent);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-wide);
+  text-transform: uppercase;
+}
+
+.not-found__title {
+  font-size: var(--font-size-display);
+  font-weight: var(--font-weight-bold);
+}
+
+.not-found__description {
+  max-width: 34rem;
+  color: var(--color-text-muted);
+}
+
+.not-found__action {
+  display: inline-flex;
+  width: fit-content;
+  min-height: 3.25rem;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-6);
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-pill);
+  background: var(--color-accent);
+  color: var(--color-text-inverse);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+  box-shadow: var(--shadow-sm);
+  transition:
+    background-color var(--motion-duration-fast) var(--motion-ease-standard),
+    border-color var(--motion-duration-fast) var(--motion-ease-standard),
+    transform var(--motion-duration-fast) var(--motion-ease-standard);
+}
+
+.not-found__action:hover {
+  border-color: var(--color-accent-hover);
+  background: var(--color-accent-hover);
+  transform: translateY(-1px);
+}
+
 .navigation-anchor--placeholder {
   display: grid;
   min-height: max(28rem, 65vh);
   align-items: center;
   border-block-start: 1px solid var(--color-border);
-}.navigation-anchor--placeholder:nth-of-type(odd) {
+}
+
+.navigation-anchor--placeholder:nth-of-type(odd) {
   background: var(--color-surface-subtle);
 }
 
