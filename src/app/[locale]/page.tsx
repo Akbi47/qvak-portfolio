@@ -14,6 +14,7 @@ import { getResumeContent } from "@/content/resume";
 import { getSkillsContent } from "@/content/skills";
 import { getMessages } from "@/features/i18n/messages";
 import { getLocaleFromParams } from "@/features/i18n/server";
+import { getSeoMetadata } from "@/features/seo/metadata";
 import { navigationSectionIds } from "@/features/navigation/config";
 
 interface LocalePageProps {
@@ -26,10 +27,11 @@ export async function generateMetadata({
   const locale = await getLocaleFromParams(params);
   const messages = await getMessages(locale);
 
-  return {
+  return getSeoMetadata({
+    locale,
     title: messages.metadata.title,
     description: messages.metadata.description,
-  };
+  });
 }
 
 export default async function LocalePage({

@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
 import { SiteHeader } from "@/components/navigation/site-header";
+import { StructuredData } from "@/components/seo/structured-data";
 import { FooterSection } from "@/components/sections/footer/footer-section";
 import { getFooterContent } from "@/content/footer";
 import { portfolioProfile } from "@/content/profile";
@@ -35,6 +36,7 @@ export default async function LocaleLayout({
         <ThemeScript />
       </head>
       <body>
+        <StructuredData locale={locale} />
         <ThemeProvider>
           <SiteHeader
             githubUrl={portfolioProfile.githubUrl}

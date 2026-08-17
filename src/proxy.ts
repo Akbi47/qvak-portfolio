@@ -1,9 +1,27 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-import { defaultLocale, locales } from "@/features/i18n/config";
+import { defaultLocale, locales, type Locale } from "@/features/i18n/config";
+import { getLocalizedPathname } from "@/features/i18n/routing";
 
 const localeRewriteHeader = "x-qvak-locale-rewrite";
+
+const legacyRedirects = {
+  "/resume": "#resume",
+  "/resume/": "#resume",
+  "/case-studies": "#projects",
+  "/case-studies/": "#projects",
+} as const;
+
+function getLegacyRedirect(locale: Locale, pathname: string): string | null {
+  const fragment = legacyRedirects[pathname as keyof typeof legacyRedirects];
+
+  if (!fragment) {
+    return null;
+  }
+
+  return `${getLocalizedPathname("/", locale)}${fragment}`;
+}
 
 export function proxy(request: NextRequest) {
   const url = request.nextUrl.clone();
@@ -20,6 +38,19 @@ export function proxy(request: NextRequest) {
 
     url.pathname = pathname.slice(defaultLocale.length + 1) || "/";
     return NextResponse.redirect(url);
+  }
+
+  const requestedLocale = pathnameLocale ?? defaultLocale;
+  const legacyPathname = pathnameLocale
+    ? pathname.slice(pathnameLocale.length + 1)
+    : pathname;
+  const redirectPath = getLegacyRedirect(requestedLocale, legacyPathname);
+
+  if (redirectPath) {
+    return NextResponse.redirect(
+      `${url.origin}${redirectPath}${url.search}`,
+      301,
+    );
   }
 
   if (pathnameLocale) {
