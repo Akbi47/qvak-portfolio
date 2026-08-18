@@ -70,9 +70,20 @@ export interface ResumeContentView {
   viewImage: string;
   closeLightbox: string;
   lightboxLabel: string;
-  privateMessage: string;
-  privateTitle: string;
   categories: ReadonlyArray<ResumeCategoryView>;
+}
+
+/**
+ * Public-safe strings only — no categories, entries, media, or links.
+ * Rendered by a server component when the resume section is private, so no
+ * sensitive content ever reaches the client RSC payload.
+ */
+export interface ResumeLockContentView {
+  eyebrow: string;
+  title: string;
+  description: string;
+  privateTitle: string;
+  privateMessage: string;
 }
 
 export const resumeEntries = [
@@ -149,8 +160,8 @@ export const resumeEntries = [
     media: [
       {
         id: "englishwing-employment-confirmation",
-        thumbnailSrc: "/images/resume/englishwing-employment-thumb.jpg",
-        fullSrc: "/images/resume/englishwing-employment.jpg",
+        thumbnailSrc: "/api/resume-media/englishwing-employment-thumb.jpg",
+        fullSrc: "/api/resume-media/englishwing-employment.jpg",
         alt: {
           en: "EnglishWing employment confirmation document",
           vi: "Giấy xác nhận làm việc tại EnglishWing",
@@ -273,8 +284,8 @@ export const resumeEntries = [
     media: [
       {
         id: "bachelor-degree-certificate",
-        thumbnailSrc: "/images/resume/bachelor-degree-thumb.jpg",
-        fullSrc: "/images/resume/bachelor-degree.jpg",
+        thumbnailSrc: "/api/resume-media/bachelor-degree-thumb.jpg",
+        fullSrc: "/api/resume-media/bachelor-degree.jpg",
         alt: {
           en: "Bachelor's degree certificate in Electronics–Telecommunications Engineering issued by the University of Science, VNU-HCM",
           vi: "Bằng cử nhân Kỹ thuật Điện tử–Viễn thông do Trường Đại học Khoa học Tự nhiên, ĐHQG-HCM cấp",
@@ -288,8 +299,8 @@ export const resumeEntries = [
       },
       {
         id: "academic-transcript",
-        thumbnailSrc: "/images/resume/transcript-thumb.jpg",
-        fullSrc: "/images/resume/transcript.jpg",
+        thumbnailSrc: "/api/resume-media/transcript-thumb.jpg",
+        fullSrc: "/api/resume-media/transcript.jpg",
         alt: {
           en: "Academic transcript from the University of Science, VNU-HCM",
           vi: "Bảng điểm của Trường Đại học Khoa học Tự nhiên, ĐHQG-HCM",
@@ -326,8 +337,8 @@ export const resumeEntries = [
     media: [
       {
         id: "toeic-certificate",
-        thumbnailSrc: "/images/resume/toeic-thumb.jpg",
-        fullSrc: "/images/resume/toeic.jpg",
+        thumbnailSrc: "/api/resume-media/toeic-thumb.jpg",
+        fullSrc: "/api/resume-media/toeic.jpg",
         alt: {
           en: "TOEIC certificates recording Listening & Reading 775 and Speaking & Writing 330",
           vi: "Chứng chỉ TOEIC ghi nhận điểm Nghe & Đọc 775 và Nói & Viết 330",
@@ -374,8 +385,8 @@ export const resumeEntries = [
     media: [
       {
         id: "basic-it-application-certificate",
-        thumbnailSrc: "/images/resume/basic-it-application-thumb.jpg",
-        fullSrc: "/images/resume/basic-it-application.jpg",
+        thumbnailSrc: "/api/resume-media/basic-it-application-thumb.jpg",
+        fullSrc: "/api/resume-media/basic-it-application.jpg",
         alt: {
           en: "Basic IT Application Certificate issued by the University of Science IT Center in 2019",
           vi: "Chứng chỉ Ứng dụng CNTT cơ bản do Trung tâm Tin học, Trường Đại học Khoa học Tự nhiên cấp năm 2019",
@@ -507,8 +518,6 @@ export function getResumeContent(locale: Locale): ResumeContentView {
     viewImage: resumeCopy.viewImage[locale],
     closeLightbox: resumeCopy.closeLightbox[locale],
     lightboxLabel: resumeCopy.lightboxLabel[locale],
-    privateMessage: resumeCopy.privateMessage[locale],
-    privateTitle: resumeCopy.privateTitle[locale],
     categories: categories.map((categoryId) => {
       const entries = (resumeEntries as ReadonlyArray<ResumeEntry>)
         .filter((entry) => entry.category === categoryId)
@@ -545,5 +554,20 @@ export function getResumeContent(locale: Locale): ResumeContentView {
         })),
       };
     }),
+  };
+}
+
+/**
+ * Returns only public-safe strings for the private lock state. Deliberately
+ * never touches `resumeEntries`, so no employer name, link, or media path can
+ * leak into the client payload while the resume is private.
+ */
+export function getResumeLockContent(locale: Locale): ResumeLockContentView {
+  return {
+    eyebrow: resumeCopy.eyebrow[locale],
+    title: resumeCopy.title[locale],
+    description: resumeCopy.description[locale],
+    privateTitle: resumeCopy.privateTitle[locale],
+    privateMessage: resumeCopy.privateMessage[locale],
   };
 }

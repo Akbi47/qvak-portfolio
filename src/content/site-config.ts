@@ -8,10 +8,10 @@ export interface SiteConfig {
   };
 }
 
-export const siteConfig = {
+export const siteConfig: SiteConfig = {
   sections: {
     resume: {
       publicity: "private",
     },
   },
-} as const satisfies SiteConfig;
+};
