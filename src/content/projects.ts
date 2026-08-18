@@ -269,16 +269,16 @@ export const projects = [
     id: "dynamic-global-solution-landing-page",
     slug: "dynamic-global-solution-landing-page",
     title: {
-      en: "Dynamic Global Solution Landing Page",
-      vi: "Landing page Dynamic Global Solution",
+      en: "Technology Services Landing Page",
+      vi: "Landing page dịch vụ công nghệ",
     },
     category: {
       en: "Web · Technology services",
       vi: "Web · Dịch vụ công nghệ",
     },
     summary: {
-      en: "A performance-focused landing page representing Dynamic Global Solution, a company offering cloud, software, and cybersecurity services.",
-      vi: "Landing page tập trung hiệu năng đại diện cho Dynamic Global Solution, công ty cung cấp dịch vụ cloud, phần mềm và an ninh mạng.",
+      en: "A performance-focused landing page for a technology services company offering cloud, software, and cybersecurity services.",
+      vi: "Landing page tập trung hiệu năng cho một công ty dịch vụ công nghệ cung cấp dịch vụ cloud, phần mềm và an ninh mạng.",
     },
     techStack: ["WordPress", "Elementor", "Contact Form 7", "Yoast SEO"],
     media: [
@@ -286,8 +286,8 @@ export const projects = [
         id: "dgs-landing-main",
         src: "/images/projects/dgs-landing.webp",
         alt: {
-          en: "Dynamic Global Solution hero section with a professional at a desk and a glowing globe",
-          vi: "Phần hero của Dynamic Global Solution với chuyên gia làm việc tại bàn và quả địa cầu phát sáng",
+          en: "Technology services landing page hero section with a professional at a desk and a glowing globe",
+          vi: "Phần hero của landing page dịch vụ công nghệ với chuyên gia làm việc tại bàn và quả địa cầu phát sáng",
         },
         width: 1792,
         height: 1024,

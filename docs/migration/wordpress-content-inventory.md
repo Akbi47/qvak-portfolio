@@ -71,17 +71,19 @@ The MVP is a long-scroll portfolio and does not require a dedicated resume route
 
 ## Local legacy source manifest
 
-All files below currently remain under `docs/migration/legacy-assets/`. Preserve their filenames and bytes during Issue #2; do not move them into `public/` or commit them as production assets in this PR.
+All files below currently remain under `docs/migration/legacy-assets/`. Preserve their filenames and bytes; do not move them into `public/` or commit them as production assets. Production publication uses sharp-derived derivatives only.
+
+> **Owner amendment (2026-08-18, Issue #46 / D3-D4 reversal):** All five certificate-related scans below are now approved for unredacted derivative publication matching the legacy `/resume/` page (bachelor, TOEIC, basic IT, transcript, EnglishWing employment confirmation), gated by the resume section publicity mechanism (private by default). Derivatives live in `private-assets/resume/` (not `public/`) and are served only through the gated `/api/resume-media/` route (404 while private). The Codeforces screenshot stays unpublished; a live profile link is used instead. See `owner-decision-capture.md`.
 
 | Local file | Dimensions / type | Supports | Decision | Publication/privacy note |
 |---|---|---|---|---|
 | `Resume - Portfolio Quách Võ Anh Khoa.pdf` | PDF, 7 pages | Full legacy `/resume/` layout and content hierarchy | Archive | Browser-rendered evidence only; includes legacy navigation/footer/map and embedded personal records. Not the canonical downloadable CV. |
-| `quachvoanhkhoa-certificate-2.jpg` | 1920×2560 JPEG | EnglishWing employment confirmation | Archive / Replace | Contains signatures, seal, and employment document text. Keep privately unless an explicitly approved redacted derivative is needed. |
-| `quachvoanhkhoa-certificate-3.jpg` | 2560×1920 JPEG | Bachelor’s degree | Keep source / Replace public copy | Contains birth and credential identifiers. Prefer structured text plus an approved redacted derivative. |
-| `quachvoanhkhoa-certificate-4.jpg` | 1920×2560 JPEG | Academic transcript | Archive / Replace | Contains detailed academic and personal identifiers; raw public use is not approved. |
-| `toeic-cer.jpg` | 2397×1892 JPEG | TOEIC Listening/Reading and Speaking/Writing certificates | Keep source / Replace public copy | Contains portrait, birth date, and score-report identifiers. Redaction and owner approval are required before publication. |
-| `quachvoanhkhoa-certificate-1.jpg` | 2047×1394 JPEG | Basic IT Application Certificate | Keep source / Replace public copy | Contains birth and certificate identifiers. Redaction and owner approval are required before publication. |
-| `codeforces-cer.jpg` | 1603×1002 JPEG | Codeforces Expert profile | Replace | Screenshot contains an email address and may become stale. Use a verified live profile URL/current text instead. |
+| `quachvoanhkhoa-certificate-2.jpg` | 1920×2560 JPEG | EnglishWing employment confirmation | Keep source / Publish derivative | Unredacted derivative `englishwing-employment.jpg` published on the EnglishWing career entry (D3 reversal), delivered via the gated `/api/resume-media/` route from `private-assets/resume/`; gated by resume publicity. Raw file stays here. |
+| `quachvoanhkhoa-certificate-3.jpg` | 2560×1920 JPEG | Bachelor’s degree | Keep source / Publish derivative | Unredacted derivative `bachelor-degree.jpg` published (D4 amendment). Raw file stays here. |
+| `quachvoanhkhoa-certificate-4.jpg` | 1920×2560 JPEG | Academic transcript | Keep source / Publish derivative | Unredacted derivative `transcript.jpg` published on the Bachelor's entry (D4 amendment). Raw file stays here. |
+| `toeic-cer.jpg` | 2397×1892 JPEG | TOEIC Listening/Reading and Speaking/Writing certificates | Keep source / Publish derivative | Unredacted derivative `toeic.jpg` published (D4 amendment). Raw file stays here. |
+| `quachvoanhkhoa-certificate-1.jpg` | 2047×1394 JPEG | Basic IT Application Certificate | Keep source / Publish derivative | Unredacted derivative `basic-it-application.jpg` published (D4 amendment). Raw file stays here. |
+| `codeforces-cer.jpg` | 1603×1002 JPEG | Codeforces Expert profile | Replace | Screenshot contains an email address and may become stale. Live profile URL used instead. |
 
 No raw source in this table is approved for production merely because the legacy WordPress page displayed it.
 
@@ -137,17 +139,19 @@ Taxonomy/author URLs should remain with the retained blog/case-study content unt
 
 No redirect below is implemented by Issue #2.
 
+> **Owner override (2026-08-18, Issue #46 / D7):** Legacy URL with a meaningful equivalent in the new portfolio → redirect to that new equivalent; legacy URL with no equivalent → redirect to the homepage. This explicitly overrides the previous guidance below against blanket homepage redirects. Execution of cutover redirects belongs to Issue #17.
+
 | Legacy URL or group | Planned destination/behavior | Status | Gate before activation |
 |---|---|---|---|
 | `/` | `/` | Keep | New homepage content approved and deployed. |
 | `/resume/` | Permanent redirect to `/#resume` | Decided, not implemented | Equivalent Resume section live; content/media/privacy review complete. |
 | `/case-studies/` | Permanent redirect to `/#projects` | Decided conditionally | Approved Projects section represents the collection. |
-| Six Case Study post URLs | Equivalent project detail or selected state; otherwise retain | Mapping required | Featured set and per-project destination approved. |
+| Six Case Study post URLs | Redirect to equivalent project content (the six featured projects) if a meaningful equivalent exists | Mapping required | Featured set and per-project destination approved. |
 | `/blog/` and four Tech Blog post URLs | Retain now; migrate later | Decided, hosting mechanism unresolved | Content/export verified and post-MVP blog or retirement plan approved. |
-| `/category/case-studies/` | Equivalent projects collection if one exists | Candidate | Backlink/index check and equivalent destination. |
-| `/category/tech-blog/`, blog tags, author archive | Retain with blog; later map to equivalent blog collection or evaluate `410` | Candidate | Blog decision plus Search Console/backlink evidence. |
-| Case-study tags | Equivalent project collection only where semantically valid; otherwise evaluate `410` | Candidate | Per-tag relevance and backlink/index check. |
-| `/blocks/*` | Remove from sitemap; candidate `410 Gone` | Candidate | Confirm no meaningful backlinks or intended standalone content. |
+| `/category/case-studies/` | Equivalent projects collection if one exists, else homepage | Candidate | Backlink/index check and equivalent destination. |
+| `/category/tech-blog/`, blog tags, author archive | Retain with blog; later map to equivalent blog collection or homepage | Candidate | Blog decision plus Search Console/backlink evidence. |
+| Case-study tags | Redirect to equivalent project collection where semantically valid; else homepage | Candidate | Per-tag relevance and backlink/index check. |
+| `/blocks/*` | Remove from sitemap; redirect to homepage | Candidate | Confirm no meaningful backlinks or intended standalone content. |
 | Old WordPress-upload CV PDFs | One owner-approved stable CV URL, or retain/archive without public redirect | Unknown | Current CV supplied; privacy and cache behavior approved. |
 
 Redirect implementation must preserve query strings where safe, avoid chains, use permanent status only after validation, and be tested against an exact pre-cutover URL export.
@@ -178,17 +182,19 @@ These are external operational prerequisites. Do not commit the resulting databa
 
 **Current backup status:** not verified. The local PDF/JPEG subset does not satisfy these gates.
 
-## Unresolved owner decisions
+## Owner decisions (answered 2026-08-18)
 
-- final English/Vietnamese profile and career copy
-- which Case Studies become featured projects and their real Live Demo/Code destinations
-- public permission for employer/client names and supporting employment evidence
-- whether certificate images are published at all, and the exact redaction/derivative policy
-- current downloadable CV file and stable production URL
-- blog retention/migration hosting mechanism during the Next.js cutover
-- per-route handling for non-migrated Case Studies and low-value taxonomy/archive URLs after Search Console/backlink review
-- final contact/social destinations and public contact fields
-- whether About FEAON has any approved future role in the personal portfolio
-- complete uploads inventory, including homepage portraits/logo and any inline post media omitted from sitemaps
+The unresolved items below were answered by the owner in Issue #46 (D1–D10). See `docs/migration/owner-decision-capture.md` for the recorded answers and acceptance criteria. Summary of the changes they imply for Issue #16:
+
+- final English/Vietnamese profile and career copy — **D1:** current copy approved as production-for-now.
+- which Case Studies become featured projects and their real Live Demo/Code destinations — **D2:** keep current dataset temporarily (owner-approved exception to the "no placeholder" criterion).
+- public permission for employer/client names and supporting employment evidence — **D3 (amended 2026-08-18):** publish all four employer names with legacy descriptions plus the EnglishWing employment confirmation, gated by the resume publicity mechanism (private by default).
+- whether certificate images are published at all, and the exact redaction/derivative policy — **D4 (amended 2026-08-18):** publish all five certificate derivatives (bachelor, TOEIC, basic IT, transcript, EnglishWing confirmation) matching the legacy page; Codeforces uses a live profile link; gated by resume publicity and served via the `/api/resume-media/` route.
+- current downloadable CV file and stable production URL — **D5:** no current CV; omit the CV link/action.
+- blog retention/migration hosting mechanism during the Next.js cutover — **D6:** no blog in the Next.js MVP.
+- per-route handling for non-migrated Case Studies and low-value taxonomy/archive URLs — **D7:** equivalent → equivalent; no equivalent → homepage (owner override of the blanket-homepage guidance).
+- final contact/social destinations and public contact fields — **D8:** keep GitHub only; no invented destinations.
+- whether About FEAON has any approved future role in the personal portfolio — **D9:** no role; keep excluded.
+- complete uploads inventory, including homepage portraits/logo and any inline post media omitted from sitemaps — **D10:** required migration assets confirmed locally under `docs/migration/legacy-assets/`; map only Issue #16's required assets.
 
 Unknowns above are explicit cutover gates; they must not be filled with guessed content or broad redirects.

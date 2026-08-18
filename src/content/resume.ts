@@ -18,13 +18,14 @@ export interface ResumeEntry {
   id: string;
   category: ResumeCategory;
   title: LocalizedText;
-  organization: LocalizedText;
+  organization?: LocalizedText;
   location?: LocalizedText;
   dateLabel?: LocalizedText;
   summary?: LocalizedText;
   highlights?: ReadonlyArray<LocalizedText>;
   tags?: ReadonlyArray<LocalizedText>;
   media?: ReadonlyArray<ResumeMedia>;
+  links?: ReadonlyArray<{ label: LocalizedText; href: string }>;
   order: number;
 }
 
@@ -42,13 +43,14 @@ export interface ResumeEntryView {
   id: string;
   index: string;
   title: string;
-  organization: string;
+  organization?: string;
   location?: string;
   dateLabel?: string;
   summary?: string;
   highlights?: ReadonlyArray<string>;
   tags?: ReadonlyArray<string>;
   media?: ReadonlyArray<ResumeMediaView>;
+  links?: ReadonlyArray<{ label: string; href: string }>;
 }
 
 export interface ResumeCategoryView {
@@ -71,9 +73,22 @@ export interface ResumeContentView {
   categories: ReadonlyArray<ResumeCategoryView>;
 }
 
+/**
+ * Public-safe strings only — no categories, entries, media, or links.
+ * Rendered by a server component when the resume section is private, so no
+ * sensitive content ever reaches the client RSC payload.
+ */
+export interface ResumeLockContentView {
+  eyebrow: string;
+  title: string;
+  description: string;
+  privateTitle: string;
+  privateMessage: string;
+}
+
 export const resumeEntries = [
   {
-    id: "dynamic-global-solutions",
+    id: "fullstack-maintenance",
     category: "career-journey",
     title: {
       en: "Full-stack development and maintenance",
@@ -88,8 +103,8 @@ export const resumeEntries = [
       vi: "2024 – Hiện tại",
     },
     summary: {
-      en: "Full-stack development and maintenance for products including QR food ordering and real-time chat.",
-      vi: "Phát triển và bảo trì full-stack cho các sản phẩm bao gồm gọi món bằng QR và chat thời gian thực.",
+      en: "Full-stack development and maintenance for products including QR food ordering and real-time chat. The company focuses on outsourced projects for international clients.",
+      vi: "Phát triển và bảo trì full-stack cho các sản phẩm bao gồm gọi món bằng QR và chat thời gian thực. Công ty chuyên về các dự án gia công cho khách hàng quốc tế.",
     },
     highlights: [
       {
@@ -109,7 +124,7 @@ export const resumeEntries = [
     order: 1,
   },
   {
-    id: "englishwing",
+    id: "backend-lms",
     category: "career-journey",
     title: {
       en: "Backend work on a learning management system",
@@ -124,8 +139,8 @@ export const resumeEntries = [
       vi: "2024",
     },
     summary: {
-      en: "Backend work on a learning management system, with frontend and DevOps collaboration.",
-      vi: "Làm backend cho hệ thống quản lý học tập, phối hợp frontend và DevOps.",
+      en: "Backend work on a learning management system at an EdTech company offering English learning platforms, with frontend and DevOps collaboration.",
+      vi: "Làm backend cho hệ thống quản lý học tập tại một công ty EdTech cung cấp nền tảng học tiếng Anh, phối hợp frontend và DevOps.",
     },
     highlights: [
       {
@@ -142,10 +157,27 @@ export const resumeEntries = [
       { en: "LMS", vi: "LMS" },
       { en: "DevOps", vi: "DevOps" },
     ],
+    media: [
+      {
+        id: "englishwing-employment-confirmation",
+        thumbnailSrc: "/api/resume-media/englishwing-employment-thumb.jpg",
+        fullSrc: "/api/resume-media/englishwing-employment.jpg",
+        alt: {
+          en: "EnglishWing employment confirmation document",
+          vi: "Giấy xác nhận làm việc tại EnglishWing",
+        },
+        caption: {
+          en: "EnglishWing employment confirmation",
+          vi: "Xác nhận làm việc tại EnglishWing",
+        },
+        width: 1600,
+        height: 2133,
+      },
+    ],
     order: 2,
   },
   {
-    id: "smartit",
+    id: "vehicle-booking-fullstack",
     category: "career-journey",
     title: {
       en: "Full-stack work on vehicle booking and management",
@@ -160,8 +192,8 @@ export const resumeEntries = [
       vi: "2023",
     },
     summary: {
-      en: "Full-stack work on vehicle booking and management for the Japanese market.",
-      vi: "Làm full-stack cho hệ thống đặt và quản lý xe phục vụ thị trường Nhật Bản.",
+      en: "Full-stack work on vehicle booking and management for the Japanese market. Maintained the backend, optimized APIs, and worked on frontend features and debugging.",
+      vi: "Làm full-stack cho hệ thống đặt và quản lý xe phục vụ thị trường Nhật Bản. Bảo trì backend, tối ưu API và làm các tính năng frontend cùng debug.",
     },
     highlights: [
       {
@@ -181,7 +213,7 @@ export const resumeEntries = [
     order: 3,
   },
   {
-    id: "zenitech",
+    id: "wordpress-seo-development",
     category: "career-journey",
     title: {
       en: "WordPress and SEO development",
@@ -196,8 +228,8 @@ export const resumeEntries = [
       vi: "2020 – 2023",
     },
     summary: {
-      en: "WordPress and SEO development, layout work, performance optimization, and Google Ads.",
-      vi: "Phát triển WordPress và SEO, làm layout, tối ưu hiệu năng và Google Ads.",
+      en: "WordPress and SEO development at an agency serving local and global clients. Starting point in tech, covering layout customization, LCP/CLS optimization, and Google Ads.",
+      vi: "Phát triển WordPress và SEO tại một agency phục vụ khách hàng trong nước và quốc tế. Điểm khởi đầu trong ngành công nghệ, gồm tùy chỉnh layout, tối ưu LCP/CLS và Google Ads.",
     },
     highlights: [
       {
@@ -240,10 +272,46 @@ export const resumeEntries = [
         en: "Good classification",
         vi: "Xếp loại Khá",
       },
+      {
+        en: "GPA 7.72",
+        vi: "GPA 7.72",
+      },
     ],
     tags: [
       { en: "Electronics", vi: "Điện tử" },
       { en: "Telecommunications", vi: "Viễn thông" },
+    ],
+    media: [
+      {
+        id: "bachelor-degree-certificate",
+        thumbnailSrc: "/api/resume-media/bachelor-degree-thumb.jpg",
+        fullSrc: "/api/resume-media/bachelor-degree.jpg",
+        alt: {
+          en: "Bachelor's degree certificate in Electronics–Telecommunications Engineering issued by the University of Science, VNU-HCM",
+          vi: "Bằng cử nhân Kỹ thuật Điện tử–Viễn thông do Trường Đại học Khoa học Tự nhiên, ĐHQG-HCM cấp",
+        },
+        caption: {
+          en: "Bachelor's degree certificate",
+          vi: "Bằng cử nhân",
+        },
+        width: 1600,
+        height: 1200,
+      },
+      {
+        id: "academic-transcript",
+        thumbnailSrc: "/api/resume-media/transcript-thumb.jpg",
+        fullSrc: "/api/resume-media/transcript.jpg",
+        alt: {
+          en: "Academic transcript from the University of Science, VNU-HCM",
+          vi: "Bảng điểm của Trường Đại học Khoa học Tự nhiên, ĐHQG-HCM",
+        },
+        caption: {
+          en: "Academic transcript",
+          vi: "Bảng điểm",
+        },
+        width: 1600,
+        height: 2133,
+      },
     ],
     order: 1,
   },
@@ -265,6 +333,23 @@ export const resumeEntries = [
     tags: [
       { en: "English", vi: "Tiếng Anh" },
       { en: "TOEIC", vi: "TOEIC" },
+    ],
+    media: [
+      {
+        id: "toeic-certificate",
+        thumbnailSrc: "/api/resume-media/toeic-thumb.jpg",
+        fullSrc: "/api/resume-media/toeic.jpg",
+        alt: {
+          en: "TOEIC certificates recording Listening & Reading 775 and Speaking & Writing 330",
+          vi: "Chứng chỉ TOEIC ghi nhận điểm Nghe & Đọc 775 và Nói & Viết 330",
+        },
+        caption: {
+          en: "TOEIC certificates",
+          vi: "Chứng chỉ TOEIC",
+        },
+        width: 1600,
+        height: 1263,
+      },
     ],
     order: 2,
   },
@@ -297,6 +382,23 @@ export const resumeEntries = [
       { en: "IT", vi: "CNTT" },
       { en: "Certificate", vi: "Chứng chỉ" },
     ],
+    media: [
+      {
+        id: "basic-it-application-certificate",
+        thumbnailSrc: "/api/resume-media/basic-it-application-thumb.jpg",
+        fullSrc: "/api/resume-media/basic-it-application.jpg",
+        alt: {
+          en: "Basic IT Application Certificate issued by the University of Science IT Center in 2019",
+          vi: "Chứng chỉ Ứng dụng CNTT cơ bản do Trung tâm Tin học, Trường Đại học Khoa học Tự nhiên cấp năm 2019",
+        },
+        caption: {
+          en: "Basic IT Application Certificate",
+          vi: "Chứng chỉ Ứng dụng CNTT cơ bản",
+        },
+        width: 1600,
+        height: 1090,
+      },
+    ],
     order: 3,
   },
   {
@@ -307,8 +409,8 @@ export const resumeEntries = [
       vi: "Hồ sơ Codeforces",
     },
     organization: {
-      en: "Handle: anhkhoaquachvo",
-      vi: "Handle: anhkhoaquachvo",
+      en: "Rank: Expert · Handle: anhkhoaquachvo",
+      vi: "Rank: Expert · Handle: anhkhoaquachvo",
     },
     summary: {
       en: "Competitive programming profile referenced in the legacy resume.",
@@ -323,6 +425,15 @@ export const resumeEntries = [
     tags: [
       { en: "Competitive programming", vi: "Lập trình thi đấu" },
       { en: "Codeforces", vi: "Codeforces" },
+    ],
+    links: [
+      {
+        label: {
+          en: "View Codeforces profile",
+          vi: "Xem hồ sơ Codeforces",
+        },
+        href: "https://codeforces.com/profile/anhkhoaquachvo",
+      },
     ],
     order: 4,
   },
@@ -369,6 +480,14 @@ const resumeCopy = {
     en: "Full-size image viewer",
     vi: "Trình xem hình kích thước đầy đủ",
   },
+  privateMessage: {
+    en: "Resume details are private. Request access to view the full career and education history.",
+    vi: "Chi tiết hồ sơ hiện ở chế độ riêng tư. Hãy liên hệ để xem đầy đủ hành trình sự nghiệp và học vấn.",
+  },
+  privateTitle: {
+    en: "Resume is private",
+    vi: "Hồ sơ đang ở chế độ riêng tư",
+  },
   categoryNames: {
     "career-journey": {
       en: "Career Journey",
@@ -411,7 +530,9 @@ export function getResumeContent(locale: Locale): ResumeContentView {
           id: entry.id,
           index: String(index + 1).padStart(2, "0"),
           title: localized(entry.title),
-          organization: localized(entry.organization),
+          organization: entry.organization
+            ? localized(entry.organization)
+            : undefined,
           location: entry.location ? localized(entry.location) : undefined,
           dateLabel: entry.dateLabel ? localized(entry.dateLabel) : undefined,
           summary: entry.summary ? localized(entry.summary) : undefined,
@@ -426,8 +547,27 @@ export function getResumeContent(locale: Locale): ResumeContentView {
             width: media.width,
             height: media.height,
           })),
+          links: entry.links?.map((link) => ({
+            label: localized(link.label),
+            href: link.href,
+          })),
         })),
       };
     }),
+  };
+}
+
+/**
+ * Returns only public-safe strings for the private lock state. Deliberately
+ * never touches `resumeEntries`, so no employer name, link, or media path can
+ * leak into the client payload while the resume is private.
+ */
+export function getResumeLockContent(locale: Locale): ResumeLockContentView {
+  return {
+    eyebrow: resumeCopy.eyebrow[locale],
+    title: resumeCopy.title[locale],
+    description: resumeCopy.description[locale],
+    privateTitle: resumeCopy.privateTitle[locale],
+    privateMessage: resumeCopy.privateMessage[locale],
   };
 }

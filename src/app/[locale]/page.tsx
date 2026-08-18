@@ -6,11 +6,13 @@ import { ContactSection } from "@/components/sections/contact/contact-section";
 import { HeroSection } from "@/components/sections/home/hero-section";
 import { ProjectsSection } from "@/components/sections/projects/projects-section";
 import { ResumeSection } from "@/components/sections/resume/resume-section";
+import { ResumeSectionLock } from "@/components/sections/resume/resume-section-lock";
 import { SkillsSection } from "@/components/sections/skills/skills-section";
 import { getContactContent } from "@/content/contact";
 import { getPortfolioProfile } from "@/content/profile";
 import { getFeaturedProjects } from "@/content/projects";
-import { getResumeContent } from "@/content/resume";
+import { getResumeContent, getResumeLockContent } from "@/content/resume";
+import { siteConfig } from "@/content/site-config";
 import { getSkillsContent } from "@/content/skills";
 import { getMessages } from "@/features/i18n/messages";
 import { getLocaleFromParams } from "@/features/i18n/server";
@@ -42,15 +44,21 @@ export default async function LocalePage({
   const profile = getPortfolioProfile(locale);
   const skills = getSkillsContent(locale);
   const projects = getFeaturedProjects(locale);
-  const resume = getResumeContent(locale);
   const contact = getContactContent(locale);
+
+  const isResumePrivate =
+    siteConfig.sections.resume.publicity === "private";
 
   return (
     <PageShell>
       <HeroSection profile={profile} />
       <SkillsSection content={skills} />
       <ProjectsSection content={projects} />
-      <ResumeSection content={resume} />
+      {isResumePrivate ? (
+        <ResumeSectionLock content={getResumeLockContent(locale)} />
+      ) : (
+        <ResumeSection content={getResumeContent(locale)} />
+      )}
       <ContactSection content={contact} />
 
       {navigationSectionIds.slice(6).map((sectionId) => (
