@@ -7,6 +7,23 @@
   // See https://github.com/obra/superpowers (docs/README.opencode.md).
   "plugin": ["superpowers@git+https://github.com/obra/superpowers.git"],
 
+  // Supabase MCP: remote, DEV project only, read-only, project-scoped.
+  // Authenticate with: opencode mcp auth supabase (browser OAuth).
+  // Vercel MCP: remote, project-scoped to qvak-portfolio (watt6 team).
+  // Authenticate with: opencode mcp auth vercel (browser OAuth).
+  "mcp": {
+    "supabase": {
+      "type": "remote",
+      "url": "https://mcp.supabase.com/mcp?project_ref=lpxpzxbmmxnikerptcfq&read_only=true",
+      "enabled": true
+    },
+    "vercel": {
+      "type": "remote",
+      "url": "https://mcp.vercel.com/watt6/qvak-portfolio",
+      "enabled": true
+    }
+  },
+
   // Approved safe Git/GitHub permission policy.
   //
   // - Safe repository inspection, staging, and commits run without confirmation.
