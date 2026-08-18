@@ -20,15 +20,6 @@ export function proxy(request: NextRequest) {
 
   const requestHeaders = new Headers(request.headers);
 
-  if (pathnameLocale === defaultLocale) {
-    if (requestHeaders.get(localeRewriteHeader) === defaultLocale) {
-      return NextResponse.next({ request: { headers: requestHeaders } });
-    }
-
-    url.pathname = pathname.slice(defaultLocale.length + 1) || "/";
-    return NextResponse.redirect(url);
-  }
-
   const requestedLocale = pathnameLocale ?? defaultLocale;
   const legacyPathname = pathnameLocale
     ? pathname.slice(pathnameLocale.length + 1)
@@ -45,6 +36,15 @@ export function proxy(request: NextRequest) {
       ),
       301,
     );
+  }
+
+  if (pathnameLocale === defaultLocale) {
+    if (requestHeaders.get(localeRewriteHeader) === defaultLocale) {
+      return NextResponse.next({ request: { headers: requestHeaders } });
+    }
+
+    url.pathname = pathname.slice(defaultLocale.length + 1) || "/";
+    return NextResponse.redirect(url);
   }
 
   const normalizedPathname = normalizeTrailingSlash(pathname);
