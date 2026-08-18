@@ -25,6 +25,7 @@ export interface ResumeEntry {
   highlights?: ReadonlyArray<LocalizedText>;
   tags?: ReadonlyArray<LocalizedText>;
   media?: ReadonlyArray<ResumeMedia>;
+  links?: ReadonlyArray<{ label: LocalizedText; href: string }>;
   order: number;
 }
 
@@ -49,6 +50,7 @@ export interface ResumeEntryView {
   highlights?: ReadonlyArray<string>;
   tags?: ReadonlyArray<string>;
   media?: ReadonlyArray<ResumeMediaView>;
+  links?: ReadonlyArray<{ label: string; href: string }>;
 }
 
 export interface ResumeCategoryView {
@@ -68,6 +70,8 @@ export interface ResumeContentView {
   viewImage: string;
   closeLightbox: string;
   lightboxLabel: string;
+  privateMessage: string;
+  privateTitle: string;
   categories: ReadonlyArray<ResumeCategoryView>;
 }
 
@@ -79,13 +83,17 @@ export const resumeEntries = [
       en: "Full-stack development and maintenance",
       vi: "Phát triển và bảo trì full-stack",
     },
+    organization: {
+      en: "Dynamic Global Solutions",
+      vi: "Dynamic Global Solutions",
+    },
     dateLabel: {
       en: "2024 – Present",
       vi: "2024 – Hiện tại",
     },
     summary: {
-      en: "Full-stack development and maintenance for products including QR food ordering and real-time chat.",
-      vi: "Phát triển và bảo trì full-stack cho các sản phẩm bao gồm gọi món bằng QR và chat thời gian thực.",
+      en: "Full-stack development and maintenance for products including QR food ordering and real-time chat. The company focuses on outsourced projects for international clients.",
+      vi: "Phát triển và bảo trì full-stack cho các sản phẩm bao gồm gọi món bằng QR và chat thời gian thực. Công ty chuyên về các dự án gia công cho khách hàng quốc tế.",
     },
     highlights: [
       {
@@ -111,13 +119,17 @@ export const resumeEntries = [
       en: "Backend work on a learning management system",
       vi: "Làm backend cho hệ thống quản lý học tập",
     },
+    organization: {
+      en: "EnglishWing",
+      vi: "EnglishWing",
+    },
     dateLabel: {
       en: "2024",
       vi: "2024",
     },
     summary: {
-      en: "Backend work on a learning management system, with frontend and DevOps collaboration.",
-      vi: "Làm backend cho hệ thống quản lý học tập, phối hợp frontend và DevOps.",
+      en: "Backend work on a learning management system at an EdTech company offering English learning platforms, with frontend and DevOps collaboration.",
+      vi: "Làm backend cho hệ thống quản lý học tập tại một công ty EdTech cung cấp nền tảng học tiếng Anh, phối hợp frontend và DevOps.",
     },
     highlights: [
       {
@@ -134,6 +146,23 @@ export const resumeEntries = [
       { en: "LMS", vi: "LMS" },
       { en: "DevOps", vi: "DevOps" },
     ],
+    media: [
+      {
+        id: "englishwing-employment-confirmation",
+        thumbnailSrc: "/images/resume/englishwing-employment-thumb.jpg",
+        fullSrc: "/images/resume/englishwing-employment.jpg",
+        alt: {
+          en: "EnglishWing employment confirmation document",
+          vi: "Giấy xác nhận làm việc tại EnglishWing",
+        },
+        caption: {
+          en: "EnglishWing employment confirmation",
+          vi: "Xác nhận làm việc tại EnglishWing",
+        },
+        width: 1600,
+        height: 2133,
+      },
+    ],
     order: 2,
   },
   {
@@ -143,13 +172,17 @@ export const resumeEntries = [
       en: "Full-stack work on vehicle booking and management",
       vi: "Làm full-stack cho hệ thống đặt và quản lý xe",
     },
+    organization: {
+      en: "SmartIT",
+      vi: "SmartIT",
+    },
     dateLabel: {
       en: "2023",
       vi: "2023",
     },
     summary: {
-      en: "Full-stack work on vehicle booking and management for the Japanese market.",
-      vi: "Làm full-stack cho hệ thống đặt và quản lý xe phục vụ thị trường Nhật Bản.",
+      en: "Full-stack work on vehicle booking and management for the Japanese market. Maintained the backend, optimized APIs, and worked on frontend features and debugging.",
+      vi: "Làm full-stack cho hệ thống đặt và quản lý xe phục vụ thị trường Nhật Bản. Bảo trì backend, tối ưu API và làm các tính năng frontend cùng debug.",
     },
     highlights: [
       {
@@ -175,13 +208,17 @@ export const resumeEntries = [
       en: "WordPress and SEO development",
       vi: "Phát triển WordPress và SEO",
     },
+    organization: {
+      en: "Zenitech",
+      vi: "Zenitech",
+    },
     dateLabel: {
       en: "2020 – 2023",
       vi: "2020 – 2023",
     },
     summary: {
-      en: "WordPress and SEO development, layout work, performance optimization, and Google Ads.",
-      vi: "Phát triển WordPress và SEO, làm layout, tối ưu hiệu năng và Google Ads.",
+      en: "WordPress and SEO development at an agency serving local and global clients. Starting point in tech, covering layout customization, LCP/CLS optimization, and Google Ads.",
+      vi: "Phát triển WordPress và SEO tại một agency phục vụ khách hàng trong nước và quốc tế. Điểm khởi đầu trong ngành công nghệ, gồm tùy chỉnh layout, tối ưu LCP/CLS và Google Ads.",
     },
     highlights: [
       {
@@ -224,6 +261,10 @@ export const resumeEntries = [
         en: "Good classification",
         vi: "Xếp loại Khá",
       },
+      {
+        en: "GPA 7.72",
+        vi: "GPA 7.72",
+      },
     ],
     tags: [
       { en: "Electronics", vi: "Điện tử" },
@@ -244,6 +285,21 @@ export const resumeEntries = [
         },
         width: 1600,
         height: 1200,
+      },
+      {
+        id: "academic-transcript",
+        thumbnailSrc: "/images/resume/transcript-thumb.jpg",
+        fullSrc: "/images/resume/transcript.jpg",
+        alt: {
+          en: "Academic transcript from the University of Science, VNU-HCM",
+          vi: "Bảng điểm của Trường Đại học Khoa học Tự nhiên, ĐHQG-HCM",
+        },
+        caption: {
+          en: "Academic transcript",
+          vi: "Bảng điểm",
+        },
+        width: 1600,
+        height: 2133,
       },
     ],
     order: 1,
@@ -342,8 +398,8 @@ export const resumeEntries = [
       vi: "Hồ sơ Codeforces",
     },
     organization: {
-      en: "Handle: anhkhoaquachvo",
-      vi: "Handle: anhkhoaquachvo",
+      en: "Rank: Expert · Handle: anhkhoaquachvo",
+      vi: "Rank: Expert · Handle: anhkhoaquachvo",
     },
     summary: {
       en: "Competitive programming profile referenced in the legacy resume.",
@@ -358,6 +414,15 @@ export const resumeEntries = [
     tags: [
       { en: "Competitive programming", vi: "Lập trình thi đấu" },
       { en: "Codeforces", vi: "Codeforces" },
+    ],
+    links: [
+      {
+        label: {
+          en: "View Codeforces profile",
+          vi: "Xem hồ sơ Codeforces",
+        },
+        href: "https://codeforces.com/profile/anhkhoaquachvo",
+      },
     ],
     order: 4,
   },
@@ -404,6 +469,14 @@ const resumeCopy = {
     en: "Full-size image viewer",
     vi: "Trình xem hình kích thước đầy đủ",
   },
+  privateMessage: {
+    en: "Resume details are private. Request access to view the full career and education history.",
+    vi: "Chi tiết hồ sơ hiện ở chế độ riêng tư. Hãy liên hệ để xem đầy đủ hành trình sự nghiệp và học vấn.",
+  },
+  privateTitle: {
+    en: "Resume is private",
+    vi: "Hồ sơ đang ở chế độ riêng tư",
+  },
   categoryNames: {
     "career-journey": {
       en: "Career Journey",
@@ -434,6 +507,8 @@ export function getResumeContent(locale: Locale): ResumeContentView {
     viewImage: resumeCopy.viewImage[locale],
     closeLightbox: resumeCopy.closeLightbox[locale],
     lightboxLabel: resumeCopy.lightboxLabel[locale],
+    privateMessage: resumeCopy.privateMessage[locale],
+    privateTitle: resumeCopy.privateTitle[locale],
     categories: categories.map((categoryId) => {
       const entries = (resumeEntries as ReadonlyArray<ResumeEntry>)
         .filter((entry) => entry.category === categoryId)
@@ -462,6 +537,10 @@ export function getResumeContent(locale: Locale): ResumeContentView {
             caption: media.caption ? localized(media.caption) : undefined,
             width: media.width,
             height: media.height,
+          })),
+          links: entry.links?.map((link) => ({
+            label: localized(link.label),
+            href: link.href,
           })),
         })),
       };

@@ -11,6 +11,7 @@ import { getContactContent } from "@/content/contact";
 import { getPortfolioProfile } from "@/content/profile";
 import { getFeaturedProjects } from "@/content/projects";
 import { getResumeContent } from "@/content/resume";
+import { siteConfig } from "@/content/site-config";
 import { getSkillsContent } from "@/content/skills";
 import { getMessages } from "@/features/i18n/messages";
 import { getLocaleFromParams } from "@/features/i18n/server";
@@ -50,7 +51,10 @@ export default async function LocalePage({
       <HeroSection profile={profile} />
       <SkillsSection content={skills} />
       <ProjectsSection content={projects} />
-      <ResumeSection content={resume} />
+      <ResumeSection
+        content={resume}
+        publicity={siteConfig.sections.resume.publicity}
+      />
       <ContactSection content={contact} />
 
       {navigationSectionIds.slice(6).map((sectionId) => (

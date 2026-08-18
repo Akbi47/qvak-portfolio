@@ -36,6 +36,11 @@ Each item records the current state in the repository and what is required to ac
   2. May any supporting employment evidence (e.g. the EnglishWing confirmation) be publicly referenced or published? If so, under what derivative/redaction policy?
 - **Acceptance:** Every employer/client name and project association is explicitly approved or corrected; the publication/redaction status of supporting employment evidence is explicitly decided (private / public-with-redaction / text-only reference), with no silent assumption either way.
 - **Decision (2026-08-18):** Do **not** publish employer/client names or supporting employment evidence. Remove or rewrite public content as necessary **without inventing replacement companies or facts**.
+- **Amendment (2026-08-18, owner decision reversal):** The owner revised this decision after seeing the MVP resume felt incomplete. All four employer names (Dynamic Global Solutions, EnglishWing, SmartIT, Zenitech) and their detailed legacy descriptions are published again in the Career Journey, and the EnglishWing employment confirmation image is published as a certificate derivative. This is gated by the resume section publicity mechanism (private by default — see new decision record below), so nothing sensitive is served publicly until the owner flips the config to `visible`.
+
+### Resume section publicity mechanism (added 2026-08-18)
+
+- **Decision (2026-08-18):** The resume section has a config-driven publicity gate: `src/content/site-config.ts` → `sections.resume.publicity`, defaulting to **`private`**. When private, the section renders its heading plus a lock overlay and **does not render resume content into the DOM at all** (privacy, not just blur — content cannot be scraped or keyboard-navigated). When the owner is applying for roles, they set the value to `visible` and deploy; the full component renders as before. This is the MVP config-based mechanism; the future CMS/admin route (Issue 19) may drive the same value at runtime.
 
 ### D4 — Certificate publication / redaction policy
 
@@ -45,6 +50,7 @@ Each item records the current state in the repository and what is required to ac
 - **Acceptance:** Certificate media policy is explicit; any published derivative is owner-approved and redacted; raw originals stay out of `public/`.
 - **Decision (2026-08-18):** Certificate content may be visible **similarly to the legacy WordPress portfolio**. Inspect the required source assets under `docs/migration/legacy-assets/`; use only the needed assets, with intentional production paths, dimensions, localized alt text, and the existing resume/lightbox behavior. Do not invent certificate data.
 - **Redaction exception (2026-08-18):** Explicit owner-approved exception to the "redacted derivative" acceptance above. The published derivatives (Bachelor's degree, TOEIC, Basic IT Application) are production-sized/compressed versions of the legacy source scans and **are not redacted** — they expose the same identifiers present in the legacy scans, which the legacy WordPress portfolio also published publicly. Raw originals remain outside `public/`. This exception applies only to the three D4/D10-required certificate assets.
+- **Amendment (2026-08-18, owner decision reversal):** The owner expanded the exception to publish **all** certificate-related media, matching the legacy `/resume/` page: the academic **transcript** (`certificate-4` → `transcript.jpg`) is added to the Bachelor's degree entry and the **EnglishWing employment confirmation** (`certificate-2` → `englishwing-employment.jpg`) to the EnglishWing career entry. All five certificate derivatives (bachelor, TOEIC, basic IT, transcript, EnglishWing confirmation) are unredacted production copies of the legacy scans; raw originals stay out of `public/`. The Codeforces **screenshot** is NOT published — a live profile link is used instead per the inventory recommendation (screenshot contains an email address and goes stale). Publication is additionally gated by the resume publicity mechanism (private by default).
 
 ### D5 — Current downloadable CV file + stable URL
 
@@ -133,13 +139,14 @@ The criteria below are **additive/refined** — they do not replace the above; t
 
 1. Featured project set and order match the owner-approved list (D2) — satisfies #16 criterion 1/2. *(Owner-approved temporary-content exception per D2: the current project dataset is retained temporarily and is explicitly NOT treated as satisfying criterion 1.)*
 2. Every rendered Live Demo/Code URL is owner-verified live; missing destinations are intentionally omitted (D2) — satisfies #16 criterion 2/3.
-3. No employer/client name or supporting employment evidence is published (D3) — satisfies #16 criterion 6.
-4. Certificate derivatives are intentional production assets (paths, dimensions, localized alt text, resume/lightbox behavior) derived only from required legacy-assets (D4/D10); raw originals stay out of `public/` — satisfies #16 criterion 5/6.
+3. All four employer names and detailed legacy descriptions are published in the Career Journey (D3 amended) — satisfies #16 criterion 6 under the publicity gate.
+4. Certificate derivatives are intentional production assets (paths, dimensions, localized alt text, resume/lightbox behavior) derived only from required legacy-assets (D4/D10 amended): bachelor, TOEIC, basic IT, transcript, EnglishWing employment confirmation; raw originals stay out of `public/`; Codeforces uses a live profile link, not the screenshot — satisfies #16 criterion 5/6 under the publicity gate.
 5. CV link/action is omitted until a real file and stable URL exist (D5) — satisfies #16 criterion 1/2/3.
 6. Contact/social destinations match the owner-approved set (GitHub only) (D8) — satisfies #16 criterion 2.
 7. Final EN/VI copy is owner-approved across all content files (D1) — satisfies #16 criterion 4.
 8. No bytes from `docs/migration/legacy-assets/` are moved into `public/` or the runtime bundle — supports #16 criterion 6.
 9. Redirect activation follows decisions (D7): equivalent legacy URLs redirect to their equivalent; non-equivalent legacy URLs redirect to the homepage; execution belongs to Issue #17. *(Cutover guard — does not map to an existing #16 criterion; tracked under #17.)*
+10. Resume section publicity is config-driven and defaults to `private`; when private the resume content is not rendered into the DOM (lock overlay only) — satisfies #16 criterion 6 privacy requirement at the delivery boundary.
 
 ---
 

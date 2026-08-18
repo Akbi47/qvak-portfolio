@@ -8,7 +8,7 @@ import { contactDetails } from "@/content/contact";
 import { portfolioProfile } from "@/content/profile";
 import { projects, type Project } from "@/content/projects";
 import { resumeEntries, type ResumeEntry } from "@/content/resume";
-import { skills } from "@/content/skills";
+import { siteConfig } from "@/content/site-config";
 
 const locales: Locale[] = ["en", "vi"];
 
@@ -17,9 +17,8 @@ const publicRoot = join(process.cwd(), "public");
 const allProjects = projects as ReadonlyArray<Project>;
 const allEntries = resumeEntries as ReadonlyArray<ResumeEntry>;
 
-const forbiddenEmployerNames = [
+const employerNames = [
   "Dynamic Global Solutions",
-  "Dynamic Global Solution",
   "EnglishWing",
   "SmartIT",
   "Zenitech",
@@ -37,33 +36,6 @@ function collectStrings(value: unknown, out: string[] = []): string[] {
       collectStrings(nested, out);
     }
   }
-  return out;
-}
-
-function collectPublishedStrings(value: unknown, out: string[] = []): string[] {
-  if (Array.isArray(value)) {
-    for (const item of value) {
-      collectPublishedStrings(item, out);
-    }
-    return out;
-  }
-
-  if (typeof value !== "object" || value === null) {
-    if (typeof value === "string") {
-      out.push(value);
-    }
-    return out;
-  }
-
-  const record = value as Record<string, unknown>;
-
-  for (const [key, nested] of Object.entries(record)) {
-    if (key === "id" || key === "slug") {
-      continue;
-    }
-    collectPublishedStrings(nested, out);
-  }
-
   return out;
 }
 
@@ -98,24 +70,31 @@ test("every resume entry is complete for both locales", () => {
   }
 });
 
-test("no employer or client names are published anywhere (D3)", () => {
-  const allContent = [
-    portfolioProfile,
-    projects,
-    resumeEntries,
-    contactDetails,
-    skills,
-  ];
-  const haystack = collectPublishedStrings(allContent)
-    .join("\n")
-    .toLowerCase();
+test("career entries publish the four approved employer names (D3 reversal)", () => {
+  const careerEntries = allEntries.filter(
+    (entry) => entry.category === "career-journey",
+  );
+  const publishedOrganizations = careerEntries
+    .map((entry) => entry.organization)
+    .filter(
+      (
+        organization,
+      ): organization is NonNullable<ResumeEntry["organization"]> =>
+        Boolean(organization),
+    )
+    .map((organization) => organization.en);
 
-  for (const name of forbiddenEmployerNames) {
+  for (const name of employerNames) {
     assert.ok(
-      !haystack.includes(name.toLowerCase()),
-      `forbidden employer/client name found in content: ${name}`,
+      publishedOrganizations.includes(name),
+      `career entry missing employer name: ${name}`,
     );
   }
+  assert.equal(publishedOrganizations.length, careerEntries.length);
+});
+
+test("resume section publicity defaults to private (privacy gate)", () => {
+  assert.equal(siteConfig.sections.resume.publicity, "private");
 });
 
 test("legacy project slug is preserved for redirect compatibility", () => {
@@ -133,6 +112,7 @@ test("no fake or placeholder external links", () => {
     allProjects
       .flatMap((project) => [project.liveDemoUrl, project.codeUrl])
       .filter(Boolean),
+    allEntries.flatMap((entry) => (entry.links ?? []).map((link) => link.href)),
     contactDetails,
   ]).filter((value) => value.startsWith("http") || value.startsWith("/"));
 
@@ -221,6 +201,10 @@ const approvedCertificateDerivatives = new Set([
   "/images/resume/toeic-thumb.jpg",
   "/images/resume/basic-it-application.jpg",
   "/images/resume/basic-it-application-thumb.jpg",
+  "/images/resume/transcript.jpg",
+  "/images/resume/transcript-thumb.jpg",
+  "/images/resume/englishwing-employment.jpg",
+  "/images/resume/englishwing-employment-thumb.jpg",
 ]);
 
 test("resume certificate media uses only the approved derivatives (D4)", () => {

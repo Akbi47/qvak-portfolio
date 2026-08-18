@@ -71,17 +71,19 @@ The MVP is a long-scroll portfolio and does not require a dedicated resume route
 
 ## Local legacy source manifest
 
-All files below currently remain under `docs/migration/legacy-assets/`. Preserve their filenames and bytes during Issue #2; do not move them into `public/` or commit them as production assets in this PR.
+All files below currently remain under `docs/migration/legacy-assets/`. Preserve their filenames and bytes; do not move them into `public/` or commit them as production assets. Production publication uses sharp-derived derivatives only.
+
+> **Owner amendment (2026-08-18, Issue #46 / D3-D4 reversal):** All five certificate-related scans below are now approved for unredacted derivative publication matching the legacy `/resume/` page (bachelor, TOEIC, basic IT, transcript, EnglishWing employment confirmation), gated by the resume section publicity mechanism (private by default). The Codeforces screenshot stays unpublished; a live profile link is used instead. See `owner-decision-capture.md`.
 
 | Local file | Dimensions / type | Supports | Decision | Publication/privacy note |
 |---|---|---|---|---|
 | `Resume - Portfolio Quách Võ Anh Khoa.pdf` | PDF, 7 pages | Full legacy `/resume/` layout and content hierarchy | Archive | Browser-rendered evidence only; includes legacy navigation/footer/map and embedded personal records. Not the canonical downloadable CV. |
-| `quachvoanhkhoa-certificate-2.jpg` | 1920×2560 JPEG | EnglishWing employment confirmation | Archive / Replace | Contains signatures, seal, and employment document text. Keep privately unless an explicitly approved redacted derivative is needed. |
-| `quachvoanhkhoa-certificate-3.jpg` | 2560×1920 JPEG | Bachelor’s degree | Keep source / Replace public copy | Contains birth and credential identifiers. Prefer structured text plus an approved redacted derivative. |
-| `quachvoanhkhoa-certificate-4.jpg` | 1920×2560 JPEG | Academic transcript | Archive / Replace | Contains detailed academic and personal identifiers; raw public use is not approved. |
-| `toeic-cer.jpg` | 2397×1892 JPEG | TOEIC Listening/Reading and Speaking/Writing certificates | Keep source / Replace public copy | Contains portrait, birth date, and score-report identifiers. Redaction and owner approval are required before publication. |
-| `quachvoanhkhoa-certificate-1.jpg` | 2047×1394 JPEG | Basic IT Application Certificate | Keep source / Replace public copy | Contains birth and certificate identifiers. Redaction and owner approval are required before publication. |
-| `codeforces-cer.jpg` | 1603×1002 JPEG | Codeforces Expert profile | Replace | Screenshot contains an email address and may become stale. Use a verified live profile URL/current text instead. |
+| `quachvoanhkhoa-certificate-2.jpg` | 1920×2560 JPEG | EnglishWing employment confirmation | Keep source / Publish derivative | Unredacted derivative `englishwing-employment.jpg` published on the EnglishWing career entry (D3 reversal); gated by resume publicity. Raw file stays here. |
+| `quachvoanhkhoa-certificate-3.jpg` | 2560×1920 JPEG | Bachelor’s degree | Keep source / Publish derivative | Unredacted derivative `bachelor-degree.jpg` published (D4 amendment). Raw file stays here. |
+| `quachvoanhkhoa-certificate-4.jpg` | 1920×2560 JPEG | Academic transcript | Keep source / Publish derivative | Unredacted derivative `transcript.jpg` published on the Bachelor's entry (D4 amendment). Raw file stays here. |
+| `toeic-cer.jpg` | 2397×1892 JPEG | TOEIC Listening/Reading and Speaking/Writing certificates | Keep source / Publish derivative | Unredacted derivative `toeic.jpg` published (D4 amendment). Raw file stays here. |
+| `quachvoanhkhoa-certificate-1.jpg` | 2047×1394 JPEG | Basic IT Application Certificate | Keep source / Publish derivative | Unredacted derivative `basic-it-application.jpg` published (D4 amendment). Raw file stays here. |
+| `codeforces-cer.jpg` | 1603×1002 JPEG | Codeforces Expert profile | Replace | Screenshot contains an email address and may become stale. Live profile URL used instead. |
 
 No raw source in this table is approved for production merely because the legacy WordPress page displayed it.
 
@@ -186,8 +188,8 @@ The unresolved items below were answered by the owner in Issue #46 (D1–D10). S
 
 - final English/Vietnamese profile and career copy — **D1:** current copy approved as production-for-now.
 - which Case Studies become featured projects and their real Live Demo/Code destinations — **D2:** keep current dataset temporarily (owner-approved exception to the "no placeholder" criterion).
-- public permission for employer/client names and supporting employment evidence — **D3:** do not publish; remove/rewrite without inventing.
-- whether certificate images are published at all, and the exact redaction/derivative policy — **D4:** visible similarly to the legacy portfolio; use only required legacy assets with intentional derivatives.
+- public permission for employer/client names and supporting employment evidence — **D3 (amended 2026-08-18):** publish all four employer names with legacy descriptions plus the EnglishWing employment confirmation, gated by the resume publicity mechanism (private by default).
+- whether certificate images are published at all, and the exact redaction/derivative policy — **D4 (amended 2026-08-18):** publish all five certificate derivatives (bachelor, TOEIC, basic IT, transcript, EnglishWing confirmation) matching the legacy page; Codeforces uses a live profile link; gated by resume publicity.
 - current downloadable CV file and stable production URL — **D5:** no current CV; omit the CV link/action.
 - blog retention/migration hosting mechanism during the Next.js cutover — **D6:** no blog in the Next.js MVP.
 - per-route handling for non-migrated Case Studies and low-value taxonomy/archive URLs — **D7:** equivalent → equivalent; no equivalent → homepage (owner override of the blanket-homepage guidance).

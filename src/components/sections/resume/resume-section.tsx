@@ -10,14 +10,20 @@ import {
 import { Container } from "@/components/layout/container";
 import { SectionHeading } from "@/components/ui/section-heading";
 import type { ResumeContentView } from "@/content/resume";
+import type { SectionPublicity } from "@/content/site-config";
 
 import { ResumeMediaView } from "./resume-media-view";
 
 interface ResumeSectionProps {
   content: ResumeContentView;
+  publicity: SectionPublicity;
 }
 
-export function ResumeSection({ content }: Readonly<ResumeSectionProps>) {
+export function ResumeSection({
+  content,
+  publicity,
+}: Readonly<ResumeSectionProps>) {
+  const isPrivate = publicity === "private";
   const [activeCategory, setActiveCategory] = useState(0);
   const [activeEntry, setActiveEntry] = useState(0);
   const [orientation, setOrientation] = useState<"vertical" | "horizontal">(
@@ -118,7 +124,44 @@ export function ResumeSection({ content }: Readonly<ResumeSectionProps>) {
           />
         </div>
 
-        <div className="resume-layout">
+        {isPrivate ? (
+          <div
+            aria-labelledby="resume-lock-title"
+            className="resume-lock"
+            role="region"
+          >
+            <span aria-hidden="true" className="resume-lock__icon">
+              <svg
+                aria-hidden="true"
+                fill="none"
+                height="40"
+                viewBox="0 0 24 24"
+                width="40"
+              >
+                <path
+                  d="M6 10h12v10H6z"
+                  stroke="currentColor"
+                  strokeLinejoin="round"
+                  strokeWidth="1.6"
+                />
+                <path
+                  d="M9 10V7a3 3 0 0 1 6 0v3"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeWidth="1.6"
+                />
+              </svg>
+            </span>
+            <h3
+              className="resume-lock__title"
+              id="resume-lock-title"
+            >
+              {content.privateTitle}
+            </h3>
+            <p className="resume-lock__message">{content.privateMessage}</p>
+          </div>
+        ) : (
+          <div className="resume-layout">
           <div
             aria-label={content.categoriesLabel}
             aria-orientation={orientation}
@@ -247,6 +290,22 @@ export function ResumeSection({ content }: Readonly<ResumeSectionProps>) {
                     viewImageLabel={content.viewImage}
                   />
                 ) : null}
+
+                {entry.links && entry.links.length > 0 ? (
+                  <ul className="resume-entry__links">
+                    {entry.links.map((link) => (
+                      <li key={link.href}>
+                        <a
+                          href={link.href}
+                          rel="noreferrer"
+                          target="_blank"
+                        >
+                          {link.label}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
               </article>
 
               {totalEntries > 1 ? (
@@ -269,7 +328,8 @@ export function ResumeSection({ content }: Readonly<ResumeSectionProps>) {
               </div>
             </div>
           ))}
-        </div>
+          </div>
+        )}
       </Container>
     </section>
   );
