@@ -1,6 +1,6 @@
 # Quach Vo Anh Khoa — Portfolio Next.js
 
-Planning and implementation source of truth for migrating `quachvoanhkhoa.feaon.com` from WordPress to Next.js.
+Planning and implementation source of truth for migrating the legacy `quachvoanhkhoa.feaon.com` WordPress portfolio to Next.js at the production domain `khoawatt.vercel.app`.
 
 ## Goal
 
