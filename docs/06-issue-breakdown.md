@@ -95,11 +95,27 @@ Requires rollback notes and redirect verification.
 
 ### Issue 18 — `design: specify Supabase portfolio CMS schema and permissions`
 
-### Issue 19 — `feat: implement authenticated portfolio admin shell`
+Common design authority. Translation-aware tables, RLS, runtime settings (resume publicity), the two-gate resume privacy model (per-entity draft/published + global private/visible publicity), repository/view-model adapter contract, media strategy, migration/backfill.
 
-### Issue 20 — `feat: add CMS management for projects skills and resume`
+### Issue 19 — `feat: implement authenticated portfolio admin foundation and runtime resume publicity`
+
+Owner-only auth + server-side authorization, no public signup, no browser secrets. Admin Settings screen toggling `resume.publicity = private | visible` (confirmation + changed-at/owner audit), fail-closed to private; public page and `/api/resume-media/*` read one authoritative value.
+
+### Issue 20 — `feat: add CMS CRUD for profile contact and skills`
+
+First CRUD slice (lowest risk): Profile, Contact/Social, Skills — EN/VI translations, URL validation, deterministic ordering, server-side reads/writes mapped into existing typed view models. Establishes the DB/repository/editing pattern.
+
+### Issue 51 — `feat: add CMS CRUD for projects`
+
+Second CRUD slice: featured/order, Live Demo/Code URL validation.
+
+### Issue 52 — `feat: add CMS CRUD for resume and CV`
+
+Third CRUD slice (most security-sensitive; last): resume categories/entries with draft/preview and the global publicity gate; private media served only through the gated route.
 
 ### Issue 21 — `feat: add CMS media management and publishing workflow`
+
+Postponed after the CRUD slices; expands the storage/security surface (permissions, private/public buckets, orphan cleanup, alt/caption translations, publishing behavior).
 
 ## Dependency graph
 
