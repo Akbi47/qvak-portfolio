@@ -20,6 +20,10 @@ const approvedMediaFiles = [
   "englishwing-employment-thumb.jpg",
 ] as const;
 
+const DENIED_RESPONSE_HEADERS: Readonly<Record<string, string>> = {
+  "Cache-Control": "no-store",
+};
+
 interface ResumeMediaRouteContext {
   params: Promise<{ file: string }>;
 }
@@ -32,24 +36,34 @@ export async function GET(
 ) {
   const publicity: SectionPublicity = siteConfig.sections.resume.publicity;
   if (publicity !== "visible") {
-    return new NextResponse("Resume is private", { status: 404 });
+    return new NextResponse("Resume is private", {
+      status: 404,
+      headers: DENIED_RESPONSE_HEADERS,
+    });
   }
 
   const { file } = await context.params;
 
   if (!(approvedMediaFiles as readonly string[]).includes(file)) {
-    return new NextResponse("Not found", { status: 404 });
+    return new NextResponse("Not found", {
+      status: 404,
+      headers: DENIED_RESPONSE_HEADERS,
+    });
   }
 
   try {
     const bytes = await readFile(join(resumeMediaRoot, file));
     return new NextResponse(new Uint8Array(bytes), {
       headers: {
-        "Cache-Control": "public, max-age=31536000, immutable",
+        "Cache-Control": "no-store",
         "Content-Type": "image/jpeg",
       },
     });
   } catch {
-    return new NextResponse("Not found", { status: 404 });
+    return new NextResponse("Not found", {
+      status: 404,
+      headers: DENIED_RESPONSE_HEADERS,
+    });
   }
 }
+
