@@ -9,7 +9,7 @@
 
   // Supabase MCP: remote, DEV project only, read-only, project-scoped.
   // Authenticate with: opencode mcp auth supabase (browser OAuth).
-  // Vercel MCP: remote, project-scoped to qvak-portfolio (watt6 team).
+  // Vercel MCP: remote, project-scoped to khoawatt (watt6 team).
   // Authenticate with: opencode mcp auth vercel (browser OAuth).
   "mcp": {
     "supabase": {
@@ -19,7 +19,7 @@
     },
     "vercel": {
       "type": "remote",
-      "url": "https://mcp.vercel.com/watt6/qvak-portfolio",
+      "url": "https://mcp.vercel.com/watt6/khoawatt",
       "enabled": true
     }
   },

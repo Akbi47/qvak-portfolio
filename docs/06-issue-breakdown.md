@@ -87,7 +87,7 @@ Keep lightbox reusable and separately testable.
 
 Requires owner decisions captured in `docs/migration/owner-decision-capture.md` (created via issue #46). Do not guess unresolved inventory decisions.
 
-### Issue 17 — `ops: cut over quachvoanhkhoa.feaon.com to Next.js`
+### Issue 17 — `ops: cut over quachvoanhkhoa.feaon.com to khoawatt.vercel.app`
 
 Requires rollback notes and redirect verification.
 

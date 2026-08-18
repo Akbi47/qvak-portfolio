@@ -6,7 +6,7 @@ Owner policy source: `docs/migration/owner-decision-capture.md` (D7 redirect pol
 
 ## When to run
 
-Run before and immediately after the production release cutover for `quachvoanhkhoa.feaon.com`. The automated preflight should be **green** (no `FAIL` entries) before DNS/cutover, and re-run after cutover to confirm the live domain behaves as intended.
+Run before and immediately after the production release cutover to `khoawatt.vercel.app` (replacing the legacy WordPress site at `quachvoanhkhoa.feaon.com`). The automated preflight should be **green** (no `FAIL` entries) before DNS/cutover, and re-run after cutover to confirm the live domain behaves as intended.
 
 ## Prerequisites (external, human-executed)
 

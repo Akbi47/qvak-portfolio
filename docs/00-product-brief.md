@@ -4,7 +4,7 @@
 
 Personal portfolio for **Quach Vo Anh Khoa**, migrating from WordPress to Next.js at:
 
-- Production domain: `https://quachvoanhkhoa.feaon.com`
+- Production domain: `https://khoawatt.vercel.app`
 - Legacy resume: `https://quachvoanhkhoa.feaon.com/resume/`
 
 ## Problem
