@@ -167,17 +167,36 @@
 
 ## Phase 6 — CMS (post-MVP)
 
-### Deliverables
+Phase 6 starts only after the Phase 5 production cutover (#17) is complete and the live site has shown stable IA/data behavior. It is an owner-operated, single-user admin — no teams/roles beyond owner, no public signup, no workflow approvals, no generic page builder.
 
-- Supabase schema
-- translation-aware content tables
-- admin authentication
-- CRUD for skills/projects/resume
-- media management
-- ordering/featured controls
-- publishing workflow as needed
-- preview/revalidation strategy
+### Goals
+
+- Runtime content management for profile, skills, projects, resume/CV, and links/contact — editable without commit + deploy.
+- Runtime resume publicity control (`private | visible`) without redeploy.
+- Content stays normalized behind the existing typed repository/view-model layer; the public UI never queries Supabase rows directly.
+
+### Architecture
+
+- Supabase is the runtime persistence layer for CMS-managed content and settings. A repository/service adapter converts database records into the same normalized typed view models the public components consume (locale validation, component contracts, accessibility, testability preserved).
+- Runtime settings (e.g. `resume.publicity`) are stored server-side and read from one authoritative source by the public page and the gated `/api/resume-media/*` route.
+- Resume privacy uses two independent gates: per-entity draft/published state, plus a global section `private | visible` publicity setting. Public rendering requires published AND visible; any read/config failure fails closed to private. Admin preview renders drafts only inside authenticated routes.
+- Media stays in private/managed storage and is served only through gated/server-authorized routes.
+
+### Slice sequencing
+
+1. #18 — Supabase schema, security, permissions (common design authority).
+2. #19 — single-owner authenticated admin foundation + runtime resume publicity setting.
+3. CRUD slice 1 (#20) — Profile + Contact/Social + Skills (establishes the DB/repository/editing pattern).
+4. CRUD slice 2 (#51) — Projects (featured/order, Live Demo/Code URL validation).
+5. CRUD slice 3 (#52) — Resume/CV with draft/preview/privacy controls (most security-sensitive; last).
+6. #21 — managed media/storage/publishing.
+
+### Exit criteria
+
+- Owner can update content and flip resume publicity in production without redeploying.
+- Public site behavior is unchanged or improved (view models still validated; accessibility/theme/locale preserved).
+- Resume stays fail-closed private by default; no private data reachable through public routes, storage URLs, or cache.
 
 ### Rule
 
-Do not start this phase merely because a field is inconvenient to edit locally. Start it after the public information architecture and data schema have stabilized.
+Do not start Phase 6 code before the Phase 5 cutover (#17) is complete and the live site has shown stable IA/data behavior.
