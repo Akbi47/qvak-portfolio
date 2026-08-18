@@ -162,6 +162,33 @@ test("legacy redirect: proxy redirect preserves the query string", () => {
   );
 });
 
+test("legacy redirect: en-prefixed legacy URL redirects directly (no chain)", () => {
+  const request = new NextRequest("https://example.com/en/resume/?x=1");
+  const response = proxy(request);
+  assert.equal(response.status, 301);
+  assert.equal(
+    response.headers.get("location"),
+    "https://example.com/?x=1#resume",
+  );
+});
+
+test("legacy redirect: en-prefixed blog URL redirects directly to the root", () => {
+  const request = new NextRequest("https://example.com/en/blog/");
+  const response = proxy(request);
+  assert.equal(response.status, 301);
+  assert.equal(response.headers.get("location"), "https://example.com/");
+});
+
+test("legacy redirect: en-prefixed case-studies URL redirects directly", () => {
+  const request = new NextRequest("https://example.com/en/case-studies/");
+  const response = proxy(request);
+  assert.equal(response.status, 301);
+  assert.equal(
+    response.headers.get("location"),
+    "https://example.com/#projects",
+  );
+});
+
 test("trailing slash: /vi/ normalizes to /vi", () => {
   assert.equal(normalizeTrailingSlash("/vi/"), "/vi");
 });

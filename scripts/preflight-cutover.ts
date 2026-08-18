@@ -96,15 +96,35 @@ async function checkLegacyRedirects(origin: string): Promise<void> {
   }
 }
 
-async function checkMetadata(origin: string): Promise<void> {
-  const checks: ReadonlyArray<{ name: string; pattern: RegExp }> = [
-    { name: "title present", pattern: /<title[^>]*>[\s\S]*?<\/title>/i },
-    { name: "canonical link present", pattern: /rel="canonical"/i },
-    { name: "hreflang en present", pattern: /hreflang="en"/i },
-    { name: "hreflang vi present", pattern: /hreflang="vi"/i },
-    { name: "hreflang x-default present", pattern: /hreflang="x-default"/i },
-  ];
+function hrefInLink(
+  html: string,
+  options: { rel?: string; hreflang?: string },
+): string | null {
+  const linkPattern = /<link\b[^>]*>/gi;
+  let match: RegExpExecArray | null;
 
+  while ((match = linkPattern.exec(html)) !== null) {
+    const tag = match[0];
+    const hasRel =
+      options.rel === undefined ||
+      new RegExp(`rel=["']${options.rel}["']`, "i").test(tag);
+    const hasHreflang =
+      options.hreflang === undefined ||
+      new RegExp(`hreflang=["']${options.hreflang}["']`, "i").test(tag);
+
+    if (hasRel && hasHreflang) {
+      return tag.match(/href=["']([^"']+)["']/i)?.[1] ?? null;
+    }
+  }
+
+  return null;
+}
+
+function isAbsoluteHref(href: string): boolean {
+  return /^https?:\/\//i.test(href);
+}
+
+async function checkMetadata(origin: string): Promise<void> {
   let status: number;
   let text: string;
   try {
@@ -121,12 +141,35 @@ async function checkMetadata(origin: string): Promise<void> {
     return;
   }
 
-  for (const check of checks) {
+  const pageOk = status === 200;
+
+  record(
+    "metadata: title present",
+    pageOk && /<title[^>]*>[\s\S]*?<\/title>/i.test(text),
+    "fail",
+    pageOk ? undefined : `status ${status}`,
+  );
+
+  const canonical = hrefInLink(text, { rel: "canonical" });
+  record(
+    "metadata: canonical href is an absolute root URL",
+    pageOk &&
+      canonical !== null &&
+      isAbsoluteHref(canonical) &&
+      new URL(canonical).pathname === "/",
+    "fail",
+    pageOk
+      ? `href ${canonical ?? "missing"}`
+      : `status ${status}`,
+  );
+
+  for (const locale of ["en", "vi", "x-default"]) {
+    const href = hrefInLink(text, { rel: "alternate", hreflang: locale });
     record(
-      `metadata: ${check.name}`,
-      status === 200 && check.pattern.test(text),
+      `metadata: hreflang "${locale}" has an absolute href`,
+      pageOk && href !== null && isAbsoluteHref(href),
       "fail",
-      status === 200 ? undefined : `status ${status}`,
+      pageOk ? `href ${href ?? "missing"}` : `status ${status}`,
     );
   }
 }
