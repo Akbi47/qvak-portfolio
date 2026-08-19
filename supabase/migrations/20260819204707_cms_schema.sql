@@ -161,8 +161,8 @@ insert into app_settings (key, value)
 values ('resume.publicity', '"private"')
 on conflict (key) do nothing;
 
--- Single-owner authorization. Invariant: exactly one row (app-level guard +
--- unique constraint; a trigger prevents a second insert).
+-- Single-owner authorization. Invariant: exactly one row, enforced at the DB
+-- level by the partial unique index below (see admin_owner_single_row).
 create table admin_owner (
   id uuid primary key default gen_random_uuid(),
   auth_uid uuid not null unique,
