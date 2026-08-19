@@ -168,6 +168,8 @@ create table admin_owner (
   auth_uid uuid not null unique,
   created_at timestamptz not null default now()
 );
+-- Single-owner invariant: enforce exactly one row at the DB level (concurrency-safe).
+create unique index admin_owner_single_row on admin_owner ((true));
 
 -- SECURITY DEFINER helpers in a private (non-exposed) schema.
 -- Hardened search_path + schema-qualified relations (avoids RLS recursion and
@@ -216,9 +218,10 @@ grant select, insert, update, delete on profile, profile_translations,
   resume_category_translations, resume_entries, resume_entry_translations,
   resume_media, resume_media_translations, app_settings to authenticated;
 
--- The Next.js server reads app_settings (resume publicity) via the service-role
--- path, so grant it SELECT on this table only (not the content tables).
-grant select on app_settings to service_role;
+-- The Next.js server reads AND writes app_settings (resume publicity) via the
+-- service-role path, so grant it the needed privileges on this table only
+-- (not the content tables).
+grant select, insert, update on app_settings to service_role;
 
 -- RLS enabled on every content table (deny-by-default).
 alter table profile enable row level security;

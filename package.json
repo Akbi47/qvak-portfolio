@@ -13,7 +13,8 @@
     "typecheck": "next typegen && tsc --noEmit",
     "test": "tsx --test src/content/*.test.ts src/features/contact/*.test.ts src/features/newsletter/*.test.ts src/features/seo/*.test.ts src/app/api/resume-media/route.test.ts",
     "preflight": "tsx scripts/preflight-cutover.ts",
-    "seed:admin": "node scripts/seed-admin.mjs"
+    "seed:admin": "node scripts/seed-admin.mjs",
+    "test:db": "NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL:-http://127.0.0.1:54331} node --test scripts/db-invariants.test.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.4",

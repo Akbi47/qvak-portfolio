@@ -33,7 +33,7 @@ export async function setResumePublicity(
     .upsert(
       {
         key: "resume.publicity",
-        value: JSON.stringify(next),
+        value: next,
         changed_at: new Date().toISOString(),
         changed_by: user?.email ?? null,
       },

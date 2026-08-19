@@ -56,25 +56,33 @@ async function main() {
     console.log(`Created auth user: ${email} (${authUid})`);
   }
 
-  // 2. Ensure the admin_owner row exists for this auth user (idempotent).
-  const existingOwner = await fetch(
-    `${url}/rest/v1/admin_owner?auth_uid=eq.${authUid}&select=id`,
+  // 2. Ensure a single admin_owner row exists, pointing at this auth user.
+  // The DB enforces exactly one row (admin_owner_single_row unique index). If
+  // an existing different owner is present, replace it explicitly rather than
+  // silently adding a second row.
+  const ownerList = await fetch(
+    `${url}/rest/v1/admin_owner?select=id,auth_uid`,
     { headers: baseHeaders },
   );
-  const ownerRows = await existingOwner.json();
-  const ownerFound = Array.isArray(ownerRows) && ownerRows.length > 0;
+  const ownerRows = await ownerList.json();
+  const ownerRow = Array.isArray(ownerRows) ? ownerRows[0] : null;
 
   let ownerRes;
-  if (ownerFound) {
-    ownerRes = await fetch(
-      `${url}/rest/v1/admin_owner?auth_uid=eq.${authUid}`,
-      {
-        method: "PATCH",
-        headers: { ...baseHeaders, Prefer: "return=minimal" },
-        body: JSON.stringify({ auth_uid: authUid }),
-      },
-    );
-    console.log(`admin_owner already set; refreshed for ${authUid}`);
+  if (ownerRow) {
+    if (ownerRow.auth_uid === authUid) {
+      ownerRes = { ok: true };
+      console.log(`admin_owner already set for ${authUid}`);
+    } else {
+      ownerRes = await fetch(
+        `${url}/rest/v1/admin_owner?id=eq.${ownerRow.id}`,
+        {
+          method: "PATCH",
+          headers: { ...baseHeaders, Prefer: "return=minimal" },
+          body: JSON.stringify({ auth_uid: authUid }),
+        },
+      );
+      console.log(`Replaced admin_owner with new auth user ${authUid}`);
+    }
   } else {
     ownerRes = await fetch(`${url}/rest/v1/admin_owner`, {
       method: "POST",
