@@ -211,25 +211,59 @@ create table app_settings (
 - Service-role key is server-only and never reaches the browser.
 - Admin state changes (e.g. toggling resume publicity) record `changed_at` / `changed_by` and require explicit confirmation before Visible.
 
-### RLS template (applied to every table)
+### RLS and grants
+
+Supabase treats table `GRANT`s and RLS policies as **separate** authorization layers — both must be set explicitly. Deny-by-default means: `REVOKE` all public/anon/authenticated privileges on content tables, then grant narrowly where required.
 
 ```sql
+-- Deny by default, then open only what is needed.
+revoke all on profile, profile_translations, social_links, skills,
+  skill_translations, projects, project_translations, project_media,
+  project_media_translations, resume_categories, resume_category_translations,
+  resume_entries, resume_entry_translations, resume_media,
+  resume_media_translations, app_settings from anon, authenticated;
+
 alter table <table> enable row level security;
-
-create policy "owner select" on <table> for select to authenticated
-  using (auth.uid() = (select id from admin_owner));
-
-create policy "owner insert" on <table> for insert to authenticated
-  with check (auth.uid() = (select id from admin_owner));
-
-create policy "owner update" on <table> for update to authenticated
-  using (auth.uid() = (select id from admin_owner));
-
-create policy "owner delete" on <table> for delete to authenticated
-  using (auth.uid() = (select id from admin_owner));
 ```
 
-An `admin_owner` table (single row) holds the owner auth id; RLS references it so ownership is centralized and deny-by-default holds.
+#### Owner authorization (non-recursive)
+
+Policies must NOT self-reference the authorization table. Use a hardened `SECURITY DEFINER` helper in a private schema (`private`) that only checks the single-owner invariant, so RLS checks do not recurse into themselves.
+
+```sql
+create schema private;
+
+create table admin_owner (
+  id uuid primary key,
+  auth_uid uuid not null unique,
+  created_at timestamptz not null default now()
+);
+-- Invariant: exactly one row. Enforced by app-level guard on insert plus the
+-- unique/primary-key constraints; a trigger prevents a second insert.
+
+-- SECURITY DEFINER helper: returns true iff the caller is the owner. Runs as
+-- the table owner, so it can read admin_owner without triggering recursion.
+create function private.is_owner()
+returns boolean
+language sql
+security definer
+set search_path = private
+as $$
+  select exists (
+    select 1 from admin_owner where auth_uid = auth.uid()
+  );
+$$;
+```
+
+Every content-table policy uses `private.is_owner()` and never reads `admin_owner` directly:
+
+```sql
+create policy "owner all" on <table> for all to authenticated
+  using (private.is_owner())
+  with check (private.is_owner());
+```
+
+`admin_owner` itself gets a **non-self-referential** policy (only its own writer / server can touch it), not the `private.is_owner()` template.
 
 ## Repository adapter contract
 
@@ -248,17 +282,48 @@ interface PortfolioRepository {
 - The Supabase adapter maps DB rows → the same view models behind the same contract.
 - Canonical/SEO URLs remain config-driven (`productionSiteUrl`); `NEXT_PUBLIC_SITE_URL` unaffected.
 
+## Preview and revalidation strategy
+
+Issue #18 scope requires an explicit draft-preview / revalidation contract:
+
+- **Draft preview is authenticated-only.** Drafts (`draft = true`, or unpublished projects) are readable only through authenticated admin paths, never through the public repository read path. Public repository reads (`PortfolioRepository`) filter to `draft = false` / `published = true` at the query boundary — drafts are never exposed to anonymous/SSR public reads.
+- **Preview rendering** happens inside the authenticated admin route using the same repository adapter with a "preview" mode that does not apply the published filter. Public pages never request preview mode.
+- **Publication/settings mutations define revalidation behavior.** A mutation to a row's published/draft state, `featured`/`order`, or to `app_settings` triggers revalidation of the affected public data (server-rendered pages use the framework's cache revalidation, e.g. `revalidatePath`/`revalidateTag` keyed by the relevant section).
+- **Resume-publicity changes must invalidate/bypass caches** so private media cannot remain accessible: changing `resume.publicity` to `private` revalidates the resume section and any cached media responses, and the `/api/resume-media/*` route must not serve cached private media after the toggle. The route checks the authoritative value on each request (fail closed).
+
+## Runtime read path (server-side, fail closed)
+
+RLS grants table reads only to the authenticated owner, yet the **unauthenticated** public page and `/api/resume-media/*` must read `app_settings('resume.publicity')`. These are distinct read paths:
+
+- **Browser/admin access** → normal RLS (`private.is_owner()`), owner-only.
+- **Public server-side reads** (SSR page + gated media route) → a tightly controlled **server-only service-role path**: the Next.js server holds the service-role key (never the browser) and calls a narrow `SECURITY DEFINER` RPC or directly reads `app_settings` with service-role privileges. This path is intentionally separate from RLS-admin access and is not exposed to the client.
+
+```sql
+-- Narrow server-side read, fail closed to 'private' on any error/missing row.
+create function private.get_app_setting(p_key text)
+returns jsonb
+language sql
+security definer
+set search_path = private
+as $$
+  select value from app_settings where key = p_key;
+$$;
+```
+
+The repository/runtime gate resolves `resume.publicity` via this server-only path; a missing row, error, or non-`visible` value resolves to `private` (never visible).
+
 ## Migration and backfill
 
-1. **SQL migration** creates the tables, `app_settings`, `admin_owner`, enables RLS, and installs owner policies.
+1. **SQL migration** creates the tables, `app_settings`, `admin_owner`, the `private` schema with `private.is_owner()` / `private.get_app_setting()` SECURITY DEFINER helpers, enables RLS, installs REVOKE/GRANT, and installs owner policies.
 2. **Backfill script** reads local `src/content/*.ts` and inserts into Supabase, preserving stable IDs and translations (seed `resume.publicity` to `private`).
 3. Migration/backfill are committed to the repo as version-controlled SQL + script; credentials never committed.
 
 ## Acceptance mapping
 
 - Schema preserves stable IDs and translations without duplicating documents → base + translation tables.
-- Runtime settings + two-gate resume privacy explicitly specified → `app_settings` + `draft`/`publicity` model.
-- RLS/admin permissions explicit, single owner, deny-by-default → RLS template + `admin_owner`.
+- Runtime settings + two-gate resume privacy explicitly specified → `app_settings` + `draft`/`publicity` model + fail-closed server read path.
+- Preview/revalidation strategy explicitly specified → authenticated-only draft preview, public reads filter drafts, mutation-driven revalidation, publicity toggle invalidates caches.
+- RLS/admin permissions explicit, single owner, deny-by-default → REVOKE + RLS template via `private.is_owner()` SECURITY DEFINER helper + separate grants.
 - Media ownership/access explicit → private/public bucket strategy + gated route.
 - Local repository view models remain the UI contract → `PortfolioRepository` adapter.
 - Migration/backfill plan exists → SQL migration + backfill script.
