@@ -2668,3 +2668,172 @@ video {
     animation: none !important;
   }
 }
+
+/* Admin shell */
+.admin-shell {
+  min-height: 100vh;
+  background: var(--color-page);
+  color: var(--color-text);
+}
+
+.admin-login {
+  max-width: 24rem;
+  margin: 0 auto;
+  padding: clamp(2rem, 8vw, 4rem) 1.25rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.admin-login h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.admin-login p {
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.admin-login-form {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.admin-field {
+  display: grid;
+  gap: 0.375rem;
+}
+
+.admin-field span {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.admin-field input {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.admin-field input:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.admin-login-form button {
+  padding: 0.625rem 1rem;
+  border: 0;
+  border-radius: 0.5rem;
+  background: var(--color-accent);
+  color: var(--color-text-inverse);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.admin-login-form button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.admin-error {
+  color: var(--color-error);
+  font-size: 0.875rem;
+}
+
+.admin-dashboard {
+  max-width: 44rem;
+  margin: 0 auto;
+  padding: clamp(1.5rem, 5vw, 3rem) 1.25rem;
+  display: grid;
+  gap: 1.5rem;
+}
+
+.admin-dashboard h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.admin-settings {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.admin-card {
+  padding: 1.25rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  background: var(--color-surface);
+  display: grid;
+  gap: 0.875rem;
+}
+
+.admin-card h2,
+.admin-card h3 {
+  margin: 0;
+}
+
+.admin-card p {
+  margin: 0;
+}
+
+.is-visible {
+  color: var(--color-success);
+}
+
+.is-private {
+  color: var(--color-text-muted);
+}
+
+.admin-card button {
+  justify-self: start;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 0.5rem;
+  background: var(--color-surface-elevated);
+  color: var(--color-text);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.admin-card button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.admin-confirm {
+  display: grid;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border: 1px solid var(--color-error);
+  border-radius: 0.5rem;
+}
+
+.admin-confirm__actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.admin-message {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+.admin-card dl {
+  display: grid;
+  grid-template-columns: 8rem 1fr;
+  gap: 0.375rem 1rem;
+  margin: 0;
+}
+
+.admin-card dt {
+  color: var(--color-text-muted);
+}
+
+.admin-card dd {
+  margin: 0;
+}

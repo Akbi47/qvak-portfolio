@@ -12,7 +12,7 @@ import { getContactContent } from "@/content/contact";
 import { getPortfolioProfile } from "@/content/profile";
 import { getFeaturedProjects } from "@/content/projects";
 import { getResumeContent, getResumeLockContent } from "@/content/resume";
-import { siteConfig } from "@/content/site-config";
+import { getResumePublicity } from "@/features/cms/resume-publicity";
 import { getSkillsContent } from "@/content/skills";
 import { getMessages } from "@/features/i18n/messages";
 import { getLocaleFromParams } from "@/features/i18n/server";
@@ -46,8 +46,7 @@ export default async function LocalePage({
   const projects = getFeaturedProjects(locale);
   const contact = getContactContent(locale);
 
-  const isResumePrivate =
-    siteConfig.sections.resume.publicity === "private";
+  const isResumePrivate = (await getResumePublicity()) === "private";
 
   return (
     <PageShell>

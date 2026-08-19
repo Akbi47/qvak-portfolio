@@ -12,7 +12,6 @@ import {
   resumeEntries,
   type ResumeEntry,
 } from "@/content/resume";
-import { siteConfig } from "@/content/site-config";
 
 const locales: Locale[] = ["en", "vi"];
 
@@ -95,10 +94,6 @@ test("career entries publish the four approved employer names (D3 reversal)", ()
     );
   }
   assert.equal(publishedOrganizations.length, careerEntries.length);
-});
-
-test("resume section publicity defaults to private (privacy gate)", () => {
-  assert.equal(siteConfig.sections.resume.publicity, "private");
 });
 
 test("private resume never exposes sensitive strings to the client", () => {

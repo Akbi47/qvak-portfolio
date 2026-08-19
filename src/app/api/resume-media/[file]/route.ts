@@ -2,8 +2,7 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { NextResponse } from "next/server";
 
-import { siteConfig } from "@/content/site-config";
-import type { SectionPublicity } from "@/content/site-config";
+import { getResumePublicity } from "@/features/cms/resume-publicity";
 
 const resumeMediaRoot = join(process.cwd(), "private-assets", "resume");
 
@@ -34,7 +33,7 @@ export async function GET(
   _request: Request,
   context: ResumeMediaRouteContext,
 ) {
-  const publicity: SectionPublicity = siteConfig.sections.resume.publicity;
+  const publicity = await getResumePublicity();
   if (publicity !== "visible") {
     return new NextResponse("Resume is private", {
       status: 404,
