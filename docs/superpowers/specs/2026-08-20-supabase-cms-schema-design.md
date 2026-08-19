@@ -213,27 +213,39 @@ create table app_settings (
 
 ### RLS and grants
 
-Supabase treats table `GRANT`s and RLS policies as **separate** authorization layers — both must be set explicitly. Deny-by-default means: `REVOKE` all public/anon/authenticated privileges on content tables, then grant narrowly where required.
+Supabase treats table `GRANT`s and RLS policies as **separate** authorization layers — both must be set explicitly. RLS filters which rows a role may access; it cannot replace table privileges. The admin role must be `GRANT`ed the needed operations, while `anon` stays at zero privileges and `private.is_owner()` enforces the single-owner row restriction.
 
 ```sql
--- Deny by default, then open only what is needed.
+-- Anon: zero privileges (deny by default).
 revoke all on profile, profile_translations, social_links, skills,
   skill_translations, projects, project_translations, project_media,
   project_media_translations, resume_categories, resume_category_translations,
   resume_entries, resume_entry_translations, resume_media,
-  resume_media_translations, app_settings from anon, authenticated;
+  resume_media_translations, app_settings from anon;
+
+-- Authenticated admin: grant the operations the owner performs; RLS then
+-- restricts which rows the authenticated role may actually access.
+grant select, insert, update, delete on profile, profile_translations,
+  social_links, skills, skill_translations, projects, project_translations,
+  project_media, project_media_translations, resume_categories,
+  resume_category_translations, resume_entries, resume_entry_translations,
+  resume_media, resume_media_translations, app_settings to authenticated;
 
 alter table <table> enable row level security;
 ```
+
+Note: `app_settings` is also read by the unauthenticated public path, but only through the `SECURITY DEFINER` RPC below — `anon` holds no direct table privileges and never reads the table directly.
 
 #### Owner authorization (non-recursive)
 
 Policies must NOT self-reference the authorization table. Use a hardened `SECURITY DEFINER` helper in a private schema (`private`) that only checks the single-owner invariant, so RLS checks do not recurse into themselves.
 
+`admin_owner` and `app_settings` live in the `public` schema, so the SECURITY DEFINER functions use a hardened `search_path` and **schema-qualify** every relation (`public.admin_owner`, `public.app_settings`, `auth.uid()`). Schema-qualifying is required — otherwise an empty search_path would make unqualified references resolve to the wrong schema (e.g. `private.admin_owner`). Functions are executable by `PUBLIC` by default, so REVOKE default execution and GRANT only the roles that need each helper.
+
 ```sql
 create schema private;
 
-create table admin_owner (
+create table public.admin_owner (
   id uuid primary key,
   auth_uid uuid not null unique,
   created_at timestamptz not null default now()
@@ -247,12 +259,15 @@ create function private.is_owner()
 returns boolean
 language sql
 security definer
-set search_path = private
+set search_path = ''
 as $$
   select exists (
-    select 1 from admin_owner where auth_uid = auth.uid()
+    select 1 from public.admin_owner where auth_uid = auth.uid()
   );
 $$;
+
+revoke all on function private.is_owner() from public;
+grant execute on function private.is_owner() to authenticated;
 ```
 
 Every content-table policy uses `private.is_owner()` and never reads `admin_owner` directly:
@@ -300,14 +315,19 @@ RLS grants table reads only to the authenticated owner, yet the **unauthenticate
 
 ```sql
 -- Narrow server-side read, fail closed to 'private' on any error/missing row.
+-- Uses a hardened empty search_path and schema-qualified relation.
 create function private.get_app_setting(p_key text)
 returns jsonb
 language sql
 security definer
-set search_path = private
+set search_path = ''
 as $$
-  select value from app_settings where key = p_key;
+  select value from public.app_settings where key = p_key;
 $$;
+
+-- Executable by PUBLIC by default; restrict to the server-side role only.
+revoke all on function private.get_app_setting(text) from public;
+grant execute on function private.get_app_setting(text) to service_role;
 ```
 
 The repository/runtime gate resolves `resume.publicity` via this server-only path; a missing row, error, or non-`visible` value resolves to `private` (never visible).
