@@ -1,6 +1,6 @@
 import { argv, env, exit } from "node:process";
 
-const DEFAULT_ORIGIN = "https://khoawatt.vercel.app";
+const DEFAULT_ORIGIN = "https://khoawatt.com";
 
 type Severity = "fail" | "info";
 
