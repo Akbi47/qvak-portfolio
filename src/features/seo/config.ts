@@ -1,4 +1,4 @@
-export const productionSiteUrl = "https://khoawatt.vercel.app";
+export const productionSiteUrl = "https://khoawatt.com";
 
 export function getSiteUrl(): string {
   return (process.env.NEXT_PUBLIC_SITE_URL ?? productionSiteUrl).replace(
