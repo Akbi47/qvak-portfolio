@@ -1,4 +1,4 @@
-import { getProfileView } from "./data";
+import { emptyProfileView, getProfileView } from "./data";
 import { ProfileForm } from "./profile-form";
 
 export const metadata = {
@@ -6,19 +6,12 @@ export const metadata = {
 };
 
 export default async function AdminProfilePage() {
-  const profile = await getProfileView();
+  const profile = (await getProfileView()) ?? emptyProfileView();
 
   return (
     <main className="admin-dashboard">
       <h1>Profile</h1>
-      {profile ? (
-        <ProfileForm initial={profile} />
-      ) : (
-        <p className="admin-message">
-          No profile record found. Run the migration/backfill to seed the profile
-          singleton (slug &quot;owner&quot;).
-        </p>
-      )}
+      <ProfileForm initial={profile} />
     </main>
   );
 }

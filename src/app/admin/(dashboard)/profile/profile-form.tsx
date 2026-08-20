@@ -142,14 +142,16 @@ export function ProfileForm({ initial }: ProfileFormProps) {
         <button disabled={isPending} type="submit">
           {isPending ? "Saving…" : "Save profile"}
         </button>
-        <button
-          className="admin-link-button admin-link-button--danger"
-          disabled={isDeleting}
-          onClick={handleDelete}
-          type="button"
-        >
-          {isDeleting ? "Deleting…" : "Delete profile"}
-        </button>
+        {initial.id ? (
+          <button
+            className="admin-link-button admin-link-button--danger"
+            disabled={isDeleting}
+            onClick={handleDelete}
+            type="button"
+          >
+            {isDeleting ? "Deleting…" : "Delete profile"}
+          </button>
+        ) : null}
       </div>
     </form>
   );

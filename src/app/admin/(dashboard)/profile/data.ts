@@ -18,6 +18,27 @@ export interface AdminProfileView {
   locationVi: string | null;
 }
 
+/** Empty default view used to render the profile form in create mode. */
+export function emptyProfileView(): AdminProfileView {
+  return {
+    id: "",
+    slug: "",
+    name: "",
+    shortName: "",
+    githubUrl: null,
+    linkedinUrl: null,
+    resumeUrl: null,
+    phone: null,
+    email: null,
+    roleEn: "",
+    roleVi: "",
+    introEn: "",
+    introVi: "",
+    locationEn: null,
+    locationVi: null,
+  };
+}
+
 export async function getProfileView(): Promise<AdminProfileView | null> {
   const client = await getServerClient();
 
