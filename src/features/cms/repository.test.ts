@@ -27,7 +27,7 @@ const FIXTURES = {
 
 async function insertProject(
   id: string,
-  opts: { status?: string; published?: boolean; withMedia?: boolean },
+  opts: { status?: string; published?: boolean; withMedia?: boolean; order?: number },
 ) {
   const { error } = await client.from("projects").upsert(
     {
@@ -35,7 +35,7 @@ async function insertProject(
       slug: id,
       tech_stack: ["TS"],
       featured: true,
-      order: 1,
+      order: opts.order ?? 1,
       status: opts.status ?? "active",
       published: opts.published ?? true,
     },
@@ -64,7 +64,7 @@ async function insertProject(
     ],
     { onConflict: "project_id,locale" },
   );
-  assert.equal(error, null, `translations ${id}: ${trErr?.message}`);
+  assert.equal(trErr, null, `translations ${id}: ${trErr?.message}`);
 
   if (opts.withMedia) {
     const { error: mediaErr } = await client.from("project_media").upsert(
@@ -79,22 +79,24 @@ async function insertProject(
       },
       { onConflict: "id" },
     );
-    assert.equal(error, null, `media ${id}: ${mediaErr?.message}`);
+    assert.equal(mediaErr, null, `media ${id}: ${mediaErr?.message}`);
   }
 }
 
 async function cleanup() {
-  for (const id of Object.values(FIXTURES)) {
-    await client.from("projects").delete().eq("id", id);
-  }
+  // Isolate from any pre-existing projects so fixture ordering is deterministic.
+  const { error } = await client.from("projects").delete().neq("id", "__none__");
+  assert.equal(error, null, `cleanup projects: ${error?.message}`);
 }
 
 test("public repository only returns featured+published+active projects with media", async () => {
   await cleanup();
-  await insertProject(FIXTURES.valid, { withMedia: true });
+  // zero-media project sorts before the valid one by order, so it must be
+  // dropped BEFORE index assignment to keep the visible index contiguous.
+  await insertProject(FIXTURES.zeroMedia, { withMedia: false, order: 0 });
   await insertProject(FIXTURES.private, { status: "private" });
   await insertProject(FIXTURES.unpublished, { published: false });
-  await insertProject(FIXTURES.zeroMedia, { withMedia: false });
+  await insertProject(FIXTURES.valid, { withMedia: true, order: 1 });
 
   const view = await getFeaturedProjects("en");
   const ids = view.projects.map((p) => p.id);
@@ -118,6 +120,11 @@ test("public repository only returns featured+published+active projects with med
 
   const valid = view.projects.find((p) => p.id === FIXTURES.valid);
   assert.ok(valid, "valid project present");
+  assert.equal(
+    valid?.index,
+    "01",
+    "visible indexes are contiguous (zero-media project dropped before numbering)",
+  );
   assert.deepEqual(
     valid?.highlights,
     ["H1", "H2"],

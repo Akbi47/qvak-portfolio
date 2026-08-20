@@ -316,11 +316,13 @@ export async function getFeaturedProjects(
     const rows = data as ProjectRow[];
     rows.sort((a, b) => a.order - b.order || a.id.localeCompare(b.id));
 
-    const projects = rows
-      .map((row, index) => {
-        const en = row.project_translations.find((t) => t.locale === "en");
-        const active = row.project_translations.find((t) => t.locale === locale);
-        const media = [...(row.project_media ?? [])]
+    // A featured+published project with zero media is non-renderable (the
+    // carousel has no zero-media state). Drop such rows BEFORE assigning the
+    // visible index so numbering stays contiguous (01/…, 02/…).
+    const renderable = rows
+      .map((row) => ({
+        row,
+        media: [...(row.project_media ?? [])]
           .sort((a, b) => a.order - b.order || a.id.localeCompare(b.id))
           .map((m) => {
             const alt =
@@ -335,32 +337,32 @@ export async function getFeaturedProjects(
               height: m.height ?? 600,
               focalPoint: m.focal_point ?? "50% 50%",
             };
-          });
+          }),
+      }))
+      .filter((entry) => entry.media.length > 0);
 
-        // A featured+published project with zero media is non-renderable (the
-        // carousel has no zero-media state). Filter it out of the public result
-        // (media editing is #21).
-        if (media.length === 0) return null;
+    const projects = renderable.map(({ row, media }, index) => {
+      const en = row.project_translations.find((t) => t.locale === "en");
+      const active = row.project_translations.find((t) => t.locale === locale);
 
-        const highlights =
-          parseStringArray(active?.highlights).length > 0
-            ? parseStringArray(active?.highlights)
-            : parseStringArray(en?.highlights);
+      const highlights =
+        parseStringArray(active?.highlights).length > 0
+          ? parseStringArray(active?.highlights)
+          : parseStringArray(en?.highlights);
 
-        return {
-          id: row.id,
-          index: String(index + 1).padStart(2, "0"),
-          title: active?.title ?? en?.title ?? "",
-          category: active?.category ?? en?.category ?? "",
-          summary: active?.summary ?? en?.summary ?? "",
-          techStack: parseTechStack(row.tech_stack),
-          media,
-          liveDemoUrl: row.live_demo_url ?? undefined,
-          codeUrl: row.code_url ?? undefined,
-          ...(highlights.length > 0 ? { highlights } : {}),
-        };
-      })
-      .filter((project): project is NonNullable<typeof project> => project !== null);
+      return {
+        id: row.id,
+        index: String(index + 1).padStart(2, "0"),
+        title: active?.title ?? en?.title ?? "",
+        category: active?.category ?? en?.category ?? "",
+        summary: active?.summary ?? en?.summary ?? "",
+        techStack: parseTechStack(row.tech_stack),
+        media,
+        liveDemoUrl: row.live_demo_url ?? undefined,
+        codeUrl: row.code_url ?? undefined,
+        ...(highlights.length > 0 ? { highlights } : {}),
+      };
+    });
 
     return {
       ...base,

@@ -50,7 +50,7 @@ export async function listProjects(): Promise<AdminProjectRow[]> {
   const { data, error } = await client
     .from("projects")
     .select(
-      "id, slug, tech_stack, live_demo_url, code_url, featured, order, status, published, project_translations(locale, title, category, summary, description)",
+      "id, slug, tech_stack, live_demo_url, code_url, featured, order, status, published, project_translations(locale, title, category, summary, description, highlights)",
     )
     .order("featured", { ascending: false })
     .order("order")

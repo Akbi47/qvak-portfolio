@@ -74,3 +74,7 @@ $$;
 
 revoke all on function public.cms_upsert_project(text, text, jsonb, text, text, boolean, integer, text, boolean, text, text, text, text, text, text, text, text, jsonb, jsonb) from public;
 grant execute on function public.cms_upsert_project(text, text, jsonb, text, text, boolean, integer, text, boolean, text, text, text, text, text, text, text, text, jsonb, jsonb) to authenticated, service_role;
+
+-- Drop the obsolete 17-argument overload from the earlier migration (replaced by
+-- the 19-argument version above that carries highlights).
+drop function if exists public.cms_upsert_project(text, text, jsonb, text, text, boolean, integer, text, boolean, text, text, text, text, text, text, text, text);
