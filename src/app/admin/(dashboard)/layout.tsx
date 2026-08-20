@@ -5,7 +5,9 @@ import { isAdminUser } from "@/features/cms/session";
 
 const navLinks = [
   { href: "/admin/settings", label: "Settings" },
+  { href: "/admin/profile", label: "Profile" },
   { href: "/admin/skills", label: "Skills" },
+  { href: "/admin/social", label: "Social" },
 ] as const;
 
 export default async function AdminDashboardLayout({
