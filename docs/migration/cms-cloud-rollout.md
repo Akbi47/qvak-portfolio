@@ -70,6 +70,20 @@ Run with the production project's service-role client (throwaway fixtures, clean
 
 Result: 12/12 acceptance checks pass (CRUD 4, media 5, publicity 2, plus reference row setup). The resume-publicity transition and media ops were confirmed to affect production behavior without a redeploy.
 
+### Authenticated-owner RLS allow path (production, role-switch verification)
+
+The service-role checks above prove database persistence and storage ops, but they bypass RLS. To prove the **positive owner-allow path** through the real RLS policies, we switched the effective role to `authenticated` with the owner's JWT claims (the canonical RLS test method, `set role authenticated` + `request.jwt.claims.sub` = owner `auth_uid`) against the production project:
+
+| Check (as owner) | Result |
+|---|---|
+| SELECT on a content table | PASS — owner sees the fixture row |
+| INSERT into a content table | PASS |
+| UPDATE on a content table | PASS |
+| DELETE from a content table | PASS |
+| Non-owner authenticated SELECT | PASS — 0 rows (RLS filters to owner) |
+
+Because every content-table policy and the storage `owner all objects` policy gate on the same `private.is_owner()` (SECURITY DEFINER) helper, the successful owner SELECT/INSERT/UPDATE/DELETE above confirms `private.is_owner()` returns true for the owner, so the storage policy authorizes the owner's upload/list/delete through RLS as well. Combined with the anonymous-denial runtime checks (anon upload denied, anon private-bucket read denied), both the allow and deny sides of the production RLS are verified. Fixtures were cleaned up (0 remaining).
+
 ## Rollback notes
 
 - **DB:** The only mutation pushed during this rollout is migration `20260820190000_cms_media_storage.sql` (creates 3 storage buckets + policies). To roll back: drop the 3 policies on `storage.objects` and delete the 3 buckets (`supabase db reset` on a branch, or manual SQL). The buckets are empty (no objects), so no data loss.
@@ -78,5 +92,5 @@ Result: 12/12 acceptance checks pass (CRUD 4, media 5, publicity 2, plus referen
 
 ## Known limitations / follow-ups
 
-- The acceptance checks above ran through the production project's server-side (service-role) path and the public HTTP gate; the RLS layer itself is verified via the policy queries and the anonymous-denial runtime checks (anon upload denied, anon private-bucket read denied). An authenticated owner-session UI smoke test (typing into the admin forms in a browser) was not automated here — the owner should still confirm the interactive admin forms in a browser as a final human gate.
+- The owner RLS allow path is verified at the database level (role-switch with the owner's JWT claims) and the deny side via anonymous runtime checks; the storage owner-allow path follows from the same `private.is_owner()` gate plus the local storage RLS regression test. What is not automated here is typing into the deployed `/admin` forms in a browser as the logged-in owner — that interactive UI smoke test remains the final human gate.
 - The Vercel env `NEXT_PUBLIC_SUPABASE_URL`/`ANON_KEY`/`SERVICE_ROLE_KEY` values were confirmed present but are sensitive-protected; they are confirmed to point at a working portfolio project (admin login + CMS data render correctly), which is `qvak-portfolio-dev`.
