@@ -9,6 +9,7 @@ const navLinks = [
   { href: "/admin/skills", label: "Skills" },
   { href: "/admin/social", label: "Social" },
   { href: "/admin/projects", label: "Projects" },
+  { href: "/admin/resume", label: "Resume" },
 ] as const;
 
 export default async function AdminDashboardLayout({
