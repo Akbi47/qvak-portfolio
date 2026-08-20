@@ -13,6 +13,10 @@ import {
   getContactContent as getLocalContact,
   type ContactContentView,
 } from "@/content/contact";
+import {
+  getFeaturedProjects as getLocalFeaturedProjects,
+  type FeaturedProjectsView,
+} from "@/content/projects";
 import { getServiceClient } from "./server";
 import { hasCmsConfig } from "./config";
 
@@ -218,6 +222,151 @@ export async function getContactContent(
         value: row.label,
         href: row.url,
       })),
+    };
+  } catch {
+    return base;
+  }
+}
+
+interface ProjectMediaRow {
+  id: string;
+  src: string;
+  width: number | null;
+  height: number | null;
+  focal_point: string | null;
+  order: number;
+  project_media_translations: Array<{ locale: string; alt: string }>;
+}
+
+interface ProjectRow {
+  id: string;
+  slug: string;
+  tech_stack: string[] | string;
+  live_demo_url: string | null;
+  code_url: string | null;
+  featured: boolean;
+  order: number;
+  status: string;
+  published: boolean;
+  project_translations: Array<{
+    locale: string;
+    title: string;
+    category: string;
+    summary: string;
+    description: string | null;
+    highlights?: string[] | string;
+  }>;
+  project_media: ProjectMediaRow[];
+}
+
+function parseTechStack(value: string[] | string | null | undefined): string[] {
+  if (Array.isArray(value)) return value;
+  if (typeof value === "string" && value.length > 0) {
+    try {
+      const parsed = JSON.parse(value);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }
+  return [];
+}
+
+function parseStringArray(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value.map((item) => String(item));
+  }
+  if (typeof value === "string" && value.length > 0) {
+    try {
+      const parsed = JSON.parse(value);
+      return Array.isArray(parsed) ? parsed.map((item) => String(item)) : [];
+    } catch {
+      return [];
+    }
+  }
+  return [];
+}
+
+export async function getFeaturedProjects(
+  locale: Locale,
+): Promise<FeaturedProjectsView> {
+  const base = getLocalFeaturedProjects(locale);
+
+  if (!hasCmsConfig()) {
+    return base;
+  }
+
+  const client = getServiceClient();
+  if (!client) return base;
+
+  try {
+    const { data, error } = await client
+      .from("projects")
+      .select(
+        "id, slug, tech_stack, live_demo_url, code_url, featured, order, status, published, project_translations(locale, title, category, summary, description, highlights), project_media(id, src, width, height, focal_point, order, project_media_translations(locale, alt))",
+      )
+      .eq("featured", true)
+      .eq("published", true)
+      .eq("status", "active")
+      .order("order")
+      .order("id");
+
+    if (error || !data) return base;
+
+    const rows = data as ProjectRow[];
+    rows.sort((a, b) => a.order - b.order || a.id.localeCompare(b.id));
+
+    // A featured+published project with zero media is non-renderable (the
+    // carousel has no zero-media state). Drop such rows BEFORE assigning the
+    // visible index so numbering stays contiguous (01/…, 02/…).
+    const renderable = rows
+      .map((row) => ({
+        row,
+        media: [...(row.project_media ?? [])]
+          .sort((a, b) => a.order - b.order || a.id.localeCompare(b.id))
+          .map((m) => {
+            const alt =
+              m.project_media_translations.find((t) => t.locale === locale)?.alt ??
+              m.project_media_translations.find((t) => t.locale === "en")?.alt ??
+              "";
+            return {
+              id: m.id,
+              src: m.src,
+              alt,
+              width: m.width ?? 800,
+              height: m.height ?? 600,
+              focalPoint: m.focal_point ?? "50% 50%",
+            };
+          }),
+      }))
+      .filter((entry) => entry.media.length > 0);
+
+    const projects = renderable.map(({ row, media }, index) => {
+      const en = row.project_translations.find((t) => t.locale === "en");
+      const active = row.project_translations.find((t) => t.locale === locale);
+
+      const highlights =
+        parseStringArray(active?.highlights).length > 0
+          ? parseStringArray(active?.highlights)
+          : parseStringArray(en?.highlights);
+
+      return {
+        id: row.id,
+        index: String(index + 1).padStart(2, "0"),
+        title: active?.title ?? en?.title ?? "",
+        category: active?.category ?? en?.category ?? "",
+        summary: active?.summary ?? en?.summary ?? "",
+        techStack: parseTechStack(row.tech_stack),
+        media,
+        liveDemoUrl: row.live_demo_url ?? undefined,
+        codeUrl: row.code_url ?? undefined,
+        ...(highlights.length > 0 ? { highlights } : {}),
+      };
+    });
+
+    return {
+      ...base,
+      projects,
     };
   } catch {
     return base;
