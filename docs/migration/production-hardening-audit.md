@@ -32,21 +32,22 @@ This document records the production hardening and operational audit for the Sup
 Production project status (via Management API, 2026-08-20):
 
 - **Plan**: Free tier.
-- **WAL-G automated backups**: enabled (`walg_enabled: true`) — Supabase runs scheduled backups with retention.
-- **PITR (point-in-time recovery)**: disabled (`pitr_enabled: false`) — Pro feature; needed for precise recovery and to meet stronger RPO.
+- **Automatic daily backups**: **not available on the Free tier.** Supabase automatically backs up Pro/Team/Enterprise plans only; the Free tier has no scheduled database backups. (A `walg_enabled` flag existing in the project does not mean Free projects get daily backups.)
+- **PITR (point-in-time recovery)**: disabled (`pitr_enabled: false`) — Pro add-on; needed for precise recovery and to meet a stronger RPO.
 - **On-demand physical backups**: none recorded yet.
 
-### Recommended backup procedure
+### Recommended backup procedure (current Free-tier posture)
 
-1. **Enable PITR** on the Pro plan (Dashboard → Database → Backups → Enable PITR). This is the single highest-impact recovery improvement and also enables on-demand physical backups.
-2. **Take a baseline physical backup** after enabling PITR.
-3. **Content** is recoverable via the in-repo backfill script (`npm run backfill`) and the seed script, so a full content rebuild is possible even without DB backups; storage objects (uploaded media) should be backed up via Storage (export/download) since they live in Supabase Storage.
-4. **Document the restore path** (below) before a real incident.
+1. **Maintain your own off-site logical backups now** (Free tier has no automatic backups): regularly run `supabase db dump` (logical) and store the output off-site. This is the currently-runnable recovery path and satisfies Issue #66's "clearly runnable" requirement.
+2. **Back up Storage objects separately.** Supabase **database backups do not include Storage API object files** — Postgres stores only object metadata. Uploaded media must be backed up by downloading/exporting the Storage buckets (`resume-media`, `project-media`, `portfolio`).
+3. **Content rebuild fallback**: the in-repo backfill script (`npm run backfill`) + seed script can rebuild the content tables from the local typed source of truth, independent of DB backups.
+4. **Enable PITR on the Pro plan** (Dashboard → Database → Backups → Enable PITR) when a stronger RPO is acceptable. PITR also enables on-demand physical backups. Until then, rely on logical dumps.
 
 ### Restore / rollback path
 
-- **Schema / data**: `supabase db reset --linked` restores from the last backup + migrations; or use the Dashboard "Restore" / PITR to a timestamp.
-- **Media (Storage)**: re-download objects from a Storage export, or restore via PITR (Storage objects are DB-backed).
+- **Schema / data (current Free tier)**: restore from your logical `db dump` using `supabase db restore` / `psql`, or rebuild content via `npm run backfill`. ⚠️ **Do NOT use `supabase db reset --linked` on production** — it destroys the linked remote database and rebuilds from local migrations; it is intended only for disposable local/dev projects.
+- **Schema / data (after enabling paid backups)**: use the Dashboard "Backups" / PITR restore to a timestamp.
+- **Media (Storage)**: restore from a separate Storage export/copy of the buckets. ⚠️ A database/PITR restore does **not** recover Storage object files (only their metadata); deleted/overwritten media requires the Storage backup.
 - **Deploy**: production is git-integrated; roll back by redeploying a prior production commit.
 - **Content**: re-run `npm run backfill` from the local typed content (the source of truth fallback).
 
@@ -69,5 +70,6 @@ Re-confirmed with no remaining gaps: all 8 CMS migrations applied; owner login +
 
 **Outstanding owner/human actions (not code):**
 - Change the temporarily reset production owner password (temp value at `/tmp/qvak-owner-temp-password.txt`; delete the file after rotating).
+- Start regular off-site logical backups (`supabase db dump`) + a separate Storage export of the media buckets (Free tier has no automatic backups).
 - Optional (Pro plan): enable leaked password protection and PITR.
 - Final browser UI smoke test of the `/admin` forms as the logged-in owner.
