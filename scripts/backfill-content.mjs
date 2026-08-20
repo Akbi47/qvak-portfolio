@@ -233,11 +233,112 @@ async function backfillProjects() {
   console.log("Projects backfilled.");
 }
 
+async function backfillResume() {
+  const { resumeEntries } = await import("../src/content/resume.ts");
+  const categoryNames = {
+    "career-journey": { en: "Career Journey", vi: "Hành trình sự nghiệp" },
+    "education-certifications": {
+      en: "Education & Certifications",
+      vi: "Học vấn & Chứng chỉ",
+    },
+  };
+
+  for (const [slug, names] of Object.entries(categoryNames)) {
+    await upsert(
+      "resume_categories",
+      [{ id: slug, slug, order: slug === "career-journey" ? 1 : 2 }],
+      "id",
+    );
+    await upsert(
+      "resume_category_translations",
+      [
+        { resume_category_id: slug, locale: "en", name: names.en },
+        { resume_category_id: slug, locale: "vi", name: names.vi },
+      ],
+      "resume_category_id,locale",
+    );
+  }
+
+  for (const entry of resumeEntries) {
+    await upsert(
+      "resume_entries",
+      [
+        {
+          id: entry.id,
+          category_id: entry.category,
+          start_date: null,
+          end_date: null,
+          order: entry.order,
+          draft: false,
+        },
+      ],
+      "id",
+    );
+
+    await upsert(
+      "resume_entry_translations",
+      [
+        {
+          resume_entry_id: entry.id,
+          locale: "en",
+          title: entry.title.en,
+          organization: entry.organization?.en ?? null,
+          location: entry.location?.en ?? null,
+          date_label: entry.dateLabel?.en ?? null,
+          summary: entry.summary?.en ?? null,
+          highlights: (entry.highlights ?? []).map((h) => h.en),
+          tags: (entry.tags ?? []).map((t) => t.en),
+        },
+        {
+          resume_entry_id: entry.id,
+          locale: "vi",
+          title: entry.title.vi,
+          organization: entry.organization?.vi ?? null,
+          location: entry.location?.vi ?? null,
+          date_label: entry.dateLabel?.vi ?? null,
+          summary: entry.summary?.vi ?? null,
+          highlights: (entry.highlights ?? []).map((h) => h.vi),
+          tags: (entry.tags ?? []).map((t) => t.vi),
+        },
+      ],
+      "resume_entry_id,locale",
+    );
+
+    for (const media of entry.media ?? []) {
+      await upsert(
+        "resume_media",
+        [
+          {
+            id: media.id,
+            resume_entry_id: entry.id,
+            thumbnail_src: media.thumbnailSrc,
+            full_src: media.fullSrc,
+            width: media.width ?? null,
+            height: media.height ?? null,
+            order: 1,
+          },
+        ],
+        "id",
+      );
+      await upsert(
+        "resume_media_translations",
+        [
+          { resume_media_id: media.id, locale: "en", alt: media.alt.en, caption: media.caption?.en ?? null },
+          { resume_media_id: media.id, locale: "vi", alt: media.alt.vi, caption: media.caption?.vi ?? null },
+        ],
+        "resume_media_id,locale",
+      );
+    }
+  }
+  console.log("Resume backfilled.");
+}
+
 async function main() {
   await backfillSkills();
   await backfillProfile();
   await backfillContact();
   await backfillProjects();
+  await backfillResume();
   console.log("Backfill complete.");
 }
 
