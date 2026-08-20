@@ -8,12 +8,13 @@ import { ProjectsSection } from "@/components/sections/projects/projects-section
 import { ResumeSection } from "@/components/sections/resume/resume-section";
 import { ResumeSectionLock } from "@/components/sections/resume/resume-section-lock";
 import { SkillsSection } from "@/components/sections/skills/skills-section";
-import { getResumeContent, getResumeLockContent } from "@/content/resume";
+import { getResumeLockContent } from "@/content/resume";
 import { getResumePublicity } from "@/features/cms/resume-publicity";
 import {
   getContactContent as getCmsContact,
   getFeaturedProjects as getCmsFeaturedProjects,
   getPortfolioProfile as getCmsProfile,
+  getResumeContent as getCmsResume,
   getSkillsContent as getCmsSkills,
 } from "@/features/cms/repository";
 import { getMessages } from "@/features/i18n/messages";
@@ -58,7 +59,7 @@ export default async function LocalePage({
       {isResumePrivate ? (
         <ResumeSectionLock content={getResumeLockContent(locale)} />
       ) : (
-        <ResumeSection content={getResumeContent(locale)} />
+        <ResumeSection content={await getCmsResume(locale)} />
       )}
       <ContactSection content={contact} />
 
