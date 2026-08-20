@@ -147,10 +147,94 @@ async function backfillContact() {
   console.log("Contact/social backfilled.");
 }
 
+async function backfillProjects() {
+  const { projects } = await import("../src/content/projects.ts");
+
+  for (const project of projects) {
+    await upsert(
+      "projects",
+      [
+        {
+          id: project.id,
+          slug: project.slug,
+          tech_stack: project.techStack,
+          live_demo_url: project.liveDemoUrl ?? null,
+          code_url: project.codeUrl ?? null,
+          featured: project.featured,
+          order: project.order,
+          status: project.status ?? "active",
+          published: true,
+        },
+      ],
+      "id",
+    );
+
+    await upsert(
+      "project_translations",
+      [
+        {
+          project_id: project.id,
+          locale: "en",
+          title: project.title.en,
+          category: project.category.en,
+          summary: project.summary.en,
+          description: null,
+        },
+        {
+          project_id: project.id,
+          locale: "vi",
+          title: project.title.vi,
+          category: project.category.vi,
+          summary: project.summary.vi,
+          description: null,
+        },
+      ],
+      "project_id,locale",
+    );
+
+    for (const media of project.media) {
+      await upsert(
+        "project_media",
+        [
+          {
+            id: media.id,
+            project_id: project.id,
+            src: media.src,
+            kind: "image",
+            width: media.width,
+            height: media.height,
+            order: media.order,
+          },
+        ],
+        "id",
+      );
+
+      await upsert(
+        "project_media_translations",
+        [
+          {
+            project_media_id: media.id,
+            locale: "en",
+            alt: media.alt.en,
+          },
+          {
+            project_media_id: media.id,
+            locale: "vi",
+            alt: media.alt.vi,
+          },
+        ],
+        "project_media_id,locale",
+      );
+    }
+  }
+  console.log("Projects backfilled.");
+}
+
 async function main() {
   await backfillSkills();
   await backfillProfile();
   await backfillContact();
+  await backfillProjects();
   console.log("Backfill complete.");
 }
 

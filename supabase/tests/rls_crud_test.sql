@@ -14,7 +14,7 @@
 -- to whichever auth user is the configured single owner.
 
 begin;
-select plan(9);
+select plan(11);
 
 -- Capture the owner uid while still superuser (admin_owner is RLS-filtered for
 -- other roles), then set claims session-wide so they survive the role switch.
@@ -40,6 +40,10 @@ insert into public.skills (id, group_key, "order")
   values ('rls-test', 'tech-stack', 1)
   on conflict (id) do nothing;
 
+insert into public.projects (id, slug, tech_stack, featured, "order", status, published)
+  values ('rls-test', 'rls-test', '[]', true, 1, 'active', true)
+  on conflict (id) do nothing;
+
 -- --- Owner: SELECT succeeds ------------------------------------------------
 set local role authenticated;
 
@@ -59,6 +63,12 @@ select is(
   (select count(*) from public.skills where id = 'rls-test'),
   1::bigint,
   'owner can SELECT skills'
+);
+
+select is(
+  (select count(*) from public.projects where id = 'rls-test'),
+  1::bigint,
+  'owner can SELECT projects'
 );
 
 -- --- Owner: INSERT succeeds -----------------------------------------------
@@ -118,10 +128,17 @@ select throws_ok(
   'non-owner cannot INSERT into skills (RLS with-check)'
 );
 
+select is(
+  (select count(*) from public.projects),
+  0::bigint,
+  'non-owner sees zero projects rows (RLS filters)'
+);
+
 -- --- Cleanup fixtures ------------------------------------------------
 reset role;
 delete from public.social_links where id = 'rls-test';
 delete from public.skills where id = 'rls-test';
+delete from public.projects where id = 'rls-test';
 delete from public.profile where id = '00000000-0000-0000-0000-000000000001';
 
 select * from finish();
