@@ -23,7 +23,7 @@ if (!LOCAL_HOST.test(url)) {
   process.exit(1);
 }
 
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import {
   getFeaturedProjects,
   getResumeContent,
@@ -397,4 +397,28 @@ test("deletion reference check blocks referenced media and allows unreferenced",
   } finally {
     await cleanupReferenceFixtures();
   }
+});
+
+test("deletion reference check fails closed when the reference query errors", async () => {
+  const failingClient = {
+    from: () => ({
+      select: () => ({
+        or: async () => ({
+          data: null,
+          error: { message: "connection refused" },
+        }),
+      }),
+    }),
+  } as unknown as SupabaseClient;
+
+  // A reference-query error must throw so deleteMedia refuses to delete,
+  // never treating an unknown reference state as "safe to delete".
+  await assert.rejects(
+    () => findMediaReferences(failingClient, "project-media", "file.jpg"),
+    /Reference check failed/,
+  );
+  await assert.rejects(
+    () => findMediaReferences(failingClient, "resume-media", "file.jpg"),
+    /Reference check failed/,
+  );
 });

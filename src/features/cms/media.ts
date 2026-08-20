@@ -40,6 +40,9 @@ export function getMediaPublicUrl(bucket: MediaBucket, path: string): string {
  * Count how many published CMS media rows reference a stored object. Deletion
  * is blocked while referenced to satisfy Issue #21's reference/orphan criterion.
  * Accepts any Supabase-style client so it is testable against local Supabase.
+ *
+ * Fail-closed: if the reference query itself errors, this throws so the caller
+ * cannot treat an unknown reference state as "safe to delete".
  */
 export async function findMediaReferences(
   client: SupabaseClient,
@@ -51,16 +54,16 @@ export async function findMediaReferences(
       .from("project_media")
       .select("id")
       .or(`src.ilike.%${path}%`);
-    if (!error && data) return data.length;
-    return 0;
+    if (error) throw new Error(`Reference check failed: ${error.message}`);
+    return data?.length ?? 0;
   }
   if (bucket === "resume-media") {
     const { data, error } = await client
       .from("resume_media")
       .select("id")
       .or(`thumbnail_src.ilike.%${path}%,full_src.ilike.%${path}%`);
-    if (!error && data) return data.length;
-    return 0;
+    if (error) throw new Error(`Reference check failed: ${error.message}`);
+    return data?.length ?? 0;
   }
   return 0;
 }
