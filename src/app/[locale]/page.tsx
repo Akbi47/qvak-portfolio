@@ -8,12 +8,14 @@ import { ProjectsSection } from "@/components/sections/projects/projects-section
 import { ResumeSection } from "@/components/sections/resume/resume-section";
 import { ResumeSectionLock } from "@/components/sections/resume/resume-section-lock";
 import { SkillsSection } from "@/components/sections/skills/skills-section";
-import { getContactContent } from "@/content/contact";
-import { getPortfolioProfile } from "@/content/profile";
 import { getFeaturedProjects } from "@/content/projects";
 import { getResumeContent, getResumeLockContent } from "@/content/resume";
 import { getResumePublicity } from "@/features/cms/resume-publicity";
-import { getSkillsContent } from "@/content/skills";
+import {
+  getContactContent as getCmsContact,
+  getPortfolioProfile as getCmsProfile,
+  getSkillsContent as getCmsSkills,
+} from "@/features/cms/repository";
 import { getMessages } from "@/features/i18n/messages";
 import { getLocaleFromParams } from "@/features/i18n/server";
 import { getSeoMetadata } from "@/features/seo/metadata";
@@ -41,10 +43,10 @@ export default async function LocalePage({
 }: Readonly<LocalePageProps>) {
   const locale = await getLocaleFromParams(params);
   const messages = await getMessages(locale);
-  const profile = getPortfolioProfile(locale);
-  const skills = getSkillsContent(locale);
+  const profile = await getCmsProfile(locale);
+  const skills = await getCmsSkills(locale);
   const projects = getFeaturedProjects(locale);
-  const contact = getContactContent(locale);
+  const contact = await getCmsContact(locale);
 
   const isResumePrivate = (await getResumePublicity()) === "private";
 
