@@ -24,7 +24,10 @@ if (!LOCAL_HOST.test(url)) {
 }
 
 import { createClient } from "@supabase/supabase-js";
-import { getFeaturedProjects } from "@/features/cms/repository";
+import {
+  getFeaturedProjects,
+  getResumeContent,
+} from "@/features/cms/repository";
 
 const client = createClient(url, serviceRole, {
   auth: { persistSession: false },
@@ -157,5 +160,79 @@ test("public repository only returns featured+published+active projects with med
     );
   } finally {
     await cleanup();
+  }
+});
+
+const RESUME_FIXTURES = {
+  category: "repo-res-cat",
+  published: "repo-res-pub",
+  draft: "repo-res-draft",
+};
+
+async function insertResumeFixture() {
+  const { error: catErr } = await client.from("resume_categories").upsert(
+    { id: RESUME_FIXTURES.category, slug: RESUME_FIXTURES.category, order: 1 },
+    { onConflict: "id" },
+  );
+  assert.equal(catErr, null, `resume category: ${catErr?.message}`);
+
+  const { error: catTrErr } = await client
+    .from("resume_category_translations")
+    .upsert(
+      [
+        { resume_category_id: RESUME_FIXTURES.category, locale: "en", name: "Test Category" },
+        { resume_category_id: RESUME_FIXTURES.category, locale: "vi", name: "Danh mục" },
+      ],
+      { onConflict: "resume_category_id,locale" },
+    );
+  assert.equal(catTrErr, null, `resume category translations: ${catTrErr?.message}`);
+
+  for (const [id, draft] of [
+    [RESUME_FIXTURES.published, false],
+    [RESUME_FIXTURES.draft, true],
+  ] as const) {
+    const { error: entryErr } = await client.from("resume_entries").upsert(
+      { id, category_id: RESUME_FIXTURES.category, order: 1, draft },
+      { onConflict: "id" },
+    );
+    assert.equal(entryErr, null, `resume entry ${id}: ${entryErr?.message}`);
+
+    const { error: trErr } = await client.from("resume_entry_translations").upsert(
+      [
+        { resume_entry_id: id, locale: "en", title: id, highlights: ["H1"] },
+        { resume_entry_id: id, locale: "vi", title: id, highlights: ["H1"] },
+      ],
+      { onConflict: "resume_entry_id,locale" },
+    );
+    assert.equal(trErr, null, `resume entry translations ${id}: ${trErr?.message}`);
+  }
+}
+
+async function cleanupResume() {
+  for (const id of [RESUME_FIXTURES.published, RESUME_FIXTURES.draft]) {
+    await client.from("resume_entries").delete().eq("id", id);
+  }
+  await client.from("resume_categories").delete().eq("id", RESUME_FIXTURES.category);
+}
+
+test("public resume repository excludes draft entries and groups by category", async () => {
+  await cleanupResume();
+  await insertResumeFixture();
+
+  try {
+    const view = await getResumeContent("en");
+    const category = view.categories.find((c) => c.id === RESUME_FIXTURES.category);
+    assert.ok(category, "resume category is present");
+    const entryIds = category?.entries.map((e) => e.id) ?? [];
+    assert.ok(
+      entryIds.includes(RESUME_FIXTURES.published),
+      "published resume entry is included",
+    );
+    assert.ok(
+      !entryIds.includes(RESUME_FIXTURES.draft),
+      "draft resume entry is excluded at the query boundary",
+    );
+  } finally {
+    await cleanupResume();
   }
 });

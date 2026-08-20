@@ -14,7 +14,7 @@
 -- to whichever auth user is the configured single owner.
 
 begin;
-select plan(11);
+select plan(13);
 
 -- Capture the owner uid while still superuser (admin_owner is RLS-filtered for
 -- other roles), then set claims session-wide so they survive the role switch.
@@ -44,6 +44,14 @@ insert into public.projects (id, slug, tech_stack, featured, "order", status, pu
   values ('rls-test', 'rls-test', '[]', true, 1, 'active', true)
   on conflict (id) do nothing;
 
+insert into public.resume_categories (id, slug, "order")
+  values ('rls-test', 'rls-test', 1)
+  on conflict (id) do nothing;
+
+insert into public.resume_entries (id, category_id, "order", draft)
+  values ('rls-test', 'rls-test', 1, false)
+  on conflict (id) do nothing;
+
 -- --- Owner: SELECT succeeds ------------------------------------------------
 set local role authenticated;
 
@@ -69,6 +77,12 @@ select is(
   (select count(*) from public.projects where id = 'rls-test'),
   1::bigint,
   'owner can SELECT projects'
+);
+
+select is(
+  (select count(*) from public.resume_entries where id = 'rls-test'),
+  1::bigint,
+  'owner can SELECT resume_entries'
 );
 
 -- --- Owner: INSERT succeeds -----------------------------------------------
@@ -134,11 +148,19 @@ select is(
   'non-owner sees zero projects rows (RLS filters)'
 );
 
+select is(
+  (select count(*) from public.resume_entries),
+  0::bigint,
+  'non-owner sees zero resume_entries rows (RLS filters)'
+);
+
 -- --- Cleanup fixtures ------------------------------------------------
 reset role;
 delete from public.social_links where id = 'rls-test';
 delete from public.skills where id = 'rls-test';
 delete from public.projects where id = 'rls-test';
+delete from public.resume_entries where id = 'rls-test';
+delete from public.resume_categories where id = 'rls-test';
 delete from public.profile where id = '00000000-0000-0000-0000-000000000001';
 
 select * from finish();

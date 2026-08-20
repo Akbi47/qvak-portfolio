@@ -17,6 +17,11 @@ import {
   getFeaturedProjects as getLocalFeaturedProjects,
   type FeaturedProjectsView,
 } from "@/content/projects";
+import {
+  getResumeContent as getLocalResume,
+  type ResumeCategory,
+  type ResumeContentView,
+} from "@/content/resume";
 import { getServiceClient } from "./server";
 import { hasCmsConfig } from "./config";
 
@@ -287,6 +292,10 @@ function parseStringArray(value: unknown): string[] {
   return [];
 }
 
+function orUndefined(value: string | null | undefined): string | undefined {
+  return value == null ? undefined : value;
+}
+
 export async function getFeaturedProjects(
   locale: Locale,
 ): Promise<FeaturedProjectsView> {
@@ -381,4 +390,148 @@ function pickTranslation(
   const en = translations.find((t) => t.locale === "en");
   const active = translations.find((t) => t.locale === locale);
   return active?.[key] ?? en?.[key] ?? "";
+}
+
+interface ResumeCategoryRow {
+  id: string;
+  slug: string;
+  order: number;
+  resume_category_translations: Array<{ locale: string; name: string }>;
+}
+
+interface ResumeEntryRow {
+  id: string;
+  category_id: string;
+  order: number;
+  draft: boolean;
+  resume_entry_translations: Array<{
+    locale: string;
+    title: string;
+    organization: string | null;
+    location: string | null;
+    date_label: string | null;
+    summary: string | null;
+    highlights: string[] | string;
+    tags: string[] | string;
+  }>;
+  resume_media: Array<{
+    id: string;
+    thumbnail_src: string;
+    full_src: string;
+    width: number | null;
+    height: number | null;
+    resume_media_translations: Array<{
+      locale: string;
+      alt: string;
+      caption: string | null;
+    }>;
+  }>;
+}
+
+export async function getResumeContent(
+  locale: Locale,
+): Promise<ResumeContentView> {
+  const base = getLocalResume(locale);
+
+  if (!hasCmsConfig()) {
+    return base;
+  }
+
+  const client = getServiceClient();
+  if (!client) return base;
+
+  try {
+    const [categoriesRes, entriesRes] = await Promise.all([
+      client
+        .from("resume_categories")
+        .select("id, slug, order, resume_category_translations(locale, name)")
+        .order("order")
+        .order("id"),
+      client
+        .from("resume_entries")
+        .select(
+          "id, category_id, order, draft, resume_entry_translations(locale, title, organization, location, date_label, summary, highlights, tags), resume_media(id, thumbnail_src, full_src, width, height, resume_media_translations(locale, alt, caption))",
+        )
+        .eq("draft", false)
+        .order("order")
+        .order("id"),
+    ]);
+
+    if (categoriesRes.error || entriesRes.error) return base;
+
+    const categories = (categoriesRes.data ?? []) as ResumeCategoryRow[];
+    const entries = (entriesRes.data ?? []) as ResumeEntryRow[];
+
+    const categoriesView = categories.map((category) => {
+      const categoryEn = category.resume_category_translations.find(
+        (t) => t.locale === "en",
+      );
+      const categoryActive = category.resume_category_translations.find(
+        (t) => t.locale === locale,
+      );
+      const categoryEntries = entries
+        .filter((entry) => entry.category_id === category.id)
+        .sort((a, b) => a.order - b.order || a.id.localeCompare(b.id));
+
+      return {
+        id: category.id as ResumeCategory,
+        name: categoryActive?.name ?? categoryEn?.name ?? category.slug,
+        entries: categoryEntries.map((entry, index) => {
+          const en = entry.resume_entry_translations.find((t) => t.locale === "en");
+          const active = entry.resume_entry_translations.find(
+            (t) => t.locale === locale,
+          );
+          const media = (entry.resume_media ?? []).map((m) => {
+            const mActive = m.resume_media_translations.find(
+              (t) => t.locale === locale,
+            );
+            const mEn = m.resume_media_translations.find((t) => t.locale === "en");
+            return {
+              id: m.id,
+              thumbnailSrc: m.thumbnail_src,
+              fullSrc: m.full_src,
+              alt: mActive?.alt ?? mEn?.alt ?? "",
+              caption: mActive?.caption ?? mEn?.caption ?? undefined,
+              width: m.width ?? undefined,
+              height: m.height ?? undefined,
+            };
+          });
+          const highlights = parseStringArray(active?.highlights).length
+            ? parseStringArray(active?.highlights)
+            : parseStringArray(en?.highlights);
+          const tags = parseStringArray(active?.tags).length
+            ? parseStringArray(active?.tags)
+            : parseStringArray(en?.tags);
+
+          return {
+            id: entry.id,
+            index: String(index + 1).padStart(2, "0"),
+            title: active?.title ?? en?.title ?? "",
+            ...(orUndefined(active?.organization) ?? orUndefined(en?.organization)
+              ? { organization: orUndefined(active?.organization) ?? orUndefined(en?.organization) }
+              : {}),
+            ...(orUndefined(active?.location) ?? orUndefined(en?.location)
+              ? { location: orUndefined(active?.location) ?? orUndefined(en?.location) }
+              : {}),
+            ...(orUndefined(active?.date_label) ?? orUndefined(en?.date_label)
+              ? { dateLabel: orUndefined(active?.date_label) ?? orUndefined(en?.date_label) }
+              : {}),
+            ...(orUndefined(active?.summary) ?? orUndefined(en?.summary)
+              ? { summary: orUndefined(active?.summary) ?? orUndefined(en?.summary) }
+              : {}),
+            ...(highlights.length > 0 ? { highlights } : {}),
+            ...(tags.length > 0 ? { tags } : {}),
+            ...(media.length > 0 ? { media } : {}),
+          };
+        }),
+      };
+    });
+
+    return {
+      ...base,
+      categories: categoriesView,
+    };
+  } catch {
+    return base;
+  }
 }
