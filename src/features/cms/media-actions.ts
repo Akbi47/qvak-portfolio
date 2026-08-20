@@ -2,9 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 
-import { getServiceClient } from "./server";
-import { isAdminUser } from "./session";
-import type { MediaBucket } from "./media";
+import { getServerClient, isAdminUser } from "./session";
+import { findMediaReferences, type MediaBucket } from "./media";
 
 export interface MediaUploadResult {
   ok: boolean;
@@ -28,11 +27,10 @@ function sanitizeFilename(filename: string): string {
 }
 
 /**
- * Upload an image to a media bucket. Runs through the server-only service-role
- * path (the browser never holds bucket credentials), but is gated by isAdminUser()
- * so only the owner can trigger uploads. The owner storage RLS also restricts
- * writes on the server-authenticated path; using service-role here is safe because
- * this function is server-only and authorization is enforced at the action boundary.
+ * Upload an image to a media bucket. Runs through the authenticated owner-session
+ * server client (getServerClient), so Storage RLS (private.is_owner()) authorizes
+ * the actual operation — matching the accepted #18 design where admin/browser
+ * writes use the normal owner RLS path rather than the service role.
  */
 export async function uploadMedia(
   bucket: MediaBucket,
@@ -47,8 +45,7 @@ export async function uploadMedia(
     return { ok: false, error: "Image must be 10 MB or smaller." };
   }
 
-  const client = getServiceClient();
-  if (!client) return { ok: false, error: "CMS is not configured." };
+  const client = await getServerClient();
 
   const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
   const base = sanitizeFilename(file.name.replace(/\.[^.]+$/, ""));
@@ -76,8 +73,17 @@ export async function deleteMedia(
 ): Promise<MediaDeleteResult> {
   if (!(await isAdminUser())) return { ok: false, error: "Unauthorized." };
 
-  const client = getServiceClient();
-  if (!client) return { ok: false, error: "CMS is not configured." };
+  const client = await getServerClient();
+
+  // Block deletion while the file is still referenced by published media rows
+  // (Issue #21 reference/orphan criterion).
+  const references = await findMediaReferences(client, bucket, path);
+  if (references > 0) {
+    return {
+      ok: false,
+      error: `Cannot delete: still referenced by ${references} media row(s). Remove the media from its project/resume first.`,
+    };
+  }
 
   const { error } = await client.storage.from(bucket).remove([path]);
   if (error) return { ok: false, error: error.message };

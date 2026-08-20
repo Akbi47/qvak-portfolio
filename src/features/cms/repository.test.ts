@@ -28,6 +28,7 @@ import {
   getFeaturedProjects,
   getResumeContent,
 } from "@/features/cms/repository";
+import { findMediaReferences } from "@/features/cms/media";
 
 const client = createClient(url, serviceRole, {
   auth: { persistSession: false },
@@ -297,5 +298,103 @@ test("storage media permissions: owner writes, anonymous denied", async (t) => {
     assert.ok(anonDownload.error, "anonymous read of private bucket is denied");
   } finally {
     await ownerClient.storage.from(MEDIA_BUCKETS.public).remove([marker]);
+  }
+});
+
+const REF_FIXTURES = {
+  project: "ref-project",
+  resumeEntry: "ref-resume-entry",
+  resumeMedia: "ref-resume-media",
+  projectMedia: "ref-project-media",
+  path: "ref-file.jpg",
+};
+
+async function createReferenceParents() {
+  const { error: projErr } = await client.from("projects").upsert(
+    { id: REF_FIXTURES.project, slug: REF_FIXTURES.project, featured: false, order: 99 },
+    { onConflict: "id" },
+  );
+  assert.equal(projErr, null, `ref project: ${projErr?.message}`);
+
+  const { error: catErr } = await client.from("resume_categories").upsert(
+    { id: "ref-cat", slug: "ref-cat", order: 99 },
+    { onConflict: "id" },
+  );
+  assert.equal(catErr, null, `ref category: ${catErr?.message}`);
+
+  const { error: entryErr } = await client.from("resume_entries").upsert(
+    { id: REF_FIXTURES.resumeEntry, category_id: "ref-cat", order: 99, draft: false },
+    { onConflict: "id" },
+  );
+  assert.equal(entryErr, null, `ref entry: ${entryErr?.message}`);
+}
+
+async function insertMediaReference(kind: "project" | "resume") {
+  if (kind === "project") {
+    const { error } = await client.from("project_media").upsert(
+      {
+        id: REF_FIXTURES.projectMedia,
+        project_id: REF_FIXTURES.project,
+        src: `/images/${REF_FIXTURES.path}`,
+        kind: "image",
+        order: 1,
+      },
+      { onConflict: "id" },
+    );
+    assert.equal(error, null, `project media ref: ${error?.message}`);
+  } else {
+    const { error } = await client.from("resume_media").upsert(
+      {
+        id: REF_FIXTURES.resumeMedia,
+        resume_entry_id: REF_FIXTURES.resumeEntry,
+        thumbnail_src: `/api/resume-media/${REF_FIXTURES.path}`,
+        full_src: `/api/resume-media/${REF_FIXTURES.path}`,
+        order: 1,
+      },
+      { onConflict: "id" },
+    );
+    assert.equal(error, null, `resume media ref: ${error?.message}`);
+  }
+}
+
+async function cleanupReferenceFixtures() {
+  await client.from("project_media").delete().eq("id", REF_FIXTURES.projectMedia);
+  await client.from("resume_media").delete().eq("id", REF_FIXTURES.resumeMedia);
+  await client.from("resume_entries").delete().eq("id", REF_FIXTURES.resumeEntry);
+  await client.from("resume_categories").delete().eq("id", "ref-cat");
+  await client.from("projects").delete().eq("id", REF_FIXTURES.project);
+}
+
+test("deletion reference check blocks referenced media and allows unreferenced", async () => {
+  await cleanupReferenceFixtures();
+  await createReferenceParents();
+
+  // Unreferenced -> allowed.
+  assert.equal(
+    await findMediaReferences(client, "project-media", REF_FIXTURES.path),
+    0,
+    "unreferenced project media reports 0 references",
+  );
+  assert.equal(
+    await findMediaReferences(client, "resume-media", REF_FIXTURES.path),
+    0,
+    "unreferenced resume media reports 0 references",
+  );
+
+  try {
+    // Referenced -> blocked (returns a positive count).
+    await insertMediaReference("project");
+    assert.ok(
+      (await findMediaReferences(client, "project-media", REF_FIXTURES.path)) > 0,
+      "referenced project media reports a reference",
+    );
+
+    await insertMediaReference("resume");
+    assert.ok(
+      (await findMediaReferences(client, "resume-media", REF_FIXTURES.path)) > 0,
+      "referenced resume media reports a reference",
+    );
+  } finally {
+    await cleanupReferenceFixtures();
   }
 });
