@@ -422,3 +422,26 @@ test("deletion reference check fails closed when the reference query errors", as
     /Reference check failed/,
   );
 });
+
+test("reference check escapes LIKE wildcards in the stored path", async () => {
+  const filters: string[] = [];
+  const recordingClient = {
+    from: () => ({
+      select: () => ({
+        or: async (filter: string) => {
+          filters.push(filter);
+          return { data: [], error: null };
+        },
+      }),
+    }),
+  } as unknown as SupabaseClient;
+
+  await findMediaReferences(recordingClient, "project-media", "100%_real.jpg");
+  await findMediaReferences(recordingClient, "resume-media", "100%_real.jpg");
+
+  // % and _ are escaped so a literal path can never broaden the match.
+  assert.ok(
+    filters.every((f) => f.includes("%100\\%\\_real.jpg%")),
+    "LIKE wildcards in the path are escaped: " + filters.join(", "),
+  );
+});

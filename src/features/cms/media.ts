@@ -36,6 +36,11 @@ export function getMediaPublicUrl(bucket: MediaBucket, path: string): string {
   return `${base}/storage/v1/object/public/${bucket}/${encodeURIComponent(path)}`;
 }
 
+/** Escape LIKE wildcards so a stored path can never broaden the reference match. */
+function escapeLike(value: string): string {
+  return value.replace(/[%_\\]/g, "\\$&");
+}
+
 /**
  * Count how many published CMS media rows reference a stored object. Deletion
  * is blocked while referenced to satisfy Issue #21's reference/orphan criterion.
@@ -49,11 +54,13 @@ export async function findMediaReferences(
   bucket: MediaBucket,
   path: string,
 ): Promise<number> {
+  const safePath = escapeLike(path);
+
   if (bucket === "project-media") {
     const { data, error } = await client
       .from("project_media")
       .select("id")
-      .or(`src.ilike.%${path}%`);
+      .or(`src.ilike.%${safePath}%`);
     if (error) throw new Error(`Reference check failed: ${error.message}`);
     return data?.length ?? 0;
   }
@@ -61,7 +68,7 @@ export async function findMediaReferences(
     const { data, error } = await client
       .from("resume_media")
       .select("id")
-      .or(`thumbnail_src.ilike.%${path}%,full_src.ilike.%${path}%`);
+      .or(`thumbnail_src.ilike.%${safePath}%,full_src.ilike.%${safePath}%`);
     if (error) throw new Error(`Reference check failed: ${error.message}`);
     return data?.length ?? 0;
   }
