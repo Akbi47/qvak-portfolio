@@ -223,6 +223,14 @@ grant select, insert, update, delete on profile, profile_translations,
 -- (not the content tables).
 grant select, insert, update on app_settings to service_role;
 
+-- Server-side ops (backfill/seed scripts) write content via service-role. The
+-- service-role key is server-only and never exposed to the browser.
+grant select, insert, update, delete on profile, profile_translations,
+  social_links, skills, skill_translations, projects, project_translations,
+  project_media, project_media_translations, resume_categories,
+  resume_category_translations, resume_entries, resume_entry_translations,
+  resume_media, resume_media_translations to service_role;
+
 -- RLS enabled on every content table (deny-by-default).
 alter table profile enable row level security;
 alter table profile_translations enable row level security;
