@@ -8,11 +8,11 @@ import { ProjectsSection } from "@/components/sections/projects/projects-section
 import { ResumeSection } from "@/components/sections/resume/resume-section";
 import { ResumeSectionLock } from "@/components/sections/resume/resume-section-lock";
 import { SkillsSection } from "@/components/sections/skills/skills-section";
-import { getFeaturedProjects } from "@/content/projects";
 import { getResumeContent, getResumeLockContent } from "@/content/resume";
 import { getResumePublicity } from "@/features/cms/resume-publicity";
 import {
   getContactContent as getCmsContact,
+  getFeaturedProjects as getCmsFeaturedProjects,
   getPortfolioProfile as getCmsProfile,
   getSkillsContent as getCmsSkills,
 } from "@/features/cms/repository";
@@ -45,7 +45,7 @@ export default async function LocalePage({
   const messages = await getMessages(locale);
   const profile = await getCmsProfile(locale);
   const skills = await getCmsSkills(locale);
-  const projects = getFeaturedProjects(locale);
+  const projects = await getCmsFeaturedProjects(locale);
   const contact = await getCmsContact(locale);
 
   const isResumePrivate = (await getResumePublicity()) === "private";
