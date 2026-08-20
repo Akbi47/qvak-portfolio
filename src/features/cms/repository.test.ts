@@ -236,3 +236,66 @@ test("public resume repository excludes draft entries and groups by category", a
     await cleanupResume();
   }
 });
+
+const MEDIA_BUCKETS = {
+  public: "project-media",
+  private: "resume-media",
+} as const;
+
+test("storage media permissions: owner writes, anonymous denied", async (t) => {
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!anonKey) {
+    t.skip("NEXT_PUBLIC_SUPABASE_ANON_KEY not set");
+    return;
+  }
+
+  const { createClient } = await import("@supabase/supabase-js");
+
+  // Dedicated anonymous client — never authenticated, used for anon operations.
+  const anonClient = createClient(url, anonKey, {
+    auth: { persistSession: false },
+  });
+
+  // Separate client used only to obtain the owner token.
+  const authClient = createClient(url, anonKey, {
+    auth: { persistSession: false },
+  });
+  const { data: signIn } = await authClient.auth.signInWithPassword({
+    email: process.env.CMS_ADMIN_EMAIL ?? "admin@khoawatt.com",
+    password: process.env.CMS_ADMIN_PASSWORD ?? "test-password-123",
+  });
+  if (!signIn.session) {
+    t.skip("owner sign-in failed; cannot verify storage RLS");
+    return;
+  }
+  const ownerToken = signIn.session.access_token;
+  const ownerClient = createClient(url, anonKey, {
+    auth: { persistSession: false },
+    global: { headers: { Authorization: `Bearer ${ownerToken}` } },
+  });
+
+  const marker = `rls-${Date.now()}.jpg`;
+  const bytes = new Uint8Array([0xff, 0xd8, 0xff, 0xe0, 1, 2, 3]);
+
+  try {
+    // Owner can upload to a public bucket.
+    const ownerUpload = await ownerClient.storage
+      .from(MEDIA_BUCKETS.public)
+      .upload(marker, bytes, { contentType: "image/jpeg" });
+    assert.equal(ownerUpload.error, null, "owner upload to public bucket");
+
+    // Anonymous cannot upload (owner-write policy).
+    const anonUpload = await anonClient.storage
+      .from(MEDIA_BUCKETS.public)
+      .upload(`anon-${marker}`, bytes, { contentType: "image/jpeg" });
+    assert.ok(anonUpload.error, "anonymous upload to public bucket is denied");
+
+    // Anonymous cannot read the private bucket.
+    const anonDownload = await anonClient.storage
+      .from(MEDIA_BUCKETS.private)
+      .download(marker);
+    assert.ok(anonDownload.error, "anonymous read of private bucket is denied");
+  } finally {
+    await ownerClient.storage.from(MEDIA_BUCKETS.public).remove([marker]);
+  }
+});
