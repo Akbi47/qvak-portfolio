@@ -50,31 +50,21 @@ export async function createSkill(
   const client = getServiceClient();
   if (!client) return { ok: false, error: "CMS is not configured." };
 
-  const { error: baseError } = await client.from("skills").insert({
-    id: data.id,
-    group_key: data.group,
-    icon_key: data.iconKey ?? null,
-    url: data.url || null,
-    order: data.order,
-    featured: data.featured,
+  // Single-transaction write: base row + both translation rows roll back together
+  // on any failure (see migration cms_atomic_mutations).
+  const { error } = await client.rpc("cms_upsert_skill", {
+    p_id: data.id,
+    p_group_key: data.group,
+    p_icon_key: data.iconKey ?? null,
+    p_url: data.url || null,
+    p_order: data.order,
+    p_featured: data.featured,
+    p_name_en: data.nameEn.trim(),
+    p_name_vi: data.nameVi.trim(),
+    p_category_en: data.categoryEn?.trim() || null,
+    p_category_vi: data.categoryVi?.trim() || null,
   });
-  if (baseError) return { ok: false, error: baseError.message };
-
-  const { error: transError } = await client.from("skill_translations").insert([
-    {
-      skill_id: data.id,
-      locale: "en",
-      name: data.nameEn,
-      category: data.categoryEn || null,
-    },
-    {
-      skill_id: data.id,
-      locale: "vi",
-      name: data.nameVi,
-      category: data.categoryVi || null,
-    },
-  ]);
-  if (transError) return { ok: false, error: transError.message };
+  if (error) return { ok: false, error: error.message };
 
   revalidatePath("/");
   revalidatePath("/vi");
@@ -92,36 +82,19 @@ export async function updateSkill(
   const client = getServiceClient();
   if (!client) return { ok: false, error: "CMS is not configured." };
 
-  const { error: baseError } = await client
-    .from("skills")
-    .update({
-      group_key: data.group,
-      icon_key: data.iconKey ?? null,
-      url: data.url || null,
-      order: data.order,
-      featured: data.featured,
-    })
-    .eq("id", data.id);
-  if (baseError) return { ok: false, error: baseError.message };
-
-  const { error: transError } = await client.from("skill_translations").upsert(
-    [
-      {
-        skill_id: data.id,
-        locale: "en",
-        name: data.nameEn,
-        category: data.categoryEn || null,
-      },
-      {
-        skill_id: data.id,
-        locale: "vi",
-        name: data.nameVi,
-        category: data.categoryVi || null,
-      },
-    ],
-    { onConflict: "skill_id,locale" },
-  );
-  if (transError) return { ok: false, error: transError.message };
+  const { error } = await client.rpc("cms_upsert_skill", {
+    p_id: data.id,
+    p_group_key: data.group,
+    p_icon_key: data.iconKey ?? null,
+    p_url: data.url || null,
+    p_order: data.order,
+    p_featured: data.featured,
+    p_name_en: data.nameEn.trim(),
+    p_name_vi: data.nameVi.trim(),
+    p_category_en: data.categoryEn?.trim() || null,
+    p_category_vi: data.categoryVi?.trim() || null,
+  });
+  if (error) return { ok: false, error: error.message };
 
   revalidatePath("/");
   revalidatePath("/vi");
@@ -135,7 +108,7 @@ export async function deleteSkill(id: string): Promise<SkillActionResult> {
   const client = getServiceClient();
   if (!client) return { ok: false, error: "CMS is not configured." };
 
-  const { error } = await client.from("skills").delete().eq("id", id);
+  const { error } = await client.rpc("cms_delete_skill", { p_id: id });
   if (error) return { ok: false, error: error.message };
 
   revalidatePath("/");

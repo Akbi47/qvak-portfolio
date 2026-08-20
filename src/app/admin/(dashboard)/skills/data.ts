@@ -22,7 +22,8 @@ export async function listSkills(): Promise<AdminSkillRow[]> {
     .from("skills")
     .select("id, group_key, icon_key, url, order, featured, skill_translations(locale, name, category)")
     .order("group_key")
-    .order("order");
+    .order("order")
+    .order("id");
 
   if (error || !data) return [];
 
