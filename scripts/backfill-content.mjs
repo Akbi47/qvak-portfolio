@@ -179,6 +179,7 @@ async function backfillProjects() {
           category: project.category.en,
           summary: project.summary.en,
           description: null,
+          highlights: (project.highlights ?? []).map((h) => h.en),
         },
         {
           project_id: project.id,
@@ -187,6 +188,7 @@ async function backfillProjects() {
           category: project.category.vi,
           summary: project.summary.vi,
           description: null,
+          highlights: (project.highlights ?? []).map((h) => h.vi),
         },
       ],
       "project_id,locale",
@@ -204,6 +206,7 @@ async function backfillProjects() {
             width: media.width,
             height: media.height,
             order: media.order,
+            focal_point: media.focalPoint,
           },
         ],
         "id",
