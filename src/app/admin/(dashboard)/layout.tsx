@@ -8,6 +8,7 @@ const navLinks = [
   { href: "/admin/profile", label: "Profile" },
   { href: "/admin/skills", label: "Skills" },
   { href: "/admin/social", label: "Social" },
+  { href: "/admin/projects", label: "Projects" },
 ] as const;
 
 export default async function AdminDashboardLayout({
