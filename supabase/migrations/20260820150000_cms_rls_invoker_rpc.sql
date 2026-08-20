@@ -147,6 +147,15 @@ as $$
   delete from public.social_links where id = p_id;
 $$;
 
+create or replace function public.cms_delete_profile(p_id uuid)
+returns void
+language sql
+security invoker
+set search_path = ''
+as $$
+  delete from public.profile where id = p_id;
+$$;
+
 -- Execute is granted to authenticated so the admin (owner) can call them with
 -- their JWT; RLS on the content tables then authorizes each operation. service_role
 -- keeps its existing execute grant for the server-side backfill/seed path.
@@ -155,20 +164,22 @@ revoke all on function public.cms_delete_skill(text) from public;
 revoke all on function public.cms_upsert_profile(uuid, text, text, text, text, text, text, text, text, text, text, text, text, text) from public;
 revoke all on function public.cms_upsert_social(text, text, text, text, integer) from public;
 revoke all on function public.cms_delete_social(text) from public;
+revoke all on function public.cms_delete_profile(uuid) from public;
 
 grant execute on function public.cms_upsert_skill(text, text, text, text, integer, boolean, text, text, text, text) to authenticated, service_role;
 grant execute on function public.cms_delete_skill(text) to authenticated, service_role;
 grant execute on function public.cms_upsert_profile(uuid, text, text, text, text, text, text, text, text, text, text, text, text, text) to authenticated, service_role;
 grant execute on function public.cms_upsert_social(text, text, text, text, integer) to authenticated, service_role;
 grant execute on function public.cms_delete_social(text) to authenticated, service_role;
+grant execute on function public.cms_delete_profile(uuid) to authenticated, service_role;
 
 -- Deterministic ordering is guaranteed by the queries in the admin data layer
 -- (order by group_key/order/id and order/id); no schema change required.
 
--- Profile is a required singleton (unique slug, single owner). Create is handled
--- by the admin form upserting on the stable slug; delete is intentionally not
--- offered because a portfolio cannot render without its profile row. This is the
--- documented interpretation of the Issue #20 Profile CRUD criterion.
+-- Profile is a required singleton (unique slug, single owner). It can be created,
+-- updated, and deleted by the admin; the public page falls back to local typed
+-- content when the profile row is absent. The stable slug 'owner' is seeded so the
+-- admin can create the record on first save.
 insert into public.profile (slug, github_url)
   values ('owner', 'https://github.com/Akbi47')
   on conflict (slug) do nothing;

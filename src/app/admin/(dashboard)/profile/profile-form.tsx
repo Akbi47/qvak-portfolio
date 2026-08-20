@@ -4,7 +4,11 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
 import type { AdminProfileView } from "./data";
-import { updateProfile, type ProfileActionResult } from "./actions";
+import {
+  deleteProfile,
+  updateProfile,
+  type ProfileActionResult,
+} from "./actions";
 
 interface ProfileFormProps {
   initial: AdminProfileView;
@@ -14,6 +18,26 @@ export function ProfileForm({ initial }: ProfileFormProps) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [isDeleting, startDelete] = useTransition();
+
+  function handleDelete() {
+    if (
+      !confirm(
+        `Delete this profile? The public page will fall back to local content until you save a new profile.`,
+      )
+    ) {
+      return;
+    }
+
+    startDelete(async () => {
+      const result = await deleteProfile(initial.id);
+      if (result.ok) {
+        router.refresh();
+      } else {
+        setError(result.error ?? "Failed to delete.");
+      }
+    });
+  }
 
   function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -114,9 +138,19 @@ export function ProfileForm({ initial }: ProfileFormProps) {
         </p>
       ) : null}
 
-      <button disabled={isPending} type="submit">
-        {isPending ? "Saving…" : "Save profile"}
-      </button>
+      <div className="admin-form-actions">
+        <button disabled={isPending} type="submit">
+          {isPending ? "Saving…" : "Save profile"}
+        </button>
+        <button
+          className="admin-link-button admin-link-button--danger"
+          disabled={isDeleting}
+          onClick={handleDelete}
+          type="button"
+        >
+          {isDeleting ? "Deleting…" : "Delete profile"}
+        </button>
+      </div>
     </form>
   );
 }

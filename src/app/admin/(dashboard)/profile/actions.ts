@@ -92,3 +92,17 @@ export async function updateProfile(
   revalidatePath("/vi");
   return { ok: true };
 }
+
+export async function deleteProfile(id: string): Promise<ProfileActionResult> {
+  if (!(await isAdminUser())) return { ok: false, error: "Unauthorized." };
+
+  const client = await getServerClient();
+
+  const { error } = await client.rpc("cms_delete_profile", { p_id: id });
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath("/");
+  revalidatePath("/vi");
+  revalidatePath("/admin/profile");
+  return { ok: true };
+}
