@@ -4,9 +4,21 @@ import { test } from "node:test";
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const serviceRole = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
+// Hard local-only guard: this test mutates CMS data and MUST never run against a
+// cloud/production project. It only ever touches a handful of fixture rows, but
+// we refuse to run unless the URL is the known local Supabase endpoint.
 if (!url || !serviceRole) {
   console.error(
-    "Requires NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (local/cloud Supabase).",
+    "Requires NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (local Supabase).",
+  );
+  process.exit(1);
+}
+
+const LOCAL_HOST = /^http:\/\/127\.0\.0\.1(?::\d+)?$/;
+if (!LOCAL_HOST.test(url)) {
+  console.error(
+    `Refusing to run repository test against non-local Supabase: ${url}\n` +
+      "This test mutates CMS fixtures and must only target local Supabase.",
   );
   process.exit(1);
 }
@@ -83,10 +95,11 @@ async function insertProject(
   }
 }
 
+// Cleanup deletes ONLY the fixture ids this test created. Never a mass delete.
 async function cleanup() {
-  // Isolate from any pre-existing projects so fixture ordering is deterministic.
-  const { error } = await client.from("projects").delete().neq("id", "__none__");
-  assert.equal(error, null, `cleanup projects: ${error?.message}`);
+  for (const id of Object.values(FIXTURES)) {
+    await client.from("projects").delete().eq("id", id);
+  }
 }
 
 test("public repository only returns featured+published+active projects with media", async () => {
@@ -98,43 +111,51 @@ test("public repository only returns featured+published+active projects with med
   await insertProject(FIXTURES.unpublished, { published: false });
   await insertProject(FIXTURES.valid, { withMedia: true, order: 1 });
 
-  const view = await getFeaturedProjects("en");
-  const ids = view.projects.map((p) => p.id);
+  try {
+    const view = await getFeaturedProjects("en");
+    const ids = view.projects.map((p) => p.id);
 
-  assert.ok(
-    ids.includes(FIXTURES.valid),
-    "valid featured+published+active project with media is included",
-  );
-  assert.ok(
-    !ids.includes(FIXTURES.private),
-    "private project is excluded at the query boundary",
-  );
-  assert.ok(
-    !ids.includes(FIXTURES.unpublished),
-    "unpublished project is excluded at the query boundary",
-  );
-  assert.ok(
-    !ids.includes(FIXTURES.zeroMedia),
-    "featured+published+active project with zero media is filtered out",
-  );
+    assert.ok(
+      ids.includes(FIXTURES.valid),
+      "valid featured+published+active project with media is included",
+    );
+    assert.ok(
+      !ids.includes(FIXTURES.private),
+      "private project is excluded at the query boundary",
+    );
+    assert.ok(
+      !ids.includes(FIXTURES.unpublished),
+      "unpublished project is excluded at the query boundary",
+    );
+    assert.ok(
+      !ids.includes(FIXTURES.zeroMedia),
+      "featured+published+active project with zero media is filtered out",
+    );
 
-  const valid = view.projects.find((p) => p.id === FIXTURES.valid);
-  assert.ok(valid, "valid project present");
-  assert.equal(
-    valid?.index,
-    "01",
-    "visible indexes are contiguous (zero-media project dropped before numbering)",
-  );
-  assert.deepEqual(
-    valid?.highlights,
-    ["H1", "H2"],
-    "highlights are preserved",
-  );
-  assert.equal(
-    valid?.media[0]?.focalPoint,
-    "40% 60%",
-    "media focalPoint is preserved",
-  );
+    const valid = view.projects.find((p) => p.id === FIXTURES.valid);
+    assert.ok(valid, "valid project present");
+    assert.deepEqual(
+      valid?.highlights,
+      ["H1", "H2"],
+      "highlights are preserved",
+    );
+    assert.equal(
+      valid?.media[0]?.focalPoint,
+      "40% 60%",
+      "media focalPoint is preserved",
+    );
 
-  await cleanup();
+    // Visible indexes must be contiguous (01, 02, ...) with no gaps, regardless
+    // of how many pre-existing renderable projects the DB holds.
+    const expectedIndexes = view.projects.map((_, i) =>
+      String(i + 1).padStart(2, "0"),
+    );
+    assert.deepEqual(
+      view.projects.map((p) => p.index),
+      expectedIndexes,
+      "visible indexes are contiguous after zero-media filtering",
+    );
+  } finally {
+    await cleanup();
+  }
 });
