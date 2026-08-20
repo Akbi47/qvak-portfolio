@@ -23,11 +23,12 @@ if (!LOCAL_HOST.test(url)) {
   process.exit(1);
 }
 
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import {
   getFeaturedProjects,
   getResumeContent,
 } from "@/features/cms/repository";
+import { findMediaReferences } from "@/features/cms/media";
 
 const client = createClient(url, serviceRole, {
   auth: { persistSession: false },
@@ -235,4 +236,212 @@ test("public resume repository excludes draft entries and groups by category", a
   } finally {
     await cleanupResume();
   }
+});
+
+const MEDIA_BUCKETS = {
+  public: "project-media",
+  private: "resume-media",
+} as const;
+
+test("storage media permissions: owner writes, anonymous denied", async (t) => {
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!anonKey) {
+    t.skip("NEXT_PUBLIC_SUPABASE_ANON_KEY not set");
+    return;
+  }
+
+  const { createClient } = await import("@supabase/supabase-js");
+
+  // Dedicated anonymous client — never authenticated, used for anon operations.
+  const anonClient = createClient(url, anonKey, {
+    auth: { persistSession: false },
+  });
+
+  // Separate client used only to obtain the owner token.
+  const authClient = createClient(url, anonKey, {
+    auth: { persistSession: false },
+  });
+  const { data: signIn } = await authClient.auth.signInWithPassword({
+    email: process.env.CMS_ADMIN_EMAIL ?? "admin@khoawatt.com",
+    password: process.env.CMS_ADMIN_PASSWORD ?? "test-password-123",
+  });
+  if (!signIn.session) {
+    t.skip("owner sign-in failed; cannot verify storage RLS");
+    return;
+  }
+  const ownerToken = signIn.session.access_token;
+  const ownerClient = createClient(url, anonKey, {
+    auth: { persistSession: false },
+    global: { headers: { Authorization: `Bearer ${ownerToken}` } },
+  });
+
+  const marker = `rls-${Date.now()}.jpg`;
+  const bytes = new Uint8Array([0xff, 0xd8, 0xff, 0xe0, 1, 2, 3]);
+
+  try {
+    // Owner can upload to a public bucket.
+    const ownerUpload = await ownerClient.storage
+      .from(MEDIA_BUCKETS.public)
+      .upload(marker, bytes, { contentType: "image/jpeg" });
+    assert.equal(ownerUpload.error, null, "owner upload to public bucket");
+
+    // Anonymous cannot upload (owner-write policy).
+    const anonUpload = await anonClient.storage
+      .from(MEDIA_BUCKETS.public)
+      .upload(`anon-${marker}`, bytes, { contentType: "image/jpeg" });
+    assert.ok(anonUpload.error, "anonymous upload to public bucket is denied");
+
+    // Anonymous cannot read the private bucket.
+    const anonDownload = await anonClient.storage
+      .from(MEDIA_BUCKETS.private)
+      .download(marker);
+    assert.ok(anonDownload.error, "anonymous read of private bucket is denied");
+  } finally {
+    await ownerClient.storage.from(MEDIA_BUCKETS.public).remove([marker]);
+  }
+});
+
+const REF_FIXTURES = {
+  project: "ref-project",
+  resumeEntry: "ref-resume-entry",
+  resumeMedia: "ref-resume-media",
+  projectMedia: "ref-project-media",
+  path: "ref-file.jpg",
+};
+
+async function createReferenceParents() {
+  const { error: projErr } = await client.from("projects").upsert(
+    { id: REF_FIXTURES.project, slug: REF_FIXTURES.project, featured: false, order: 99 },
+    { onConflict: "id" },
+  );
+  assert.equal(projErr, null, `ref project: ${projErr?.message}`);
+
+  const { error: catErr } = await client.from("resume_categories").upsert(
+    { id: "ref-cat", slug: "ref-cat", order: 99 },
+    { onConflict: "id" },
+  );
+  assert.equal(catErr, null, `ref category: ${catErr?.message}`);
+
+  const { error: entryErr } = await client.from("resume_entries").upsert(
+    { id: REF_FIXTURES.resumeEntry, category_id: "ref-cat", order: 99, draft: false },
+    { onConflict: "id" },
+  );
+  assert.equal(entryErr, null, `ref entry: ${entryErr?.message}`);
+}
+
+async function insertMediaReference(kind: "project" | "resume") {
+  if (kind === "project") {
+    const { error } = await client.from("project_media").upsert(
+      {
+        id: REF_FIXTURES.projectMedia,
+        project_id: REF_FIXTURES.project,
+        src: `/images/${REF_FIXTURES.path}`,
+        kind: "image",
+        order: 1,
+      },
+      { onConflict: "id" },
+    );
+    assert.equal(error, null, `project media ref: ${error?.message}`);
+  } else {
+    const { error } = await client.from("resume_media").upsert(
+      {
+        id: REF_FIXTURES.resumeMedia,
+        resume_entry_id: REF_FIXTURES.resumeEntry,
+        thumbnail_src: `/api/resume-media/${REF_FIXTURES.path}`,
+        full_src: `/api/resume-media/${REF_FIXTURES.path}`,
+        order: 1,
+      },
+      { onConflict: "id" },
+    );
+    assert.equal(error, null, `resume media ref: ${error?.message}`);
+  }
+}
+
+async function cleanupReferenceFixtures() {
+  await client.from("project_media").delete().eq("id", REF_FIXTURES.projectMedia);
+  await client.from("resume_media").delete().eq("id", REF_FIXTURES.resumeMedia);
+  await client.from("resume_entries").delete().eq("id", REF_FIXTURES.resumeEntry);
+  await client.from("resume_categories").delete().eq("id", "ref-cat");
+  await client.from("projects").delete().eq("id", REF_FIXTURES.project);
+}
+
+test("deletion reference check blocks referenced media and allows unreferenced", async () => {
+  await cleanupReferenceFixtures();
+  await createReferenceParents();
+
+  // Unreferenced -> allowed.
+  assert.equal(
+    await findMediaReferences(client, "project-media", REF_FIXTURES.path),
+    0,
+    "unreferenced project media reports 0 references",
+  );
+  assert.equal(
+    await findMediaReferences(client, "resume-media", REF_FIXTURES.path),
+    0,
+    "unreferenced resume media reports 0 references",
+  );
+
+  try {
+    // Referenced -> blocked (returns a positive count).
+    await insertMediaReference("project");
+    assert.ok(
+      (await findMediaReferences(client, "project-media", REF_FIXTURES.path)) > 0,
+      "referenced project media reports a reference",
+    );
+
+    await insertMediaReference("resume");
+    assert.ok(
+      (await findMediaReferences(client, "resume-media", REF_FIXTURES.path)) > 0,
+      "referenced resume media reports a reference",
+    );
+  } finally {
+    await cleanupReferenceFixtures();
+  }
+});
+
+test("deletion reference check fails closed when the reference query errors", async () => {
+  const failingClient = {
+    from: () => ({
+      select: () => ({
+        or: async () => ({
+          data: null,
+          error: { message: "connection refused" },
+        }),
+      }),
+    }),
+  } as unknown as SupabaseClient;
+
+  // A reference-query error must throw so deleteMedia refuses to delete,
+  // never treating an unknown reference state as "safe to delete".
+  await assert.rejects(
+    () => findMediaReferences(failingClient, "project-media", "file.jpg"),
+    /Reference check failed/,
+  );
+  await assert.rejects(
+    () => findMediaReferences(failingClient, "resume-media", "file.jpg"),
+    /Reference check failed/,
+  );
+});
+
+test("reference check escapes LIKE wildcards in the stored path", async () => {
+  const filters: string[] = [];
+  const recordingClient = {
+    from: () => ({
+      select: () => ({
+        or: async (filter: string) => {
+          filters.push(filter);
+          return { data: [], error: null };
+        },
+      }),
+    }),
+  } as unknown as SupabaseClient;
+
+  await findMediaReferences(recordingClient, "project-media", "100%_real.jpg");
+  await findMediaReferences(recordingClient, "resume-media", "100%_real.jpg");
+
+  // % and _ are escaped so a literal path can never broaden the match.
+  assert.ok(
+    filters.every((f) => f.includes("%100\\%\\_real.jpg%")),
+    "LIKE wildcards in the path are escaped: " + filters.join(", "),
+  );
 });
