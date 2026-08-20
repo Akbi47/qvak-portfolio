@@ -1,4 +1,4 @@
-import { getServiceClient } from "@/features/cms/server";
+import { getServerClient } from "@/features/cms/session";
 
 export interface AdminProfileView {
   id: string;
@@ -19,8 +19,7 @@ export interface AdminProfileView {
 }
 
 export async function getProfileView(): Promise<AdminProfileView | null> {
-  const client = getServiceClient();
-  if (!client) return null;
+  const client = await getServerClient();
 
   const { data, error } = await client
     .from("profile")

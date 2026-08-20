@@ -2,8 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
-import { getServiceClient } from "@/features/cms/server";
-import { isAdminUser } from "@/features/cms/session";
+import { getServerClient, isAdminUser } from "@/features/cms/session";
 import { isHttpUrl, required } from "@/features/cms/validation";
 import type { SkillGroup } from "@/content/skills";
 
@@ -47,8 +46,7 @@ export async function createSkill(
   const invalid = validate(data);
   if (invalid) return invalid;
 
-  const client = getServiceClient();
-  if (!client) return { ok: false, error: "CMS is not configured." };
+  const client = await getServerClient();
 
   // Single-transaction write: base row + both translation rows roll back together
   // on any failure (see migration cms_atomic_mutations).
@@ -79,8 +77,7 @@ export async function updateSkill(
   const invalid = validate(data);
   if (invalid) return invalid;
 
-  const client = getServiceClient();
-  if (!client) return { ok: false, error: "CMS is not configured." };
+  const client = await getServerClient();
 
   const { error } = await client.rpc("cms_upsert_skill", {
     p_id: data.id,
@@ -105,8 +102,7 @@ export async function updateSkill(
 export async function deleteSkill(id: string): Promise<SkillActionResult> {
   if (!(await isAdminUser())) return { ok: false, error: "Unauthorized." };
 
-  const client = getServiceClient();
-  if (!client) return { ok: false, error: "CMS is not configured." };
+  const client = await getServerClient();
 
   const { error } = await client.rpc("cms_delete_skill", { p_id: id });
   if (error) return { ok: false, error: error.message };

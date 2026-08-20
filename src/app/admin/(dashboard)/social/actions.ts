@@ -2,8 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
-import { getServiceClient } from "@/features/cms/server";
-import { isAdminUser } from "@/features/cms/session";
+import { getServerClient, isAdminUser } from "@/features/cms/session";
 import { isHttpUrl, required } from "@/features/cms/validation";
 
 export interface SocialLinkFormData {
@@ -36,8 +35,7 @@ export async function createSocialLink(
   const invalid = validate(data);
   if (invalid) return invalid;
 
-  const client = getServiceClient();
-  if (!client) return { ok: false, error: "CMS is not configured." };
+  const client = await getServerClient();
 
   const { error } = await client.rpc("cms_upsert_social", {
     p_id: data.id && data.id.length > 0 ? data.id : data.label.toLowerCase().replaceAll(" ", "-"),
@@ -62,8 +60,7 @@ export async function updateSocialLink(
   if (invalid) return invalid;
   if (!data.id) return { ok: false, error: "Missing id." };
 
-  const client = getServiceClient();
-  if (!client) return { ok: false, error: "CMS is not configured." };
+  const client = await getServerClient();
 
   const { error } = await client.rpc("cms_upsert_social", {
     p_id: data.id,
@@ -82,8 +79,7 @@ export async function updateSocialLink(
 
 export async function deleteSocialLink(id: string): Promise<SocialActionResult> {
   if (!(await isAdminUser())) return { ok: false, error: "Unauthorized." };
-  const client = getServiceClient();
-  if (!client) return { ok: false, error: "CMS is not configured." };
+  const client = await getServerClient();
 
   const { error } = await client.rpc("cms_delete_social", { p_id: id });
   if (error) return { ok: false, error: error.message };

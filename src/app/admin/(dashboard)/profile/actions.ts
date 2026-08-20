@@ -2,8 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
-import { getServiceClient } from "@/features/cms/server";
-import { isAdminUser } from "@/features/cms/session";
+import { getServerClient, isAdminUser } from "@/features/cms/session";
 import { isHttpUrl, required } from "@/features/cms/validation";
 
 export interface ProfileFormData {
@@ -56,20 +55,23 @@ export async function updateProfile(
   const invalid = validate(data);
   if (invalid) return invalid;
 
-  const client = getServiceClient();
-  if (!client) return { ok: false, error: "CMS is not configured." };
+  const client = await getServerClient();
 
-  const { data: profile } = await client
+  // Profile is a required singleton keyed by the stable slug 'owner'. Resolve the
+  // existing row's id, or generate a fresh id to create it on first save.
+  const { data: existing } = await client
     .from("profile")
     .select("id")
-    .limit(1)
+    .eq("slug", "owner")
     .maybeSingle();
-  if (!profile) return { ok: false, error: "Profile not found." };
+  const profileId =
+    existing?.id ?? (crypto.randomUUID() as unknown as string);
 
   // Single-transaction write: base row + both translation rows roll back together
-  // on any failure (see migration cms_atomic_mutations).
+  // on any failure (see migration cms_atomic_mutations). Creates the singleton
+  // profile on first save and updates it thereafter.
   const { error } = await client.rpc("cms_upsert_profile", {
-    p_id: profile.id,
+    p_id: profileId,
     p_name: data.name.trim(),
     p_short_name: data.shortName.trim(),
     p_github_url: data.githubUrl || null,

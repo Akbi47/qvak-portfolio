@@ -1,4 +1,4 @@
-import { getServiceClient } from "@/features/cms/server";
+import { getServerClient } from "@/features/cms/session";
 
 export interface AdminSocialLink {
   id: string;
@@ -9,8 +9,7 @@ export interface AdminSocialLink {
 }
 
 export async function listSocialLinks(): Promise<AdminSocialLink[]> {
-  const client = getServiceClient();
-  if (!client) return [];
+  const client = await getServerClient();
 
   const { data, error } = await client
     .from("social_links")

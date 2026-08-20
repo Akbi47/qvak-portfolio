@@ -1,4 +1,4 @@
-import { getServiceClient } from "@/features/cms/server";
+import { getServerClient } from "@/features/cms/session";
 import type { SkillGroup } from "@/content/skills";
 
 export interface AdminSkillRow {
@@ -15,8 +15,7 @@ export interface AdminSkillRow {
 }
 
 export async function listSkills(): Promise<AdminSkillRow[]> {
-  const client = getServiceClient();
-  if (!client) return [];
+  const client = await getServerClient();
 
   const { data, error } = await client
     .from("skills")

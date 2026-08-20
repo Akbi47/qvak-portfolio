@@ -14,7 +14,10 @@ export default async function AdminProfilePage() {
       {profile ? (
         <ProfileForm initial={profile} />
       ) : (
-        <p className="admin-message">No profile record found. Run the backfill script first.</p>
+        <p className="admin-message">
+          No profile record found. Run the migration/backfill to seed the profile
+          singleton (slug &quot;owner&quot;).
+        </p>
       )}
     </main>
   );
