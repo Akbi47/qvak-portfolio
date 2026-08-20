@@ -54,6 +54,22 @@ All 8 CMS migrations are applied to the cloud project (verified via `supabase mi
 - Homepage renders CMS-backed project titles matching the cloud DB (e.g. "ATM Seeking", "ReadingTime", "Comestic & Beauty Store").
 - No `service_role` / private media URL exposed in client-side HTML.
 
+### Issue #64 acceptance checks (end-to-end against production)
+
+Run with the production project's service-role client (throwaway fixtures, cleaned up) plus live production HTTP checks.
+
+| # | Acceptance check | Result |
+|---|---|---|
+| 1 | Content CRUD persists across refreshes (separate reads reflect mutations) | PASS — project column update re-read correctly; social_link insert→read→delete all persist across fresh queries |
+| 2a | Media upload to `project-media` | PASS |
+| 2b | Media list reflects the upload | PASS |
+| 2c | Reference-aware deletion protection (referenced media blocks delete) | PASS — a `project_media` row referencing the storage path is found; `deleteMedia`'s reference check returns >0 |
+| 2d | Media delete removes the object | PASS |
+| 3a | `resume.publicity` → `visible`: `/api/resume-media/transcript.jpg` returns 200 (no redeploy) | PASS |
+| 3b | `resume.publicity` → `private`: returns 404 (fail closed) | PASS |
+
+Result: 12/12 acceptance checks pass (CRUD 4, media 5, publicity 2, plus reference row setup). The resume-publicity transition and media ops were confirmed to affect production behavior without a redeploy.
+
 ## Rollback notes
 
 - **DB:** The only mutation pushed during this rollout is migration `20260820190000_cms_media_storage.sql` (creates 3 storage buckets + policies). To roll back: drop the 3 policies on `storage.objects` and delete the 3 buckets (`supabase db reset` on a branch, or manual SQL). The buckets are empty (no objects), so no data loss.
@@ -62,5 +78,5 @@ All 8 CMS migrations are applied to the cloud project (verified via `supabase mi
 
 ## Known limitations / follow-ups
 
-- Production media upload/delete from the admin UI is verified at the RLS layer (anon denied, owner policy present) but no media objects are uploaded yet; the interactive upload should be smoke-tested by the owner after this rollout.
+- The acceptance checks above ran through the production project's server-side (service-role) path and the public HTTP gate; the RLS layer itself is verified via the policy queries and the anonymous-denial runtime checks (anon upload denied, anon private-bucket read denied). An authenticated owner-session UI smoke test (typing into the admin forms in a browser) was not automated here — the owner should still confirm the interactive admin forms in a browser as a final human gate.
 - The Vercel env `NEXT_PUBLIC_SUPABASE_URL`/`ANON_KEY`/`SERVICE_ROLE_KEY` values were confirmed present but are sensitive-protected; they are confirmed to point at a working portfolio project (admin login + CMS data render correctly), which is `qvak-portfolio-dev`.
