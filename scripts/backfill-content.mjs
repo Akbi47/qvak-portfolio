@@ -67,7 +67,7 @@ async function backfillSkills() {
           category: skill.category?.vi ?? null,
         },
       ],
-      "id",
+      "skill_id,locale",
     );
   }
   console.log("Skills backfilled.");
@@ -83,6 +83,8 @@ async function backfillProfile() {
     [
       {
         slug: "owner",
+        name: portfolioProfile.name,
+        short_name: portfolioProfile.name.split(" ").pop() ?? null,
         github_url: portfolioProfile.githubUrl,
         linkedin_url: null,
         resume_url: null,
@@ -119,7 +121,7 @@ async function backfillProfile() {
         location: null,
       },
     ],
-    "id",
+    "profile_id,locale",
   );
   console.log("Profile backfilled.");
 }
