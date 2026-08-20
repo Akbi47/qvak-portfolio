@@ -23,6 +23,8 @@ export interface ProjectFormData {
   summaryVi: string;
   descriptionEn: string;
   descriptionVi: string;
+  highlightsEn: string;
+  highlightsVi: string;
 }
 
 export interface ProjectActionResult {
@@ -59,6 +61,13 @@ function splitTechStack(value: string): string[] {
     .filter(Boolean);
 }
 
+function splitLines(value: string): string[] {
+  return value
+    .split("\n")
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
 export async function createProject(
   data: ProjectFormData,
 ): Promise<ProjectActionResult> {
@@ -89,6 +98,8 @@ export async function createProject(
     p_summary_vi: data.summaryVi.trim(),
     p_description_en: data.descriptionEn.trim() || null,
     p_description_vi: data.descriptionVi.trim() || null,
+    p_highlights_en: splitLines(data.highlightsEn),
+    p_highlights_vi: splitLines(data.highlightsVi),
   });
   if (error) return { ok: false, error: error.message };
 
@@ -126,6 +137,8 @@ export async function updateProject(
     p_summary_vi: data.summaryVi.trim(),
     p_description_en: data.descriptionEn.trim() || null,
     p_description_vi: data.descriptionVi.trim() || null,
+    p_highlights_en: splitLines(data.highlightsEn),
+    p_highlights_vi: splitLines(data.highlightsVi),
   });
   if (error) return { ok: false, error: error.message };
 

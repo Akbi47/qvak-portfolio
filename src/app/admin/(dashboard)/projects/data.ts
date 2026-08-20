@@ -18,6 +18,8 @@ export interface AdminProjectRow {
   summaryVi: string;
   descriptionEn: string | null;
   descriptionVi: string | null;
+  highlightsEn: string[];
+  highlightsVi: string[];
 }
 
 interface ProjectTranslation {
@@ -26,6 +28,7 @@ interface ProjectTranslation {
   category: string;
   summary: string;
   description: string | null;
+  highlights?: string[] | string;
 }
 
 interface ProjectRowWithTranslations {
@@ -87,7 +90,24 @@ function mapProjectRow(
     summaryVi: vi?.summary ?? "",
     descriptionEn: en?.description ?? null,
     descriptionVi: vi?.description ?? null,
+    highlightsEn: parseStringArray(en?.highlights),
+    highlightsVi: parseStringArray(vi?.highlights),
   };
+}
+
+function parseStringArray(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value.map((item) => String(item));
+  }
+  if (typeof value === "string" && value.length > 0) {
+    try {
+      const parsed = JSON.parse(value);
+      return Array.isArray(parsed) ? parsed.map((item) => String(item)) : [];
+    } catch {
+      return [];
+    }
+  }
+  return [];
 }
 
 function parseTechStack(value: string[] | string | null | undefined): string[] {

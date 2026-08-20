@@ -41,6 +41,8 @@ export function ProjectForm({ existing }: ProjectFormProps) {
       summaryVi: String(fd.get("summaryVi") ?? ""),
       descriptionEn: String(fd.get("descriptionEn") ?? ""),
       descriptionVi: String(fd.get("descriptionVi") ?? ""),
+      highlightsEn: String(fd.get("highlightsEn") ?? ""),
+      highlightsVi: String(fd.get("highlightsVi") ?? ""),
     };
 
     startTransition(async () => {
@@ -112,6 +114,16 @@ export function ProjectForm({ existing }: ProjectFormProps) {
       <label className="admin-field">
         <span>Description (VI)</span>
         <textarea name="descriptionVi" rows={4} defaultValue={existing?.descriptionVi ?? ""} />
+      </label>
+
+      <h3>Highlights (one per line)</h3>
+      <label className="admin-field">
+        <span>Highlights (EN)</span>
+        <textarea name="highlightsEn" rows={4} defaultValue={existing?.highlightsEn.join("\n") ?? ""} />
+      </label>
+      <label className="admin-field">
+        <span>Highlights (VI)</span>
+        <textarea name="highlightsVi" rows={4} defaultValue={existing?.highlightsVi.join("\n") ?? ""} />
       </label>
 
       <h3>Details</h3>
