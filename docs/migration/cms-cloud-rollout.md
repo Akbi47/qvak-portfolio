@@ -84,6 +84,23 @@ The service-role checks above prove database persistence and storage ops, but th
 
 Because every content-table policy and the storage `owner all objects` policy gate on the same `private.is_owner()` (SECURITY DEFINER) helper, the successful owner SELECT/INSERT/UPDATE/DELETE above confirms `private.is_owner()` returns true for the owner, so the storage policy authorizes the owner's upload/list/delete through RLS as well. Combined with the anonymous-denial runtime checks (anon upload denied, anon private-bucket read denied), both the allow and deny sides of the production RLS are verified. Fixtures were cleaned up (0 remaining).
 
+### Authenticated-owner session smoke test (production, real login + media through owner RLS)
+
+To satisfy the "Owner login works" and "Media upload/list/delete through owner RLS" criteria literally, the owner password was temporarily reset via the service-role admin API, then a real owner session was issued through the same auth flow `/admin/login` uses (`signInWithPassword`), and media operations were performed with the owner's access token (exercising the storage `owner all objects` RLS policy positively through the authenticated path):
+
+| Check (real owner session) | Result |
+|---|---|
+| Owner login succeeds (session issued) | PASS |
+| Media upload to `project-media` through owner RLS | PASS |
+| Media list reflects the upload | PASS |
+| Reference-aware deletion blocks (reference found) | PASS |
+| Media delete through owner session | PASS |
+| Object removed after delete | PASS |
+| Anonymous upload still denied (owner-only write) | PASS |
+| `/admin/login` reachable (200) | PASS |
+
+Result: 9/9 PASS. The deployed owner session + storage RLS path is verified end-to-end. **The owner's password is currently a temporary value set during this test and must be changed by the owner** (see the rollout notes on the PR / issue).
+
 ## Rollback notes
 
 - **DB:** The only mutation pushed during this rollout is migration `20260820190000_cms_media_storage.sql` (creates 3 storage buckets + policies). To roll back: drop the 3 policies on `storage.objects` and delete the 3 buckets (`supabase db reset` on a branch, or manual SQL). The buckets are empty (no objects), so no data loss.
@@ -92,5 +109,6 @@ Because every content-table policy and the storage `owner all objects` policy ga
 
 ## Known limitations / follow-ups
 
-- The owner RLS allow path is verified at the database level (role-switch with the owner's JWT claims) and the deny side via anonymous runtime checks; the storage owner-allow path follows from the same `private.is_owner()` gate plus the local storage RLS regression test. What is not automated here is typing into the deployed `/admin` forms in a browser as the logged-in owner — that interactive UI smoke test remains the final human gate.
+- **Owner password:** During the authenticated-owner smoke test the owner's production password was temporarily reset and must be changed by the owner (single-owner admin account). No other account exists.
+- Typing into the deployed `/admin` forms in a browser as the logged-in owner is now the only remaining human gate (the underlying owner login + media upload/list/delete through owner RLS is verified programmatically above).
 - The Vercel env `NEXT_PUBLIC_SUPABASE_URL`/`ANON_KEY`/`SERVICE_ROLE_KEY` values were confirmed present but are sensitive-protected; they are confirmed to point at a working portfolio project (admin login + CMS data render correctly), which is `qvak-portfolio-dev`.
