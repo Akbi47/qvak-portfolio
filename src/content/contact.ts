@@ -4,6 +4,19 @@ type LocalizedText = Readonly<Record<Locale, string>>;
 
 export type ContactFieldName = "name" | "email" | "subject" | "message";
 
+export type SocialPlatform =
+  | "facebook"
+  | "github"
+  | "instagram"
+  | "linkedin"
+  | "x";
+
+export interface SocialLinkView {
+  id: SocialPlatform;
+  label: string;
+  href: string;
+}
+
 export interface ContactDetailView {
   id: string;
   label: string;
@@ -17,6 +30,7 @@ export interface ContactContentView {
   description: string;
   detailsLabel: string;
   details: ReadonlyArray<ContactDetailView>;
+  socials: ReadonlyArray<SocialLinkView>;
   form: {
     name: string;
     namePlaceholder: string;
@@ -52,6 +66,38 @@ export const contactDetails = {
     href: "https://github.com/Akbi47",
   },
 } as const;
+
+const socialDefaults: ReadonlyArray<{
+  href: string;
+  id: SocialPlatform;
+  label: LocalizedText;
+}> = [
+  {
+    id: "linkedin",
+    label: { en: "LinkedIn", vi: "LinkedIn" },
+    href: "#",
+  },
+  {
+    id: "instagram",
+    label: { en: "Instagram", vi: "Instagram" },
+    href: "#",
+  },
+  {
+    id: "facebook",
+    label: { en: "Facebook", vi: "Facebook" },
+    href: "#",
+  },
+  {
+    id: "github",
+    label: { en: "GitHub", vi: "GitHub" },
+    href: contactDetails.github.href,
+  },
+  {
+    id: "x",
+    label: { en: "X", vi: "X" },
+    href: "#",
+  },
+];
 
 const contactCopy = {
   eyebrow: {
@@ -148,6 +194,11 @@ export function getContactContent(locale: Locale): ContactContentView {
       label: localized(detail.label),
       value: localized(detail.value),
       href: detail.href,
+    })),
+    socials: socialDefaults.map((social) => ({
+      id: social.id,
+      label: localized(social.label),
+      href: social.href,
     })),
     form: {
       name: localized(contactCopy.form.name),

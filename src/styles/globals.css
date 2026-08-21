@@ -1765,20 +1765,22 @@ video {
   gap: var(--space-8);
 }
 
+.contact-card {
+  margin-block-start: var(--space-10);
+  padding: var(--space-6);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  background: var(--color-surface);
+}
+
 .contact-layout {
   display: grid;
   gap: var(--space-6);
-  margin-block-start: var(--space-10);
 }
 
 .contact-info__card {
   display: grid;
   gap: var(--space-5);
-  padding: var(--space-6);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-xl);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-md);
 }
 
 .contact-info__heading {
@@ -1792,6 +1794,36 @@ video {
   padding: 0;
   gap: var(--space-3);
   list-style: none;
+}
+
+.contact-socials {
+  display: flex;
+  justify-content: center;
+  margin: 0;
+  padding: var(--space-4) 0 0;
+  border-block-start: 1px solid var(--color-border);
+  gap: var(--space-5);
+  list-style: none;
+}
+
+.contact-socials__link {
+  display: inline-flex;
+  color: var(--color-text-muted);
+  transition:
+    color var(--motion-duration-base) var(--motion-ease-standard);
+}
+
+.contact-socials__link:hover {
+  color: var(--color-accent);
+}
+
+.contact-socials__link--pending {
+  opacity: 0.55;
+}
+
+.contact-socials__icon {
+  width: 1.5rem;
+  height: 1.5rem;
 }
 
 .contact-info__link {
