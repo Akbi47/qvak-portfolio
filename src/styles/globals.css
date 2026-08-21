@@ -289,6 +289,8 @@ video {
   position: sticky;
   z-index: 50;
   top: 0;
+  backdrop-filter: blur(0.5rem);
+  -webkit-backdrop-filter: blur(0.5rem);
   pointer-events: none;
 }
 
@@ -301,7 +303,6 @@ video {
   gap: var(--space-4);
   padding-block: var(--space-2);
   background: transparent;
-  backdrop-filter: blur(0.5rem);
   pointer-events: auto;
 }
 
