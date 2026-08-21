@@ -54,24 +54,34 @@ export function ContactSection({ content }: Readonly<ContactSectionProps>) {
                 </ul>
 
                 <ul aria-label={content.detailsLabel} className="contact-socials">
-                  {content.socials.map((social) => (
-                    <li key={social.id}>
-                      <a
-                        aria-label={social.label}
-                        className="contact-socials__link"
-                        href={social.href}
-                        rel="noopener noreferrer"
-                        target={
-                          social.href.startsWith("https://")
-                            ? "_blank"
-                            : undefined
-                        }
-                        title={social.label}
-                      >
-                        <SocialGlyphIcon platform={social.id} />
-                      </a>
-                    </li>
-                  ))}
+                  {content.socials.map((social) => {
+                    const isConfigured = social.href.startsWith("https://");
+
+                    return (
+                      <li key={social.id}>
+                        {isConfigured ? (
+                          <a
+                            aria-label={social.label}
+                            className="contact-socials__link"
+                            href={social.href}
+                            rel="noopener noreferrer"
+                            target="_blank"
+                            title={social.label}
+                          >
+                            <SocialGlyphIcon platform={social.id} />
+                          </a>
+                        ) : (
+                          <span
+                            aria-disabled="true"
+                            className="contact-socials__link contact-socials__link--pending"
+                            title={social.label}
+                          >
+                            <SocialGlyphIcon platform={social.id} />
+                          </span>
+                        )}
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
             </aside>
