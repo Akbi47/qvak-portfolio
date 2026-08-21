@@ -218,6 +218,13 @@ export async function getContactContent(
     if (error || !data) return base;
 
     const rows = data as SocialRow[];
+    const platformSet = new Set<string>([
+      "facebook",
+      "github",
+      "instagram",
+      "linkedin",
+      "x",
+    ]);
 
     return {
       ...base,
@@ -227,6 +234,16 @@ export async function getContactContent(
         value: row.label,
         href: row.url,
       })),
+      socials: rows
+        .filter(
+          (row) =>
+            row.icon_key !== null && platformSet.has(row.icon_key),
+        )
+        .map((row) => ({
+          id: row.icon_key as ContactContentView["socials"][number]["id"],
+          label: row.label,
+          href: row.url,
+        })),
     };
   } catch {
     return base;
