@@ -250,10 +250,10 @@ export function SiteHeader({
             <Image
               alt=""
               className="site-header__logo-image"
-              height={219}
+              height={727}
               priority
               src="/images/brand/qvak-logo.png"
-              width={500}
+              width={906}
             />
           </a>
 

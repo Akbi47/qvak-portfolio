@@ -32,9 +32,9 @@
   --palette-neutral-700: oklch(34% 0.025 270);
   --palette-neutral-900: oklch(19% 0.025 270);
   --palette-neutral-950: oklch(13% 0.025 270);
-  --palette-violet-400: oklch(70% 0.17 295);
-  --palette-violet-500: oklch(61% 0.22 295);
-  --palette-violet-600: oklch(53% 0.22 295);
+  --palette-gold-400: oklch(83% 0.14 82);
+  --palette-gold-500: oklch(70% 0.15 80);
+  --palette-gold-600: oklch(64% 0.145 79);
   --palette-green-600: oklch(53% 0.14 155);
   --palette-red-600: oklch(55% 0.2 25);
 
@@ -48,12 +48,12 @@
   --color-text-inverse: var(--palette-neutral-0);
   --color-border: var(--palette-neutral-200);
   --color-border-strong: oklch(78% 0.02 270);
-  --color-accent: var(--palette-violet-600);
-  --color-accent-hover: oklch(47% 0.22 295);
-  --color-accent-soft: oklch(94% 0.04 295);
+  --color-accent: var(--palette-gold-600);
+  --color-accent-hover: oklch(58% 0.14 78);
+  --color-accent-soft: oklch(95% 0.055 85);
   --color-success: var(--palette-green-600);
   --color-error: var(--palette-red-600);
-  --color-focus: var(--palette-violet-500);
+  --color-focus: var(--palette-gold-500);
 
   /* Typography */
   --font-family-sans: Arial, Helvetica, sans-serif;
@@ -126,12 +126,12 @@
   --color-text-inverse: var(--palette-neutral-950);
   --color-border: oklch(30% 0.03 270);
   --color-border-strong: oklch(40% 0.04 270);
-  --color-accent: var(--palette-violet-400);
-  --color-accent-hover: oklch(76% 0.15 295);
-  --color-accent-soft: oklch(28% 0.08 295);
+  --color-accent: var(--palette-gold-400);
+  --color-accent-hover: oklch(88% 0.12 86);
+  --color-accent-soft: oklch(28% 0.07 84);
   --color-success: oklch(72% 0.14 155);
   --color-error: oklch(72% 0.17 25);
-  --color-focus: var(--palette-violet-400);
+  --color-focus: var(--palette-gold-400);
   --shadow-sm: 0 1px 2px oklch(5% 0.02 270 / 0.3);
   --shadow-md: 0 12px 32px oklch(5% 0.02 270 / 0.32);
   --shadow-lg: 0 24px 64px oklch(5% 0.02 270 / 0.38);
@@ -319,8 +319,8 @@ video {
 }
 
 .site-header__logo-image {
-  width: 5.5rem;
-  height: auto;
+  height: 2.75rem;
+  width: auto;
 }
 
 .site-header__navigation {
