@@ -37,6 +37,7 @@ export function SiteHeader({
   const [activeSection, setActiveSection] =
     useState<NavigationSectionId>("home");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const navigationRef = useRef<HTMLDivElement>(null);
@@ -68,6 +69,17 @@ export function SiteHeader({
       window.removeEventListener("resize", updateActiveSection);
       window.removeEventListener("scroll", updateActiveSection);
     };
+  }, []);
+
+  useEffect(() => {
+    function updateScrolled() {
+      setScrolled(window.scrollY > 16);
+    }
+
+    updateScrolled();
+    window.addEventListener("scroll", updateScrolled, { passive: true });
+
+    return () => window.removeEventListener("scroll", updateScrolled);
   }, []);
 
   useEffect(() => {
@@ -238,7 +250,11 @@ export function SiteHeader({
   }
 
   return (
-    <header className="site-header" ref={headerRef}>
+    <header
+      className="site-header"
+      data-scrolled={scrolled ? "true" : "false"}
+      ref={headerRef}
+    >
       <div className="container-shell" data-size="wide">
         <div className="site-header__surface">
           <a

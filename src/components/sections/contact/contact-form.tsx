@@ -16,6 +16,7 @@ const FIELD_ORDER: ContactFieldName[] = ["name", "email", "subject", "message"];
 
 interface ContactFormProps {
   content: ContactContentView;
+  labelledById?: string;
 }
 
 const initialState = { status: "idle" } as const;
@@ -34,7 +35,10 @@ function SubmitButton({ content }: Readonly<{ content: ContactContentView }>) {
   );
 }
 
-export function ContactForm({ content }: Readonly<ContactFormProps>) {
+export function ContactForm({
+  content,
+  labelledById,
+}: Readonly<ContactFormProps>) {
   const [state, formAction] = useActionState(
     submitContactForm,
     initialState,
@@ -105,7 +109,7 @@ export function ContactForm({ content }: Readonly<ContactFormProps>) {
   return (
     <form
       action={formAction}
-      aria-label={content.aria.formLabel}
+      aria-labelledby={labelledById}
       className="contact-form"
       noValidate
       onSubmit={handleSubmit}
