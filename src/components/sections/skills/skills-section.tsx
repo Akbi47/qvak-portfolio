@@ -4,7 +4,6 @@ import {
   useRef,
   useState,
   type KeyboardEvent,
-  type ReactNode,
 } from "react";
 
 import { Container } from "@/components/layout/container";
@@ -15,6 +14,8 @@ import type {
   SkillsContentView,
 } from "@/content/skills";
 
+import { skillIcons } from "./skill-icons";
+
 interface SkillsSectionProps {
   content: SkillsContentView;
 }
@@ -24,16 +25,28 @@ const tabOrder = [
   "others",
 ] as const satisfies ReadonlyArray<SkillGroup>;
 
-const skillMarks: Readonly<Record<SkillIconKey, ReactNode>> = {
-  typescript: "TS",
-  javascript: "JS",
-  react: "⚛",
-  nextjs: "N",
-  nodejs: "<>",
-  nestjs: "N",
-  postgresql: "PG",
-  wordpress: "W",
-};
+function SkillIcon({ iconKey }: { iconKey?: SkillIconKey }) {
+  if (!iconKey) {
+    return (
+      <span aria-hidden="true" className="skill-card__mark">
+        {"{}"}
+      </span>
+    );
+  }
+
+  const icon = skillIcons[iconKey];
+
+  return (
+    <svg
+      aria-hidden="true"
+      className="skill-card__icon"
+      fill={icon.hex}
+      viewBox="0 0 24 24"
+    >
+      <path d={icon.path} />
+    </svg>
+  );
+}
 
 export function SkillsSection({ content }: Readonly<SkillsSectionProps>) {
   const [activeTab, setActiveTab] = useState<SkillGroup>("tech-stack");
@@ -129,9 +142,7 @@ export function SkillsSection({ content }: Readonly<SkillsSectionProps>) {
           <ul className="skills-grid">
             {content.techStack.map((skill) => (
               <li className="skill-card" key={skill.id}>
-                <span aria-hidden="true" className="skill-card__mark">
-                  {skill.iconKey ? skillMarks[skill.iconKey] : "{}"}
-                </span>
+                <SkillIcon iconKey={skill.iconKey} />
                 <span className="skill-card__name">{skill.name}</span>
               </li>
             ))}
