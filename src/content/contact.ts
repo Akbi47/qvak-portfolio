@@ -29,6 +29,8 @@ export interface ContactContentView {
   title: string;
   description: string;
   detailsLabel: string;
+  detailsHeading: string;
+  formHeading: string;
   details: ReadonlyArray<ContactDetailView>;
   socials: ReadonlyArray<SocialLinkView>;
   form: {
@@ -116,6 +118,14 @@ const contactCopy = {
     en: "Find me on",
     vi: "Kết nối với mình",
   },
+  detailsHeading: {
+    en: "Contact details",
+    vi: "Thông tin liên hệ",
+  },
+  formHeading: {
+    en: "Send me a message",
+    vi: "Gửi tin nhắn cho mình",
+  },
   form: {
     name: { en: "Name", vi: "Họ tên" },
     namePlaceholder: { en: "Your name", vi: "Tên của bạn" },
@@ -189,6 +199,8 @@ export function getContactContent(locale: Locale): ContactContentView {
     title: localized(contactCopy.title),
     description: localized(contactCopy.description),
     detailsLabel: localized(contactCopy.detailsLabel),
+    detailsHeading: localized(contactCopy.detailsHeading),
+    formHeading: localized(contactCopy.formHeading),
     details: Object.values(contactDetails).map((detail) => ({
       id: detail.id,
       label: localized(detail.label),
