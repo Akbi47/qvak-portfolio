@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import type { SkillGroup } from "@/content/skills";
@@ -126,9 +127,12 @@ export function SkillForm({ existing }: SkillFormProps) {
         </p>
       ) : null}
 
-      <button disabled={isPending} type="submit">
-        {isPending ? "Saving…" : existing ? "Update skill" : "Create skill"}
-      </button>
+      <div className="admin-form-actions">
+        <button disabled={isPending} type="submit">
+          {isPending ? "Saving…" : existing ? "Update skill" : "Create skill"}
+        </button>
+        <Link href="/admin/skills">Cancel</Link>
+      </div>
     </form>
   );
 }

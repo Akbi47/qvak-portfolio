@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import type { AdminSocialLink } from "./data";
@@ -72,9 +73,12 @@ export function SocialLinkForm({ existing }: SocialLinkFormProps) {
         </p>
       ) : null}
 
-      <button disabled={isPending} type="submit">
-        {isPending ? "Saving…" : existing ? "Update link" : "Create link"}
-      </button>
+      <div className="admin-form-actions">
+        <button disabled={isPending} type="submit">
+          {isPending ? "Saving…" : existing ? "Update link" : "Create link"}
+        </button>
+        <Link href="/admin/social">Cancel</Link>
+      </div>
     </form>
   );
 }

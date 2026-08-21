@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import type { AdminResumeCategory } from "./data";
@@ -71,9 +72,12 @@ export function ResumeCategoryForm({ existing }: ResumeCategoryFormProps) {
         </p>
       ) : null}
 
-      <button disabled={isPending} type="submit">
-        {isPending ? "Saving…" : existing ? "Update category" : "Create category"}
-      </button>
+      <div className="admin-form-actions">
+        <button disabled={isPending} type="submit">
+          {isPending ? "Saving…" : existing ? "Update category" : "Create category"}
+        </button>
+        <Link href="/admin/resume">Cancel</Link>
+      </div>
     </form>
   );
 }

@@ -1,17 +1,14 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { isAdminUser } from "@/features/cms/session";
+import { ThemeToggle } from "@/features/theme/theme-toggle";
+import { AdminSidebar } from "./admin-sidebar";
 
-const navLinks = [
-  { href: "/admin/settings", label: "Settings" },
-  { href: "/admin/profile", label: "Profile" },
-  { href: "/admin/skills", label: "Skills" },
-  { href: "/admin/social", label: "Social" },
-  { href: "/admin/projects", label: "Projects" },
-  { href: "/admin/resume", label: "Resume" },
-  { href: "/admin/media", label: "Media" },
-] as const;
+const adminThemeMessages = {
+  toggle: "Toggle color theme",
+  switchToDark: "Switch to dark theme",
+  switchToLight: "Switch to light theme",
+};
 
 export default async function AdminDashboardLayout({
   children,
@@ -23,15 +20,20 @@ export default async function AdminDashboardLayout({
   }
 
   return (
-    <>
-      <nav className="admin-nav" aria-label="Admin">
-        {navLinks.map((link) => (
-          <Link href={link.href} key={link.href}>
-            {link.label}
-          </Link>
-        ))}
-      </nav>
-      {children}
-    </>
+    <div className="admin-shell">
+      <AdminSidebar />
+      <div className="admin-main">
+        <header className="admin-topbar">
+          <span className="admin-topbar__title">Content management</span>
+          <div className="admin-topbar__actions">
+            <ThemeToggle messages={adminThemeMessages} />
+            <a className="admin-topbar__view" href="/" target="_blank" rel="noreferrer">
+              View site <span aria-hidden="true">↗</span>
+            </a>
+          </div>
+        </header>
+        <div className="admin-content">{children}</div>
+      </div>
+    </div>
   );
 }

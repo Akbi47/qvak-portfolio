@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 
 import { listResumeCategories } from "../../data";
 import { ResumeCategoryForm } from "../../resume-category-form";
+import { AdminFormCard, AdminPage } from "../../../admin-page";
 
 interface AdminEditResumeCategoryPageProps {
   params: Promise<{ id: string }>;
@@ -23,9 +24,11 @@ export default async function AdminEditResumeCategoryPage({
   }
 
   return (
-    <main className="admin-dashboard">
-      <h1>Edit resume category</h1>
-      <ResumeCategoryForm existing={category} />
-    </main>
+    <AdminPage backHref="/admin/resume" title="Edit resume category">
+      <AdminFormCard>
+        <h2>Category</h2>
+        <ResumeCategoryForm existing={category} />
+      </AdminFormCard>
+    </AdminPage>
   );
 }

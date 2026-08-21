@@ -1,4 +1,5 @@
 import { SkillForm } from "../skill-form";
+import { AdminFormCard, AdminPage } from "../../admin-page";
 
 export const metadata = {
   title: "New skill",
@@ -6,9 +7,11 @@ export const metadata = {
 
 export default function AdminNewSkillPage() {
   return (
-    <main className="admin-dashboard">
-      <h1>New skill</h1>
-      <SkillForm />
-    </main>
+    <AdminPage backHref="/admin/skills" title="New skill">
+      <AdminFormCard>
+        <h2>Skill details</h2>
+        <SkillForm />
+      </AdminFormCard>
+    </AdminPage>
   );
 }

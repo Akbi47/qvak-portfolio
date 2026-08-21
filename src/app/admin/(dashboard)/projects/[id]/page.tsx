@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 
 import { getProject } from "../data";
 import { ProjectForm } from "../project-form";
+import { AdminFormCard, AdminPage } from "../../admin-page";
 
 interface AdminEditProjectPageProps {
   params: Promise<{ id: string }>;
@@ -22,9 +23,11 @@ export default async function AdminEditProjectPage({
   }
 
   return (
-    <main className="admin-dashboard">
-      <h1>Edit project</h1>
-      <ProjectForm existing={project} />
-    </main>
+    <AdminPage backHref="/admin/projects" title="Edit project">
+      <AdminFormCard>
+        <h2>Project details</h2>
+        <ProjectForm existing={project} />
+      </AdminFormCard>
+    </AdminPage>
   );
 }
