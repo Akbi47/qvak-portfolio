@@ -142,6 +142,9 @@ export function ProfileForm({ initial }: ProfileFormProps) {
         <button disabled={isPending} type="submit">
           {isPending ? "Saving…" : "Save profile"}
         </button>
+        <button className="admin-button-secondary" disabled={isPending} type="reset">
+          Cancel changes
+        </button>
         {initial.id ? (
           <button
             className="admin-link-button admin-link-button--danger"

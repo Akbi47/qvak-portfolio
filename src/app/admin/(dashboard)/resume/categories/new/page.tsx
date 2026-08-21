@@ -1,4 +1,5 @@
 import { ResumeCategoryForm } from "../../resume-category-form";
+import { AdminFormCard, AdminPage } from "../../../admin-page";
 
 export const metadata = {
   title: "New resume category",
@@ -6,9 +7,11 @@ export const metadata = {
 
 export default function AdminNewResumeCategoryPage() {
   return (
-    <main className="admin-dashboard">
-      <h1>New resume category</h1>
-      <ResumeCategoryForm />
-    </main>
+    <AdminPage backHref="/admin/resume" title="New resume category">
+      <AdminFormCard>
+        <h2>Category</h2>
+        <ResumeCategoryForm />
+      </AdminFormCard>
+    </AdminPage>
   );
 }

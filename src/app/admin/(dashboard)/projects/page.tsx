@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { listProjects } from "./data";
 import { DeleteProjectButton } from "./delete-project";
+import { AdminPage, AdminTable } from "../admin-page";
 
 export const metadata = {
   title: "Admin projects",
@@ -11,23 +12,27 @@ export default async function AdminProjectsPage() {
   const projects = await listProjects();
 
   return (
-    <main className="admin-dashboard">
-      <div className="admin-page-head">
-        <h1>Projects</h1>
+    <AdminPage
+      action={
         <Link className="admin-button" href="/admin/projects/new">
           New project
         </Link>
-      </div>
-
-      <table className="admin-table">
+      }
+      title="Projects"
+    >
+      {projects.length === 0 ? (
+        <p className="admin-empty">No projects yet.</p>
+      ) : (
+      <AdminTable label="Projects">
         <thead>
           <tr>
-            <th>ID</th>
-            <th>Title</th>
-            <th>Featured</th>
-            <th>Status</th>
-            <th>Order</th>
-            <th />
+            <th scope="col">ID</th>
+            <th scope="col">Title</th>
+            <th scope="col">Featured</th>
+            <th scope="col">Status</th>
+            <th scope="col">Published</th>
+            <th scope="col">Order</th>
+            <th scope="col"><span className="sr-only">Actions</span></th>
           </tr>
         </thead>
         <tbody>
@@ -35,8 +40,21 @@ export default async function AdminProjectsPage() {
             <tr key={project.id}>
               <td>{project.id}</td>
               <td>{project.titleEn}</td>
-              <td>{project.featured ? "✓" : ""}</td>
-              <td>{project.status}</td>
+              <td>
+                {project.featured ? (
+                  <span className="admin-badge admin-badge--success">Featured</span>
+                ) : null}
+              </td>
+              <td>
+                <span className={`admin-badge ${project.status === "active" ? "admin-badge--success" : "admin-badge--muted"}`}>
+                  {project.status}
+                </span>
+              </td>
+              <td>
+                <span className={`admin-badge ${project.published ? "admin-badge--success" : "admin-badge--muted"}`}>
+                  {project.published ? "Published" : "Draft"}
+                </span>
+              </td>
               <td>{project.order}</td>
               <td className="admin-row-actions">
                 <Link href={`/admin/projects/${project.id}`}>Edit</Link>
@@ -45,7 +63,8 @@ export default async function AdminProjectsPage() {
             </tr>
           ))}
         </tbody>
-      </table>
-    </main>
+      </AdminTable>
+      )}
+    </AdminPage>
   );
 }

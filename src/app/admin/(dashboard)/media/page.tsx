@@ -2,6 +2,7 @@ import { listBucketObjects, getMediaPublicUrl } from "@/features/cms/media";
 import type { MediaBucket } from "@/features/cms/media";
 import { MediaUploadForm } from "./media-upload-form";
 import { MediaDeleteButton } from "./media-delete";
+import { AdminPage } from "../admin-page";
 
 export const metadata = {
   title: "Admin media",
@@ -22,8 +23,7 @@ export default async function AdminMediaPage() {
   );
 
   return (
-    <main className="admin-dashboard">
-      <h1>Media</h1>
+    <AdminPage title="Media">
       <p className="admin-message">
         Upload and manage images stored in Supabase Storage. Resume media is
         private and served only through the gated route; project and portfolio
@@ -48,8 +48,10 @@ export default async function AdminMediaPage() {
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       alt={object.name}
+                      height={80}
                       loading="lazy"
                       src={getMediaPublicUrl(bucket.id, object.name)}
+                      width={80}
                     />
                   </div>
                   <div className="admin-media-meta">
@@ -62,6 +64,6 @@ export default async function AdminMediaPage() {
           )}
         </section>
       ))}
-    </main>
+    </AdminPage>
   );
 }

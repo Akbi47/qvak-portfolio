@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import type { AdminProjectRow } from "./data";
@@ -167,9 +168,12 @@ export function ProjectForm({ existing }: ProjectFormProps) {
         </p>
       ) : null}
 
-      <button disabled={isPending} type="submit">
-        {isPending ? "Saving…" : existing ? "Update project" : "Create project"}
-      </button>
+      <div className="admin-form-actions">
+        <button disabled={isPending} type="submit">
+          {isPending ? "Saving…" : existing ? "Update project" : "Create project"}
+        </button>
+        <Link href="/admin/projects">Cancel</Link>
+      </div>
     </form>
   );
 }

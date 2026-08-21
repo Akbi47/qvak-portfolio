@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { listResumeCategories, listResumeEntries } from "./data";
 import { ResumeDeleteButton } from "./resume-delete";
+import { AdminPage, AdminTable } from "../admin-page";
 
 export const metadata = {
   title: "Admin resume",
@@ -12,9 +13,7 @@ export default async function AdminResumePage() {
   const entries = await listResumeEntries();
 
   return (
-    <main className="admin-dashboard">
-      <h1>Resume / CV</h1>
-
+    <AdminPage title="Resume / CV">
       <section className="admin-section">
         <div className="admin-page-head">
           <h2>Categories</h2>
@@ -22,13 +21,16 @@ export default async function AdminResumePage() {
             New category
           </Link>
         </div>
-        <table className="admin-table">
+        {categories.length === 0 ? (
+          <p className="admin-empty">No resume categories yet.</p>
+        ) : (
+        <AdminTable label="Resume categories">
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Order</th>
-              <th />
+              <th scope="col">ID</th>
+              <th scope="col">Name</th>
+              <th scope="col">Order</th>
+              <th scope="col"><span className="sr-only">Actions</span></th>
             </tr>
           </thead>
           <tbody>
@@ -44,7 +46,8 @@ export default async function AdminResumePage() {
               </tr>
             ))}
           </tbody>
-        </table>
+        </AdminTable>
+        )}
       </section>
 
       <section className="admin-section">
@@ -54,15 +57,18 @@ export default async function AdminResumePage() {
             New entry
           </Link>
         </div>
-        <table className="admin-table">
+        {entries.length === 0 ? (
+          <p className="admin-empty">No resume entries yet.</p>
+        ) : (
+        <AdminTable label="Resume entries">
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Title</th>
-              <th>Category</th>
-              <th>Draft</th>
-              <th>Order</th>
-              <th />
+              <th scope="col">ID</th>
+              <th scope="col">Title</th>
+              <th scope="col">Category</th>
+              <th scope="col">Publication status</th>
+              <th scope="col">Order</th>
+              <th scope="col"><span className="sr-only">Actions</span></th>
             </tr>
           </thead>
           <tbody>
@@ -73,7 +79,13 @@ export default async function AdminResumePage() {
                   <td>{entry.id}</td>
                   <td>{entry.titleEn}</td>
                   <td>{category?.nameEn ?? entry.categoryId}</td>
-                  <td>{entry.draft ? "✓" : ""}</td>
+                  <td>
+                    {entry.draft ? (
+                      <span className="admin-badge admin-badge--muted">Draft</span>
+                    ) : (
+                      <span className="admin-badge admin-badge--success">Published</span>
+                    )}
+                  </td>
                   <td>{entry.order}</td>
                   <td className="admin-row-actions">
                     <Link href={`/admin/resume/entries/${entry.id}`}>Edit</Link>
@@ -83,8 +95,9 @@ export default async function AdminResumePage() {
               );
             })}
           </tbody>
-        </table>
+        </AdminTable>
+        )}
       </section>
-    </main>
+    </AdminPage>
   );
 }

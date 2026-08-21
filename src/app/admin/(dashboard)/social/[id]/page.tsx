@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 
 import { listSocialLinks } from "../data";
 import { SocialLinkForm } from "../social-form";
+import { AdminFormCard, AdminPage } from "../../admin-page";
 
 interface AdminEditSocialPageProps {
   params: Promise<{ id: string }>;
@@ -23,9 +24,11 @@ export default async function AdminEditSocialPage({
   }
 
   return (
-    <main className="admin-dashboard">
-      <h1>Edit social link</h1>
-      <SocialLinkForm existing={link} />
-    </main>
+    <AdminPage backHref="/admin/social" title="Edit social link">
+      <AdminFormCard>
+        <h2>Social link</h2>
+        <SocialLinkForm existing={link} />
+      </AdminFormCard>
+    </AdminPage>
   );
 }

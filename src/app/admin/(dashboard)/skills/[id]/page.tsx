@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 
 import { getSkill } from "../data";
 import { SkillForm } from "../skill-form";
+import { AdminFormCard, AdminPage } from "../../admin-page";
 
 interface AdminEditSkillPageProps {
   params: Promise<{ id: string }>;
@@ -22,9 +23,11 @@ export default async function AdminEditSkillPage({
   }
 
   return (
-    <main className="admin-dashboard">
-      <h1>Edit skill</h1>
-      <SkillForm existing={skill} />
-    </main>
+    <AdminPage backHref="/admin/skills" title="Edit skill">
+      <AdminFormCard>
+        <h2>Skill details</h2>
+        <SkillForm existing={skill} />
+      </AdminFormCard>
+    </AdminPage>
   );
 }

@@ -1,4 +1,5 @@
 import { ProjectForm } from "../project-form";
+import { AdminFormCard, AdminPage } from "../../admin-page";
 
 export const metadata = {
   title: "New project",
@@ -6,9 +7,11 @@ export const metadata = {
 
 export default function AdminNewProjectPage() {
   return (
-    <main className="admin-dashboard">
-      <h1>New project</h1>
-      <ProjectForm />
-    </main>
+    <AdminPage backHref="/admin/projects" title="New project">
+      <AdminFormCard>
+        <h2>Project details</h2>
+        <ProjectForm />
+      </AdminFormCard>
+    </AdminPage>
   );
 }
