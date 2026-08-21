@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 
 import { isAdminUser } from "@/features/cms/session";
 import { ThemeToggle } from "@/features/theme/theme-toggle";
+import { signOut } from "./actions";
 import { AdminSidebar } from "./admin-sidebar";
 
 const adminThemeMessages = {
@@ -30,6 +31,11 @@ export default async function AdminDashboardLayout({
             <a className="admin-topbar__view" href="/" target="_blank" rel="noreferrer">
               View site <span aria-hidden="true">↗</span>
             </a>
+            <form action={signOut}>
+              <button type="submit" className="admin-topbar__signout">
+                Sign out
+              </button>
+            </form>
           </div>
         </header>
         <div className="admin-content">{children}</div>
