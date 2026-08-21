@@ -1786,7 +1786,7 @@ video {
 
 .contact-layout {
   display: grid;
-  gap: var(--space-8);
+  gap: var(--space-6);
 }
 
 .contact-info {
@@ -1802,6 +1802,7 @@ video {
   gap: var(--space-2);
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-heading);
 }
 
 .contact-heading::before {
@@ -1848,12 +1849,7 @@ video {
 
 .contact-layout {
   display: grid;
-  gap: var(--space-6);
-}
-
-.contact-info__card {
-  display: grid;
-  gap: var(--space-5);
+  gap: var(--space-8);
 }
 
 .contact-info__list {
@@ -2068,7 +2064,7 @@ video {
   .contact-layout {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     align-items: start;
-    gap: var(--space-10);
+    gap: var(--space-12);
   }
 
   .contact-panel {
