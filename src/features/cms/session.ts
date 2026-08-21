@@ -1,4 +1,5 @@
 import { createServerClient } from "@supabase/ssr";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 
 import { cmsConfig, hasCmsConfig } from "./config";
@@ -46,4 +47,11 @@ export async function isAdminUser(): Promise<boolean> {
     .maybeSingle();
 
   return owner !== null;
+}
+
+export async function endOwnerSession(
+  client?: SupabaseClient,
+): Promise<void> {
+  const supabase = client ?? (await getServerClient());
+  await supabase.auth.signOut();
 }
