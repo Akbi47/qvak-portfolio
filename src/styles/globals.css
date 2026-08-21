@@ -289,23 +289,20 @@ video {
   position: sticky;
   z-index: 50;
   top: 0;
-  padding-block: var(--space-3);
+  backdrop-filter: blur(0.5rem);
+  -webkit-backdrop-filter: blur(0.5rem);
   pointer-events: none;
 }
 
 .site-header__surface {
   position: relative;
   display: flex;
-  min-height: 3.5rem;
+  min-height: 4rem;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-4);
-  padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-pill);
-  background: color-mix(in oklch, var(--color-surface) 92%, transparent);
-  box-shadow: var(--shadow-md);
-  backdrop-filter: blur(1rem);
+  padding-block: var(--space-2);
+  background: transparent;
   pointer-events: auto;
 }
 
