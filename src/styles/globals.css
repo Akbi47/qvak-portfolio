@@ -786,7 +786,11 @@ video {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   margin: 0;
   padding: 0;
-  gap: var(--space-3);
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-border);
   list-style: none;
 }
 
@@ -798,21 +802,22 @@ video {
   justify-items: center;
   gap: var(--space-3);
   padding: var(--space-5) var(--space-3);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  background: color-mix(in oklch, var(--color-surface) 92%, transparent);
-  box-shadow: var(--shadow-sm);
+  background: var(--color-surface);
   text-align: center;
-  transition:
-    border-color var(--motion-duration-base) var(--motion-ease-standard),
-    transform var(--motion-duration-base) var(--motion-ease-standard),
-    box-shadow var(--motion-duration-base) var(--motion-ease-standard);
+  transition: background var(--motion-duration-base) var(--motion-ease-standard);
 }
 
 .skill-card:hover {
-  border-color: var(--color-border-strong);
-  box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
+  background: var(--color-surface-subtle);
+}
+
+.skill-card__icon {
+  width: 2.5rem;
+  height: auto;
+}
+
+.skill-card__icon--mono {
+  color: var(--color-text);
 }
 
 .skill-card__mark {
@@ -2506,7 +2511,6 @@ video {
 
   .skills-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: var(--space-4);
   }
 
   .skills-groups {

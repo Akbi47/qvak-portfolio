@@ -35,12 +35,17 @@ function SkillIcon({ iconKey }: { iconKey?: SkillIconKey }) {
   }
 
   const icon = skillIcons[iconKey];
+  const monochrome = icon.hex === "#000000";
 
   return (
     <svg
       aria-hidden="true"
-      className="skill-card__icon"
-      fill={icon.hex}
+      className={
+        monochrome
+          ? "skill-card__icon skill-card__icon--mono"
+          : "skill-card__icon"
+      }
+      fill={monochrome ? "currentColor" : icon.hex}
       viewBox="0 0 24 24"
     >
       <path d={icon.path} />
