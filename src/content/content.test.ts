@@ -183,10 +183,16 @@ test("no resumeUrl is wired until a real CV exists (D5)", () => {
   );
 });
 
-test("contact/social destinations are GitHub only (D8)", () => {
-  const detailIds = Object.keys(contactDetails);
-  assert.deepEqual(detailIds.sort(), ["github"]);
-  assert.ok(contactDetails.github.href.startsWith("https://github.com/"));
+test("contact details carry owner-approved destinations (supersedes D8)", () => {
+  const detailIds = Object.keys(contactDetails).sort();
+  assert.deepEqual(detailIds, ["email", "location", "phone"]);
+  assert.equal(contactDetails.email.href, "mailto:contact@khoawatt.com");
+  assert.equal(contactDetails.phone.href, "tel:+84704823238");
+  assert.equal(
+    "href" in contactDetails.location,
+    false,
+    "location is intentionally not a link",
+  );
 });
 
 test("referenced public images exist on disk", () => {

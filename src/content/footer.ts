@@ -8,7 +8,7 @@ export interface FooterSocialView {
   id: string;
   label: string;
   value: string;
-  href: string;
+  href?: string;
 }
 
 export interface FooterContentView {
@@ -143,7 +143,7 @@ export function getFooterContent(locale: Locale): FooterContentView {
       id: detail.id,
       label: localized(detail.label),
       value: localized(detail.value),
-      href: detail.href,
+      href: "href" in detail ? detail.href : undefined,
     })),
     newsletter: {
       label: localized(footerCopy.newsletter.label),

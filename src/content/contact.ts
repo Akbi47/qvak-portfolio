@@ -61,11 +61,22 @@ export interface ContactContentView {
 }
 
 export const contactDetails = {
-  github: {
-    id: "github",
-    label: { en: "GitHub", vi: "GitHub" },
-    value: { en: "Akbi47", vi: "Akbi47" },
-    href: "https://github.com/Akbi47",
+  email: {
+    id: "email",
+    label: { en: "Email", vi: "Email" },
+    value: { en: "contact@khoawatt.com", vi: "contact@khoawatt.com" },
+    href: "mailto:contact@khoawatt.com",
+  },
+  phone: {
+    id: "phone",
+    label: { en: "Phone", vi: "Điện thoại" },
+    value: { en: "+84 704823238", vi: "+84 704823238" },
+    href: "tel:+84704823238",
+  },
+  location: {
+    id: "location",
+    label: { en: "Location", vi: "Vị trí" },
+    value: { en: "Ho Chi Minh, Vietnam", vi: "Hồ Chí Minh, Việt Nam" },
   },
 } as const;
 
@@ -75,8 +86,8 @@ const socialDefaults: ReadonlyArray<{
   label: LocalizedText;
 }> = [
   {
-    id: "linkedin",
-    label: { en: "LinkedIn", vi: "LinkedIn" },
+    id: "facebook",
+    label: { en: "Facebook", vi: "Facebook" },
     href: "#",
   },
   {
@@ -85,18 +96,18 @@ const socialDefaults: ReadonlyArray<{
     href: "#",
   },
   {
-    id: "facebook",
-    label: { en: "Facebook", vi: "Facebook" },
-    href: "#",
-  },
-  {
     id: "github",
     label: { en: "GitHub", vi: "GitHub" },
-    href: contactDetails.github.href,
+    href: "https://github.com/Akbi47",
   },
   {
     id: "x",
     label: { en: "X", vi: "X" },
+    href: "#",
+  },
+  {
+    id: "linkedin",
+    label: { en: "LinkedIn", vi: "LinkedIn" },
     href: "#",
   },
 ];
@@ -205,7 +216,7 @@ export function getContactContent(locale: Locale): ContactContentView {
       id: detail.id,
       label: localized(detail.label),
       value: localized(detail.value),
-      href: detail.href,
+      href: "href" in detail ? detail.href : undefined,
     })),
     socials: socialDefaults.map((social) => ({
       id: social.id,

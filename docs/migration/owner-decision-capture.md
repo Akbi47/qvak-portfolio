@@ -85,6 +85,7 @@ Each item records the current state in the repository and what is required to ac
 - **Question:** Which contact/social destinations are final (GitHub, email, LinkedIn, etc.)? Are email/phone/location intentionally public?
 - **Acceptance:** Contact/social values are owner-approved and verified; absent values are intentionally omitted.
 - **Decision (2026-08-18):** Keep current contact/social destinations **as-is** — currently GitHub only. Do **not** invent email, phone, location, LinkedIn, or other destinations.
+- **Update (2026-08-22):** Owner supplied verified contact details — email `contact@khoawatt.com`, phone `+84 704823238`, location Ho Chi Minh, Vietnam. These now publish in `src/content/contact.ts` (email/phone as links, location plain text). Social set stays Facebook, Instagram, GitHub (`Akbi47`), X, LinkedIn; unconfigured socials render non-interactive until real URLs are provided.
 
 ### D9 — About FEAON role
 

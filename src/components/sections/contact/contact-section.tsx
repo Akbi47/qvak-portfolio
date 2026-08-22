@@ -1,63 +1,15 @@
 import { Container } from "@/components/layout/container";
 import { SectionHeading } from "@/components/ui/section-heading";
-import type {
-  ContactContentView,
-  SocialPlatform,
-} from "@/content/contact";
+import type { ContactContentView } from "@/content/contact";
 
 import { ContactForm } from "./contact-form";
-import { SocialGlyphIcon } from "./social-glyph-icon";
+import { DetailGlyphIcon, SocialGlyphIcon } from "./social-glyph-icon";
 
 interface ContactSectionProps {
   content: ContactContentView;
 }
 
-interface LinkGlyphProps {
-  className?: string;
-}
-
-function DetailLinkGlyph({ className }: Readonly<LinkGlyphProps>) {
-  return (
-    <svg
-      aria-hidden="true"
-      className={className}
-      fill="none"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="2"
-      viewBox="0 0 24 24"
-    >
-      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-    </svg>
-  );
-}
-
-const socialPlatformSet = new Set<string>([
-  "facebook",
-  "github",
-  "instagram",
-  "linkedin",
-  "x",
-]);
-
-function DetailIcon({
-  className,
-  id,
-}: Readonly<{ className?: string; id: string }>) {
-  return socialPlatformSet.has(id) ? (
-    <SocialGlyphIcon platform={id as SocialPlatform} />
-  ) : (
-    <DetailLinkGlyph className={className} />
-  );
-}
-
 export function ContactSection({ content }: Readonly<ContactSectionProps>) {
-  const nonSocialDetails = content.details.filter(
-    (detail) => !socialPlatformSet.has(detail.id),
-  );
-
   return (
     <section
       aria-labelledby="contact-title"
@@ -78,7 +30,7 @@ export function ContactSection({ content }: Readonly<ContactSectionProps>) {
         <div className="contact-card">
           <div className="contact-layout">
             <div className="contact-info">
-              {nonSocialDetails.length > 0 ? (
+              {content.details.length > 0 ? (
                 <>
                   <h3
                     className="contact-heading"
@@ -90,13 +42,10 @@ export function ContactSection({ content }: Readonly<ContactSectionProps>) {
                     className="contact-info__list"
                     aria-labelledby="contact-details-title"
                   >
-                    {nonSocialDetails.map((detail) => (
+                    {content.details.map((detail) => (
                       <li className="contact-detail" key={detail.id}>
                         <span className="contact-detail__chip">
-                          <DetailIcon
-                            className="contact-detail__icon"
-                            id={detail.id}
-                          />
+                          <DetailGlyphIcon id={detail.id} />
                         </span>
                         <span className="contact-detail__text">
                           <span className="contact-info__label">

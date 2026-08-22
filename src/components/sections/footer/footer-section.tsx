@@ -14,6 +14,16 @@ interface FooterSectionProps {
   messages: HeaderMessages;
 }
 
+function isExternalHref(href: string) {
+  return href.startsWith("https://") || href.startsWith("http://");
+}
+
+function externalLinkProps(href: string) {
+  return isExternalHref(href)
+    ? { rel: "noopener noreferrer", target: "_blank" }
+    : {};
+}
+
 export function FooterSection({
   content,
   locale,
@@ -34,16 +44,23 @@ export function FooterSection({
             <ul className="site-footer__socials">
               {content.details.map((detail) => (
                 <li key={detail.id}>
-                  <a
-                    className="site-footer__social"
-                    href={detail.href}
-                    rel="noopener noreferrer"
-                    target="_blank"
-                  >
-                    <span className="site-footer__social-label">
-                      {detail.label}
+                  {detail.href ? (
+                    <a
+                      className="site-footer__social"
+                      href={detail.href}
+                      {...externalLinkProps(detail.href)}
+                    >
+                      <span className="site-footer__social-label">
+                        {detail.label}
+                      </span>
+                    </a>
+                  ) : (
+                    <span className="site-footer__social">
+                      <span className="site-footer__social-label">
+                        {detail.label}
+                      </span>
                     </span>
-                  </a>
+                  )}
                 </li>
               ))}
             </ul>
@@ -76,17 +93,25 @@ export function FooterSection({
             <ul className="site-footer__links">
               {content.details.map((detail) => (
                 <li key={detail.id}>
-                  <a
-                    className="site-footer__link"
-                    href={detail.href}
-                    rel="noopener noreferrer"
-                    target="_blank"
-                  >
-                    <span className="site-footer__link-label">
-                      {detail.label}:
-                    </span>{" "}
-                    {detail.value}
-                  </a>
+                  {detail.href ? (
+                    <a
+                      className="site-footer__link"
+                      href={detail.href}
+                      {...externalLinkProps(detail.href)}
+                    >
+                      <span className="site-footer__link-label">
+                        {detail.label}:
+                      </span>{" "}
+                      {detail.value}
+                    </a>
+                  ) : (
+                    <span className="site-footer__link">
+                      <span className="site-footer__link-label">
+                        {detail.label}:
+                      </span>{" "}
+                      {detail.value}
+                    </span>
+                  )}
                 </li>
               ))}
             </ul>

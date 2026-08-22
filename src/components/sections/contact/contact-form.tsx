@@ -12,7 +12,11 @@ import {
   type ContactFieldName,
 } from "@/features/contact/validation";
 
-const FIELD_ORDER: ContactFieldName[] = ["name", "email", "subject", "message"];
+const FIELD_ROWS: ReadonlyArray<ReadonlyArray<ContactFieldName>> = [
+  ["name", "email"],
+  ["subject"],
+  ["message"],
+];
 
 interface ContactFormProps {
   content: ContactContentView;
@@ -116,35 +120,50 @@ export function ContactForm({
     >
       <p className="contact-form__required-note">{content.aria.requiredNote}</p>
 
-      {FIELD_ORDER.map((field) => {
-        const label = content.form[field];
-        const placeholder = content.form[`${field}Placeholder`];
-        const errorCode = fieldErrors[field];
-        const describedBy = errorCode ? `${field}-error` : undefined;
+      {FIELD_ROWS.map((row) => {
+        const fields = row.map((field) => {
+          const label = content.form[field];
+          const placeholder = content.form[`${field}Placeholder`];
+          const errorCode = fieldErrors[field];
+          const describedBy = errorCode ? `${field}-error` : undefined;
 
-        const commonProps = {
-          "aria-describedby": describedBy,
-          "aria-invalid": errorCode ? true : undefined,
-          id: field,
-          name: field,
-          onChange: (
-            event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-          ) => handleChange(field, event.target.value),
-          required: true,
-          value: values[field],
-        };
+          const commonProps = {
+            "aria-describedby": describedBy,
+            "aria-invalid": errorCode ? true : undefined,
+            id: field,
+            name: field,
+            onChange: (
+              event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+            ) => handleChange(field, event.target.value),
+            required: true,
+            value: values[field],
+          };
 
-        if (field === "message") {
           return (
             <div className="contact-form__field" key={field}>
               <label htmlFor={field}>
                 {label} <span aria-hidden="true">*</span>
               </label>
-              <textarea
-                {...commonProps}
-                placeholder={placeholder}
-                rows={6}
-              />
+              {field === "message" ? (
+                <textarea
+                  {...commonProps}
+                  placeholder={placeholder}
+                  rows={4}
+                />
+              ) : (
+                <input
+                  {...commonProps}
+                  autoComplete={
+                    field === "email"
+                      ? "email"
+                      : field === "name"
+                        ? "name"
+                        : "off"
+                  }
+                  placeholder={placeholder}
+                  type={field === "email" ? "email" : "text"}
+                />
+              )}
               {errorCode ? (
                 <p className="contact-form__error" id={`${field}-error`}>
                   {content.errors[errorCode]}
@@ -152,31 +171,14 @@ export function ContactForm({
               ) : null}
             </div>
           );
-        }
+        });
 
-        return (
-          <div className="contact-form__field" key={field}>
-            <label htmlFor={field}>
-              {label} <span aria-hidden="true">*</span>
-            </label>
-            <input
-              {...commonProps}
-              autoComplete={
-                field === "email"
-                  ? "email"
-                  : field === "name"
-                    ? "name"
-                    : "off"
-              }
-              placeholder={placeholder}
-              type={field === "email" ? "email" : "text"}
-            />
-            {errorCode ? (
-              <p className="contact-form__error" id={`${field}-error`}>
-                {content.errors[errorCode]}
-              </p>
-            ) : null}
+        return row.length > 1 ? (
+          <div className="contact-form__row" key={row.join("-")}>
+            {fields}
           </div>
+        ) : (
+          fields
         );
       })}
 
