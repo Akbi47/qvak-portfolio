@@ -226,24 +226,24 @@ export async function getContactContent(
       "x",
     ]);
 
+    const cmsSocials = rows
+      .filter(
+        (row) =>
+          row.url.startsWith("https://") &&
+          row.icon_key !== null &&
+          platformSet.has(row.icon_key),
+      )
+      .map((row) => ({
+        id: row.icon_key as ContactContentView["socials"][number]["id"],
+        label: row.label,
+        href: row.url,
+      }));
+
     return {
       ...base,
-      details: rows.map((row) => ({
-        id: row.id,
-        label: row.label,
-        value: row.label,
-        href: row.url,
-      })),
-      socials: rows
-        .filter(
-          (row) =>
-            row.icon_key !== null && platformSet.has(row.icon_key),
-        )
-        .map((row) => ({
-          id: row.icon_key as ContactContentView["socials"][number]["id"],
-          label: row.label,
-          href: row.url,
-        })),
+      // Contact details stay owner-managed static content; only configured
+      // socials are CMS-driven. An empty table falls back to static defaults.
+      socials: cmsSocials.length > 0 ? cmsSocials : base.socials,
     };
   } catch {
     return base;
