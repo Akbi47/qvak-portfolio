@@ -1853,6 +1853,18 @@ video {
   content: "";
 }
 
+.contact-heading--socials {
+  justify-content: center;
+  padding-top: var(--space-4);
+  border-block-start: 1px solid var(--color-border);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+}
+
+.contact-heading--socials::before {
+  content: none;
+}
+
 .contact-detail {
   display: flex;
   align-items: center;
@@ -1904,8 +1916,7 @@ video {
   display: flex;
   justify-content: center;
   margin: 0;
-  padding: var(--space-4) 0 0;
-  border-block-start: 1px solid var(--color-border);
+  padding: var(--space-3) 0 0;
   gap: var(--space-5);
   list-style: none;
 }

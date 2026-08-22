@@ -72,7 +72,10 @@ export function ContactSection({ content }: Readonly<ContactSectionProps>) {
                 </>
               ) : null}
 
-              <h4 className="contact-heading" id="contact-socials-title">
+              <h4
+                className="contact-heading contact-heading--socials"
+                id="contact-socials-title"
+              >
                 {content.detailsLabel}
               </h4>
               <ul
