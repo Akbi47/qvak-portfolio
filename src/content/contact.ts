@@ -9,6 +9,7 @@ export type SocialPlatform =
   | "github"
   | "instagram"
   | "linkedin"
+  | "thread"
   | "x";
 
 export interface SocialLinkView {
@@ -109,6 +110,11 @@ const socialDefaults: ReadonlyArray<{
     id: "linkedin",
     label: { en: "LinkedIn", vi: "LinkedIn" },
     href: "#",
+  },
+  {
+    id: "thread",
+    label: { en: "Threads", vi: "Threads" },
+    href: "https://www.threads.com/khoawatt",
   },
 ];
 

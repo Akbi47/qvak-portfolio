@@ -17,6 +17,7 @@ Each item records the current state in the repository and what is required to ac
 - **Question:** Approve the current EN/VI copy as final, or provide corrections per string?
 - **Acceptance:** Every user-facing string across all content files is owner-approved for both locales.
 - **Decision (2026-08-18):** Approve the current EN/VI content as the **production-for-now** copy. It may be revised later.
+- **Update (2026-08-22):** Owner approved a Skills content refresh (bilingual): Tech Stack tab expands to exactly 20 items (TypeScript, JavaScript, Python, Node.js, NestJS, React, Next.js, MongoDB, PostgreSQL, MySQL, Docker, AWS, DigitalOcean, Firebase, Azure DevOps, Tailwind CSS, SCSS, WordPress, WSL, Linux — WSL intentionally has no brand glyph and falls back to the `{}` mark); Others tab replaces the previous 3 categories with exactly 7 owner-specified groups (Architecture; DevOps & Infrastructure; Frontend & UX; SEO & Growth; Workflow & Collaboration; Product & Creative; Agentic AI & AI Development) with per-group subtitles, skill chips, and three Agentic AI sub-sections. Canonical copy lives in `src/content/skills.ts`; production CMS rows sync through `scripts/sync-skills-content.sql` **after** the code deploys (old builds crash on unknown `icon_key` values during SSR).
 
 ### D2 — Featured project set + real Live Demo / Code URLs
 
@@ -86,6 +87,7 @@ Each item records the current state in the repository and what is required to ac
 - **Acceptance:** Contact/social values are owner-approved and verified; absent values are intentionally omitted.
 - **Decision (2026-08-18):** Keep current contact/social destinations **as-is** — currently GitHub only. Do **not** invent email, phone, location, LinkedIn, or other destinations.
 - **Update (2026-08-22):** Owner supplied verified contact details — email `contact@khoawatt.com`, phone `+84 704823238`, location Ho Chi Minh, Vietnam. These now publish in `src/content/contact.ts` (email/phone as links, location plain text). Social set stays Facebook, Instagram, GitHub (`Akbi47`), X, LinkedIn; unconfigured socials render non-interactive until real URLs are provided.
+- **Update (2026-08-22, later):** Owner added a Threads profile to the CMS (`social_links` row `thread` → `https://www.threads.com/khoawatt`). The `thread` platform is now supported end-to-end: `SocialPlatform` union, Simple Icons Threads glyph, static default, and the CMS platform allow-list (previously the row was silently filtered out).
 
 ### D9 — About FEAON role
 
