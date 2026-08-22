@@ -26,6 +26,7 @@ If an issue conflicts with an accepted canonical document, stop and report the c
 7. Do not introduce the CMS into MVP tasks unless the issue explicitly belongs to the CMS phase.
 8. Every implementation PR must state tests run, screenshots/visual verification, known limitations, and docs affected.
 9. Follow the PR contract in `docs/07-codex-execution-contract.md` and the issue template in `.github/ISSUE_TEMPLATE/feature.md`.
+10. Database changes are strictly **local-first** (see "Database workflow" below): every migration, seed/backfill, or content SQL must be applied and verified on the local Supabase stack BEFORE it touches the linked cloud project. After any production data mutation, immediately mirror the same change back into local. Local missing data that production already has is never acceptable — treat divergence as a defect to fix in the same task.
 
 ## Commands
 
@@ -33,6 +34,8 @@ If an issue conflicts with an accepted canonical document, stop and report the c
 - `npm run typecheck` — runs `next typegen && tsc --noEmit` (needed because Next types are generated)
 - `npm run build` — production build (Next 16 defaults to Turbopack)
 - `npm run dev` — dev server
+- `supabase db query --local -f scripts/<file>.sql` — apply content SQL to the local stack first
+- `supabase db query --linked -f scripts/<file>.sql` — promote to the linked cloud project only after local verification
 - `gh` is available for issue/PR workflows; PRs use `Closes #<issue>` with one PR per issue.
 
 There is a minimal `npm test` runner using Node's built-in `node:test` via `tsx`, covering the contact-delivery feature (`src/features/contact/*.test.ts`). For other areas, verification remains manual/visual smoke checks plus lint/typecheck/build.
@@ -40,6 +43,15 @@ There is a minimal `npm test` runner using Node's built-in `node:test` via `tsx`
 ### Build quirk
 
 `npm run build` uses Turbopack, which can fail in sandboxed environments (CSS worker cannot bind an internal port → `Operation not permitted`). If the default build fails this way, run `npm run build -- --webpack` — that path is verified passing.
+
+### Database workflow (local-first)
+
+Local dev serves CMS content from its own Supabase stack (`127.0.0.1`, see `.env.local`); production serves from the linked cloud project. The two drift silently unless kept in sync, so:
+
+1. **Apply locally first**: run every new SQL script with `supabase db query --local -f …`, then verify in `npm run dev` before promoting.
+2. **Promote to cloud only after local verification**: same script with `--linked` (production mutations remain human-approved).
+3. **Mirror prod back into local immediately** after any production data change: `supabase db dump --data-only --linked -x 'auth.*' -x 'storage.*' -f /tmp/prod-data.sql`, strip non-content tables (`auth.*`, `storage.*`, `admin_owner` — never import production credentials), then `truncate` the matching local tables and restore via `psql`. Verify row counts match before calling it done.
+4. **Divergence is a defect**: if local lacks data that production has (or vice versa), fix it in the same task that caused it — do not leave it for later.
 
 ## Architecture notes
 
