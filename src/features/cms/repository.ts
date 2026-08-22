@@ -4,7 +4,9 @@ import {
   type PortfolioProfileView,
 } from "@/content/profile";
 import {
+  foldOtherCategories,
   getSkillsContent as getLocalSkills,
+  type OtherCategoryEntry,
   type SkillGroup,
   type SkillIconKey,
   type SkillsContentView,
@@ -154,42 +156,28 @@ export async function getSkillsContent(
       .filter((r) => r.group_key === "others")
       .sort((a, b) => a.order - b.order || a.id.localeCompare(b.id));
 
-    const categories = new Map<
-      string,
-      { id: string; name: string; skills: Array<{ id: string; name: string; iconKey?: SkillIconKey }> }
-    >();
+    const otherEntries: OtherCategoryEntry[] = otherRows.map((row) => {
+      const translationEn = row.skill_translations.find(
+        (t) => t.locale === "en",
+      );
+      const categoryEn = translationEn?.category ?? null;
 
-    for (const row of otherRows) {
-      const categoryEn =
-        row.skill_translations.find((t) => t.locale === "en")?.category ?? null;
-      const categoryName =
-        row.skill_translations.find((t) => t.locale === locale)?.category ??
-        categoryEn;
-
-      if (!categoryName) continue;
-
-      const existing = categories.get(categoryName);
-      const skill = {
+      return {
         id: row.id,
         name: pickTranslation(row.skill_translations, "name", locale),
+        categoryEn,
+        categoryDisplay:
+          row.skill_translations.find((t) => t.locale === locale)?.category ??
+          categoryEn ??
+          undefined,
         iconKey: row.icon_key ?? undefined,
       };
-
-      if (existing) {
-        existing.skills.push(skill);
-      } else {
-        categories.set(categoryName, {
-          id: categoryEn?.toLowerCase().replaceAll(" ", "-") ?? row.id,
-          name: categoryName,
-          skills: [skill],
-        });
-      }
-    }
+    });
 
     return {
       ...base,
       techStack,
-      otherCategories: [...categories.values()],
+      otherCategories: foldOtherCategories(otherEntries, locale),
     };
   } catch {
     return base;
@@ -223,6 +211,7 @@ export async function getContactContent(
       "github",
       "instagram",
       "linkedin",
+      "thread",
       "x",
     ]);
 

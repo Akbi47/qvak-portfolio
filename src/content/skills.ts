@@ -12,17 +12,18 @@ export type SkillIconKey =
   | "nodejs"
   | "nestjs"
   | "postgresql"
-  | "wordpress";
-
-export interface Skill {
-  id: string;
-  name: LocalizedText;
-  group: SkillGroup;
-  category?: LocalizedText;
-  iconKey?: SkillIconKey;
-  order: number;
-  featured?: boolean;
-}
+  | "wordpress"
+  | "python"
+  | "mongodb"
+  | "mysql"
+  | "docker"
+  | "aws"
+  | "digitalocean"
+  | "firebase"
+  | "azuredevops"
+  | "tailwindcss"
+  | "scss"
+  | "linux";
 
 export interface SkillView {
   id: string;
@@ -30,10 +31,19 @@ export interface SkillView {
   iconKey?: SkillIconKey;
 }
 
-export interface SkillCategoryView {
+export interface SkillSectionView {
   id: string;
   name: string;
   skills: ReadonlyArray<SkillView>;
+}
+
+export interface SkillCategoryView {
+  id: string;
+  name: string;
+  subtitle?: string;
+  featured?: boolean;
+  skills: ReadonlyArray<SkillView>;
+  sections?: ReadonlyArray<SkillSectionView>;
 }
 
 export interface SkillsContentView {
@@ -86,174 +96,488 @@ const skillCopy = {
   },
 } as const;
 
-export const skills = [
-  {
-    id: "typescript",
-    name: { en: "TypeScript", vi: "TypeScript" },
-    group: "tech-stack",
-    iconKey: "typescript",
-    order: 1,
-    featured: true,
-  },
-  {
-    id: "javascript",
-    name: { en: "JavaScript", vi: "JavaScript" },
-    group: "tech-stack",
-    iconKey: "javascript",
-    order: 2,
-    featured: true,
-  },
-  {
-    id: "react",
-    name: { en: "React", vi: "React" },
-    group: "tech-stack",
-    iconKey: "react",
-    order: 3,
-    featured: true,
-  },
-  {
-    id: "nextjs",
-    name: { en: "Next.js", vi: "Next.js" },
-    group: "tech-stack",
-    iconKey: "nextjs",
-    order: 4,
-    featured: true,
-  },
-  {
-    id: "nodejs",
-    name: { en: "Node.js", vi: "Node.js" },
-    group: "tech-stack",
-    iconKey: "nodejs",
-    order: 5,
-  },
-  {
-    id: "nestjs",
-    name: { en: "NestJS", vi: "NestJS" },
-    group: "tech-stack",
-    iconKey: "nestjs",
-    order: 6,
-  },
-  {
-    id: "postgresql",
-    name: { en: "PostgreSQL", vi: "PostgreSQL" },
-    group: "tech-stack",
-    iconKey: "postgresql",
-    order: 7,
-  },
-  {
-    id: "wordpress",
-    name: { en: "WordPress", vi: "WordPress" },
-    group: "tech-stack",
-    iconKey: "wordpress",
-    order: 8,
-  },
-  {
-    id: "responsive-design",
-    name: { en: "Responsive design", vi: "Thiết kế responsive" },
-    group: "others",
-    category: { en: "Frontend craft", vi: "Hoàn thiện frontend" },
-    order: 1,
-  },
-  {
-    id: "accessibility",
-    name: { en: "Web accessibility", vi: "Khả năng tiếp cận web" },
-    group: "others",
-    category: { en: "Frontend craft", vi: "Hoàn thiện frontend" },
-    order: 2,
-  },
-  {
-    id: "localization",
-    name: { en: "Localization", vi: "Bản địa hóa" },
-    group: "others",
-    category: { en: "Frontend craft", vi: "Hoàn thiện frontend" },
-    order: 3,
-  },
-  {
-    id: "api-integration",
-    name: { en: "API integration", vi: "Tích hợp API" },
-    group: "others",
-    category: { en: "Product engineering", vi: "Kỹ thuật sản phẩm" },
-    order: 4,
-  },
-  {
-    id: "performance",
-    name: { en: "Performance optimization", vi: "Tối ưu hiệu năng" },
-    group: "others",
-    category: { en: "Product engineering", vi: "Kỹ thuật sản phẩm" },
-    order: 5,
-  },
-  {
-    id: "seo",
-    name: { en: "Technical SEO", vi: "SEO kỹ thuật" },
-    group: "others",
-    category: { en: "Product engineering", vi: "Kỹ thuật sản phẩm" },
-    order: 6,
-  },
-  {
-    id: "git",
-    name: { en: "Git", vi: "Git" },
-    group: "others",
-    category: { en: "Workflow", vi: "Quy trình làm việc" },
-    order: 7,
-  },
-  {
-    id: "github",
-    name: { en: "GitHub", vi: "GitHub" },
-    group: "others",
-    category: { en: "Workflow", vi: "Quy trình làm việc" },
-    order: 8,
-  },
-  {
-    id: "docker",
-    name: { en: "Docker", vi: "Docker" },
-    group: "others",
-    category: { en: "Workflow", vi: "Quy trình làm việc" },
-    order: 9,
-  },
-] as const satisfies ReadonlyArray<Skill>;
-
-function localizeSkill(skill: Skill, locale: Locale): SkillView {
-  return {
-    id: skill.id,
-    name: skill.name[locale],
-    iconKey: skill.iconKey,
-  };
+interface TechStackDefinition {
+  readonly id: string;
+  readonly name: string;
+  readonly iconKey?: SkillIconKey;
+  readonly featured?: boolean;
 }
 
-export function getSkillsContent(locale: Locale): SkillsContentView {
-  const techStack = skills
-    .filter((skill) => skill.group === "tech-stack")
-    .sort((left, right) => left.order - right.order)
-    .map((skill) => localizeSkill(skill, locale));
+/**
+ * Approved Tech Stack tab content (owner-approved list, 2026-08).
+ * Names are proper nouns shared across locales; WSL intentionally has no
+ * Simple Icons glyph and falls back to the generic `{}` mark.
+ */
+const techStackDefinitions: ReadonlyArray<TechStackDefinition> = [
+  { id: "typescript", name: "TypeScript", iconKey: "typescript", featured: true },
+  { id: "javascript", name: "JavaScript", iconKey: "javascript", featured: true },
+  { id: "python", name: "Python", iconKey: "python" },
+  { id: "nodejs", name: "Node.js", iconKey: "nodejs" },
+  { id: "nestjs", name: "NestJS", iconKey: "nestjs" },
+  { id: "react", name: "React", iconKey: "react", featured: true },
+  { id: "nextjs", name: "Next.js", iconKey: "nextjs", featured: true },
+  { id: "mongodb", name: "MongoDB", iconKey: "mongodb" },
+  { id: "postgresql", name: "PostgreSQL", iconKey: "postgresql" },
+  { id: "mysql", name: "MySQL", iconKey: "mysql" },
+  { id: "docker", name: "Docker", iconKey: "docker" },
+  { id: "aws", name: "AWS", iconKey: "aws" },
+  { id: "digitalocean", name: "DigitalOcean", iconKey: "digitalocean" },
+  { id: "firebase", name: "Firebase", iconKey: "firebase" },
+  { id: "azuredevops", name: "Azure DevOps", iconKey: "azuredevops" },
+  { id: "tailwindcss", name: "Tailwind CSS", iconKey: "tailwindcss" },
+  { id: "scss", name: "SCSS", iconKey: "scss" },
+  { id: "wordpress", name: "WordPress", iconKey: "wordpress" },
+  { id: "wsl", name: "WSL" },
+  { id: "linux", name: "Linux", iconKey: "linux" },
+];
 
-  const otherSkills = skills
-    .filter((skill) => skill.group === "others")
-    .sort((left, right) => left.order - right.order);
-  const categories = new Map<string, SkillCategoryView>();
+interface OtherSkillDefinition {
+  readonly id: string;
+  readonly name: LocalizedText;
+}
 
-  for (const skill of otherSkills) {
-    const categoryName = skill.category?.[locale];
+interface OtherSectionDefinition {
+  readonly id: string;
+  readonly name: LocalizedText;
+  readonly skills: ReadonlyArray<OtherSkillDefinition>;
+}
 
-    if (!categoryName) {
+interface OtherGroupDefinition {
+  readonly id: string;
+  readonly name: LocalizedText;
+  readonly subtitle: LocalizedText;
+  readonly featured?: boolean;
+  readonly skills?: ReadonlyArray<OtherSkillDefinition>;
+  readonly sections?: ReadonlyArray<OtherSectionDefinition>;
+}
+
+/** Owner-approved Others tab groups and subtitles (2026-08). */
+const otherGroupDefinitions: ReadonlyArray<OtherGroupDefinition> = [
+  {
+    id: "architecture",
+    name: { en: "Architecture", vi: "Kiến trúc" },
+    subtitle: {
+      en: "Backend architecture & engineering practices.",
+      vi: "Kiến trúc backend & thực hành kỹ thuật.",
+    },
+    skills: [
+      { id: "rest-api", name: { en: "REST API", vi: "REST API" } },
+      {
+        id: "clean-architecture",
+        name: { en: "Clean Architecture", vi: "Clean Architecture" },
+      },
+      {
+        id: "dependency-injection",
+        name: { en: "Dependency Injection", vi: "Dependency Injection" },
+      },
+      {
+        id: "api-integration",
+        name: { en: "API Integration", vi: "Tích hợp API" },
+      },
+    ],
+  },
+  {
+    id: "devops-infrastructure",
+    name: { en: "DevOps & Infrastructure", vi: "DevOps & Hạ tầng" },
+    subtitle: {
+      en: "Infrastructure, deployment and cloud technologies.",
+      vi: "Hạ tầng, triển khai và công nghệ đám mây.",
+    },
+    skills: [
+      { id: "aws-skill", name: { en: "AWS", vi: "AWS" } },
+      {
+        id: "digitalocean-skill",
+        name: { en: "DigitalOcean", vi: "DigitalOcean" },
+      },
+      { id: "firebase-skill", name: { en: "Firebase", vi: "Firebase" } },
+      {
+        id: "azure-devops-skill",
+        name: { en: "Azure DevOps", vi: "Azure DevOps" },
+      },
+      { id: "docker-skill", name: { en: "Docker", vi: "Docker" } },
+      { id: "vps", name: { en: "VPS", vi: "VPS" } },
+      { id: "linux-skill", name: { en: "Linux", vi: "Linux" } },
+      { id: "wsl-skill", name: { en: "WSL", vi: "WSL" } },
+    ],
+  },
+  {
+    id: "frontend-ux",
+    name: { en: "Frontend & UX", vi: "Frontend & UX" },
+    subtitle: {
+      en: "Building responsive, accessible and optimized web experiences.",
+      vi: "Xây dựng trải nghiệm web responsive, dễ tiếp cận và tối ưu.",
+    },
+    skills: [
+      {
+        id: "responsive-design",
+        name: { en: "Responsive Design", vi: "Thiết kế responsive" },
+      },
+      {
+        id: "web-accessibility",
+        name: { en: "Web Accessibility", vi: "Khả năng tiếp cận web" },
+      },
+      {
+        id: "performance-optimization",
+        name: { en: "Performance Optimization", vi: "Tối ưu hiệu năng" },
+      },
+      {
+        id: "core-web-vitals",
+        name: { en: "Core Web Vitals", vi: "Core Web Vitals" },
+      },
+      { id: "localization", name: { en: "Localization", vi: "Bản địa hóa" } },
+    ],
+  },
+  {
+    id: "seo-growth",
+    name: { en: "SEO & Growth", vi: "SEO & Tăng trưởng" },
+    subtitle: {
+      en: "Improving website visibility, structure and growth.",
+      vi: "Cải thiện khả năng hiển thị, cấu trúc và tăng trưởng của website.",
+    },
+    skills: [
+      { id: "technical-seo", name: { en: "Technical SEO", vi: "SEO kỹ thuật" } },
+      { id: "on-page-seo", name: { en: "On-page SEO", vi: "On-page SEO" } },
+      { id: "off-page-seo", name: { en: "Off-page SEO", vi: "Off-page SEO" } },
+      { id: "google-ads", name: { en: "Google Ads", vi: "Google Ads" } },
+      { id: "wordpress-skill", name: { en: "WordPress", vi: "WordPress" } },
+      {
+        id: "website-architecture",
+        name: { en: "Website Architecture", vi: "Kiến trúc website" },
+      },
+      {
+        id: "keyword-research",
+        name: { en: "Keyword Research", vi: "Nghiên cứu từ khóa" },
+      },
+    ],
+  },
+  {
+    id: "workflow-collaboration",
+    name: { en: "Workflow & Collaboration", vi: "Quy trình & Hợp tác" },
+    subtitle: {
+      en: "Working effectively across engineering teams and product workflows.",
+      vi: "Làm việc hiệu quả cùng đội ngũ kỹ thuật và quy trình sản phẩm.",
+    },
+    skills: [
+      { id: "git", name: { en: "Git", vi: "Git" } },
+      { id: "github", name: { en: "GitHub", vi: "GitHub" } },
+      { id: "gitlab", name: { en: "GitLab", vi: "GitLab" } },
+      { id: "jira", name: { en: "JIRA", vi: "JIRA" } },
+      { id: "agile-scrum", name: { en: "Agile / Scrum", vi: "Agile / Scrum" } },
+      { id: "code-review", name: { en: "Code Review", vi: "Code Review" } },
+      {
+        id: "pair-programming",
+        name: { en: "Pair Programming", vi: "Pair Programming" },
+      },
+      {
+        id: "cross-functional-collaboration",
+        name: {
+          en: "Cross-functional Collaboration",
+          vi: "Hợp tác liên bộ phận",
+        },
+      },
+      {
+        id: "requirement-analysis",
+        name: { en: "Requirement Analysis", vi: "Phân tích yêu cầu" },
+      },
+      {
+        id: "technical-planning",
+        name: { en: "Technical Planning", vi: "Lập kế hoạch kỹ thuật" },
+      },
+    ],
+  },
+  {
+    id: "product-creative",
+    name: { en: "Product & Creative", vi: "Sản phẩm & Sáng tạo" },
+    subtitle: {
+      en: "Product creation, visual content and digital promotion.",
+      vi: "Tạo dựng sản phẩm, nội dung thị giác và quảng bá số.",
+    },
+    skills: [
+      { id: "canva", name: { en: "Canva", vi: "Canva" } },
+      {
+        id: "adobe-photoshop",
+        name: { en: "Adobe Photoshop", vi: "Adobe Photoshop" },
+      },
+      { id: "capcut", name: { en: "CapCut", vi: "CapCut" } },
+      {
+        id: "content-creation",
+        name: { en: "Content Creation", vi: "Sáng tạo nội dung" },
+      },
+      {
+        id: "visual-design",
+        name: { en: "Visual Design", vi: "Thiết kế thị giác" },
+      },
+      {
+        id: "product-presentation",
+        name: { en: "Product Presentation", vi: "Trình bày sản phẩm" },
+      },
+      {
+        id: "digital-content",
+        name: { en: "Digital Content", vi: "Nội dung số" },
+      },
+    ],
+  },
+  {
+    id: "agentic-ai-development",
+    name: {
+      en: "Agentic AI & AI Development",
+      vi: "Agentic AI & Phát triển AI",
+    },
+    subtitle: {
+      en: "AI-assisted engineering, coding agents and autonomous development workflows.",
+      vi: "Kỹ thuật hỗ trợ bởi AI, coding agent và quy trình phát triển tự chủ.",
+    },
+    featured: true,
+    sections: [
+      {
+        id: "ai-models-assistants",
+        name: { en: "AI Models & Assistants", vi: "Mô hình & Trợ lý AI" },
+        skills: [
+          { id: "chatgpt", name: { en: "ChatGPT", vi: "ChatGPT" } },
+          { id: "claude", name: { en: "Claude", vi: "Claude" } },
+          {
+            id: "google-gemini",
+            name: { en: "Google Gemini", vi: "Google Gemini" },
+          },
+          { id: "deepseek", name: { en: "DeepSeek", vi: "DeepSeek" } },
+        ],
+      },
+      {
+        id: "agentic-coding-harness",
+        name: {
+          en: "Agentic Coding & Harness",
+          vi: "Agentic Coding & Harness",
+        },
+        skills: [
+          { id: "opencode", name: { en: "OpenCode", vi: "OpenCode" } },
+          {
+            id: "codex-desktop-cli",
+            name: { en: "Codex Desktop / CLI", vi: "Codex Desktop / CLI" },
+          },
+          { id: "claude-cli", name: { en: "Claude CLI", vi: "Claude CLI" } },
+          { id: "antigravity", name: { en: "Antigravity", vi: "Antigravity" } },
+          {
+            id: "commandcode",
+            name: { en: "CommandCode", vi: "CommandCode" },
+          },
+          { id: "openclaw", name: { en: "OpenClaw", vi: "OpenClaw" } },
+        ],
+      },
+      {
+        id: "ai-development-capabilities",
+        name: {
+          en: "AI Development Capabilities",
+          vi: "Năng lực phát triển AI",
+        },
+        skills: [
+          { id: "agentic-coding", name: { en: "Agentic Coding", vi: "Agentic Coding" } },
+          {
+            id: "multi-agent-workflows",
+            name: { en: "Multi-agent Workflows", vi: "Quy trình đa agent" },
+          },
+          {
+            id: "ai-assisted-development",
+            name: {
+              en: "AI-assisted Development",
+              vi: "Phát triển hỗ trợ bởi AI",
+            },
+          },
+          {
+            id: "context-engineering",
+            name: { en: "Context Engineering", vi: "Context Engineering" },
+          },
+          {
+            id: "tool-mcp-integration",
+            name: {
+              en: "Tool / MCP Integration",
+              vi: "Tích hợp Tool / MCP",
+            },
+          },
+          {
+            id: "ai-workflow-orchestration",
+            name: {
+              en: "AI Workflow Orchestration",
+              vi: "Điều phối quy trình AI",
+            },
+          },
+          {
+            id: "repository-aware-development",
+            name: {
+              en: "Repository-aware Development",
+              vi: "Phát triển gắn với repository",
+            },
+          },
+        ],
+      },
+    ],
+  },
+];
+
+export interface OtherCategoryEntry {
+  id: string;
+  name: string;
+  categoryEn: string | null;
+  /** Locale-aware category label used when a category is unknown to code. */
+  categoryDisplay?: string;
+  iconKey?: SkillIconKey;
+}
+
+/**
+ * Folds flat skill entries (static or CMS) into ordered skill-group cards.
+ * Entries are matched to a group (or one of its sections) by their English
+ * category title; unknown categories become plain trailing cards so
+ * owner-added CMS categories still render.
+ */
+export function foldOtherCategories(
+  entries: ReadonlyArray<OtherCategoryEntry>,
+  locale: Locale,
+): Array<SkillCategoryView> {
+  const localizedGroups = otherGroupDefinitions.map((group) => ({
+    definition: group,
+    card: {
+      id: group.id,
+      name: group.name[locale],
+      subtitle: group.subtitle[locale],
+      featured: group.featured,
+      skills: [] as SkillView[],
+      sections: group.sections?.map((section) => ({
+        id: section.id,
+        name: section.name[locale],
+        skills: [] as SkillView[],
+      })),
+    } satisfies SkillCategoryView,
+  }));
+
+  const knownTitles = new Map<string, number>();
+  const sectionIndexByTitle = new Map<string, { group: number; index: number }>();
+
+  localizedGroups.forEach((group, index) => {
+    knownTitles.set(group.definition.name.en, index);
+
+    group.definition.sections?.forEach((section, sectionIdx) => {
+      sectionIndexByTitle.set(section.name.en, { group: index, index: sectionIdx });
+    });
+  });
+
+  for (const entry of entries) {
+    if (!entry.categoryEn) {
       continue;
     }
 
-    const existingCategory = categories.get(categoryName);
-    const localizedSkill = localizeSkill(skill, locale);
+    const sectionTarget = sectionIndexByTitle.get(entry.categoryEn);
 
-    if (existingCategory) {
-      categories.set(categoryName, {
-        ...existingCategory,
-        skills: [...existingCategory.skills, localizedSkill],
+    if (sectionTarget) {
+      const target = localizedGroups[sectionTarget.group];
+
+      target.card.sections?.[sectionTarget.index]?.skills.push({
+        id: entry.id,
+        name: entry.name,
+        iconKey: entry.iconKey,
       });
-    } else {
-      categories.set(categoryName, {
-        id: skill.category?.en.toLowerCase().replaceAll(" ", "-") ?? skill.id,
-        name: categoryName,
-        skills: [localizedSkill],
+      continue;
+    }
+
+    const groupIndex = knownTitles.get(entry.categoryEn);
+
+    if (groupIndex !== undefined) {
+      localizedGroups[groupIndex].card.skills.push({
+        id: entry.id,
+        name: entry.name,
+        iconKey: entry.iconKey,
       });
     }
   }
+
+  const cards = localizedGroups
+    .filter((group) => {
+      const hasSkills =
+        group.card.skills.length > 0 ||
+        (group.card.sections?.some((section) => section.skills.length > 0) ??
+          false);
+
+      return hasSkills;
+    })
+    .map((group) => group.card);
+
+  const knownCardIds = new Set(cards.map((card) => card.id));
+
+  const fallbackCards = buildFallbackCards(entries).filter(
+    (card) => !knownCardIds.has(card.id),
+  );
+
+  return [...cards, ...fallbackCards];
+}
+
+function buildFallbackCards(
+  entries: ReadonlyArray<OtherCategoryEntry>,
+): Array<SkillCategoryView> {
+  const fallback = new Map<string, SkillCategoryView>();
+
+  for (const entry of entries) {
+    if (!entry.categoryEn || isKnownCategoryTitle(entry.categoryEn)) {
+      continue;
+    }
+
+    const existing = fallback.get(entry.categoryEn);
+    const skill: SkillView = {
+      id: entry.id,
+      name: entry.name,
+      iconKey: entry.iconKey,
+    };
+
+    if (existing) {
+      existing.skills = [...existing.skills, skill];
+    } else {
+      fallback.set(entry.categoryEn, {
+        id: entry.categoryEn.toLowerCase().replaceAll(/[^a-z0-9]+/g, "-"),
+        name: entry.categoryDisplay ?? entry.categoryEn,
+        skills: [skill],
+      });
+    }
+  }
+
+  return [...fallback.values()];
+}
+
+function isKnownCategoryTitle(title: string): boolean {
+  return otherGroupDefinitions.some(
+    (group) =>
+      group.name.en === title ||
+      (group.sections?.some((section) => section.name.en === title) ?? false),
+  );
+}
+
+function localizeTechStack(): ReadonlyArray<SkillView> {
+  return techStackDefinitions.map((definition) => ({
+    id: definition.id,
+    name: definition.name,
+    iconKey: definition.iconKey,
+  }));
+}
+
+export function getSkillsContent(locale: Locale): SkillsContentView {
+  const techStack = localizeTechStack();
+
+  const staticEntries: ReadonlyArray<OtherCategoryEntry> =
+    otherGroupDefinitions.flatMap((group) => {
+      const flatSkills = (group.skills ?? []).map((skill) => ({
+        id: skill.id,
+        name: skill.name[locale],
+        categoryEn: group.name.en,
+        categoryDisplay: group.name[locale],
+      }));
+
+      const sectionSkills = (group.sections ?? []).flatMap((section) =>
+        section.skills.map((skill) => ({
+          id: skill.id,
+          name: skill.name[locale],
+          categoryEn: section.name.en,
+          categoryDisplay: section.name[locale],
+        })),
+      );
+
+      return [...flatSkills, ...sectionSkills];
+    });
 
   return {
     eyebrow: skillCopy.eyebrow[locale],
@@ -269,6 +593,6 @@ export function getSkillsContent(locale: Locale): SkillsContentView {
       others: skillCopy.panels.others[locale],
     },
     techStack,
-    otherCategories: [...categories.values()],
+    otherCategories: foldOtherCategories(staticEntries, locale),
   };
 }

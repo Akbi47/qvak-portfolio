@@ -26,15 +26,15 @@ const tabOrder = [
 ] as const satisfies ReadonlyArray<SkillGroup>;
 
 function SkillIcon({ iconKey }: { iconKey?: SkillIconKey }) {
-  if (!iconKey) {
+  const icon = iconKey ? skillIcons[iconKey] : undefined;
+
+  if (!icon) {
     return (
       <span aria-hidden="true" className="skill-card__mark">
         {"{}"}
       </span>
     );
   }
-
-  const icon = skillIcons[iconKey];
   const monochrome = icon.hex === "#000000";
 
   return (
@@ -169,20 +169,54 @@ export function SkillsSection({ content }: Readonly<SkillsSectionProps>) {
             {content.otherCategories.map((category) => (
               <section
                 aria-labelledby={`skills-category-${category.id}`}
-                className="skills-group"
+                className={
+                  category.featured
+                    ? "skills-group skills-group--featured"
+                    : "skills-group"
+                }
+                data-group-id={category.id}
                 key={category.id}
               >
-                <h3
-                  className="skills-group__title"
-                  id={`skills-category-${category.id}`}
-                >
-                  {category.name}
-                </h3>
-                <ul className="skills-group__list">
-                  {category.skills.map((skill) => (
-                    <li key={skill.id}>{skill.name}</li>
-                  ))}
-                </ul>
+                <header className="skills-group__header">
+                  <h3
+                    className="skills-group__title"
+                    id={`skills-category-${category.id}`}
+                  >
+                    {category.name}
+                  </h3>
+                  {category.subtitle ? (
+                    <p className="skills-group__subtitle">
+                      {category.subtitle}
+                    </p>
+                  ) : null}
+                </header>
+                {category.sections ? (
+                  category.sections.map((section) => {
+                    const sectionId = `skills-subgroup-${category.id}-${section.id}`;
+
+                    return (
+                      <div className="skills-subgroup" key={section.id}>
+                        <h4 className="skills-subgroup__title" id={sectionId}>
+                          {section.name}
+                        </h4>
+                        <ul
+                          aria-labelledby={sectionId}
+                          className="skills-group__list"
+                        >
+                          {section.skills.map((skill) => (
+                            <li key={skill.id}>{skill.name}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <ul className="skills-group__list">
+                    {category.skills.map((skill) => (
+                      <li key={skill.id}>{skill.name}</li>
+                    ))}
+                  </ul>
+                )}
               </section>
             ))}
           </div>
