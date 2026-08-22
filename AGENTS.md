@@ -50,7 +50,7 @@ Local dev serves CMS content from its own Supabase stack (`127.0.0.1`, see `.env
 
 1. **Apply locally first**: run every new SQL script with `supabase db query --local -f …`, then verify in `npm run dev` before promoting.
 2. **Promote to cloud only after local verification**: same script with `--linked` (production mutations remain human-approved).
-3. **Mirror prod back into local immediately** after any production data change: `supabase db dump --data-only --linked -x 'auth.*' -x 'storage.*' -f /tmp/prod-data.sql`, strip non-content tables (`auth.*`, `storage.*`, `admin_owner` — never import production credentials), then `truncate` the matching local tables and restore via `psql`. Verify row counts match before calling it done.
+3. **Mirror prod back into local immediately** after any production data change: `supabase db dump --data-only --linked -x 'auth.*' -x 'storage.*' -x 'public.admin_owner' -f /tmp/prod-data.sql`, strip any remaining non-content tables (`auth.*`, `storage.*` — never import production credentials), then `truncate` the matching local tables and restore via `psql`. Verify row counts match before calling it done.
 4. **Divergence is a defect**: if local lacks data that production has (or vice versa), fix it in the same task that caused it — do not leave it for later.
 
 ## Architecture notes
